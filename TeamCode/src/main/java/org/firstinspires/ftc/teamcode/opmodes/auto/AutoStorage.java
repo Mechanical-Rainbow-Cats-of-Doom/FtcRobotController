@@ -41,32 +41,39 @@ public class AutoStorage extends LinearOpMode {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(this.hardwareMap);
         drive.setPoseEstimate(initial);
-        TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(initial);
+        TrajectorySequence trajSeq;
+        {
+            TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(initial);
 
-        builder.waitSeconds(0.1);
-        // 9.35 seconds long
-        builder.lineTo(new Vector2d(-40, 55 * multiplier));
-        builder.splineToLinearHeading(new Pose2d(-21, 42 * multiplier, Math.toRadians(100 * multiplier)),
-                Math.toRadians(-110 * multiplier));
-        builder.addTemporalMarker(() -> lift.setPosition(getPosition(height[0])));
-        builder.waitSeconds(4);
-        builder.lineTo(new Vector2d(-19, 50 * multiplier));
-        if (multiplier == 1) {
-            builder.lineToLinearHeading(new Pose2d(-60, 58, Math.toRadians(240)));
-        } else {
-            builder.lineToLinearHeading(new Pose2d(-58, -59, Math.toRadians(330)));
+            builder.waitSeconds(0.1);
+            // 9.35 seconds long
+            builder.lineTo(new Vector2d(-40, 55 * multiplier));
+            builder.splineToLinearHeading(new Pose2d(-21, 42 * multiplier, Math.toRadians(100 * multiplier)),
+                    Math.toRadians(-110 * multiplier));
+            builder.addTemporalMarker(() -> lift.setPosition(getPosition(height[0])));
+            builder.waitSeconds(4);
+            builder.lineTo(new Vector2d(-19, 50 * multiplier));
+            if (multiplier == 1) {
+                builder.lineToLinearHeading(new Pose2d(-60, 58, Math.toRadians(240)));
+            } else {
+                builder.lineToLinearHeading(new Pose2d(-58, -62, Math.toRadians(330)));
+            }
+            builder.addTemporalMarker(carousel::on);
+            builder.waitSeconds(4);
+            builder.addTemporalMarker(carousel::off);
+            if (multiplier == 1) {
+                builder.lineToLinearHeading(new Pose2d(-60, 35, Math.toRadians(90)));
+            } else {
+                builder.lineToLinearHeading(new Pose2d(-60, -38, Math.toRadians(-90)));
+            }
+//            builder.waitSeconds(10);
+//            builder.addTemporalMarker(() -> {
+//                // TODO FIRE TAPE MEASURE
+//            });
+//            builder.waitSeconds(3);
+
+            trajSeq = builder.build();
         }
-        builder.addTemporalMarker(carousel::on);
-        builder.waitSeconds(4);
-        builder.addTemporalMarker(carousel::off);
-        builder.lineToLinearHeading(new Pose2d(-60, 35 * multiplier, Math.toRadians(90 * multiplier)));
-//        builder.waitSeconds(10);
-//        builder.addTemporalMarker(() -> {
-//            // TODO FIRE TAPE MEASURE
-//        });
-//        builder.waitSeconds(3);
-
-        TrajectorySequence trajSeq = builder.build();
 
         Thread thread = new Thread(() -> {
             while (!isStopRequested()) {

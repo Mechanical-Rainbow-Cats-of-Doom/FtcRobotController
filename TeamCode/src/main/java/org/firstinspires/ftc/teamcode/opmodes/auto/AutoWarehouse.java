@@ -122,7 +122,7 @@ public class AutoWarehouse extends LinearOpMode {
                 drive.setMotorPowers(0, 0, 0, 0);
                 drive.followTrajectory(
                         drive.trajectoryBuilder(drive.getPoseEstimate())
-                                .lineToLinearHeading(new Pose2d(40, nextToWall + 2 * multiplier,
+                                .lineToLinearHeading(new Pose2d(40, (nextToWall + 2) * multiplier,
                                         Math.toRadians(0)))
                                 .build()
                 );
