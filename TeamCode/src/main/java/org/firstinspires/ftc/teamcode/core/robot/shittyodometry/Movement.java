@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.hardware.I2cDevice;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.core.robot.tools.IMU;
-import org.firstinspires.ftc.teamcode.core.robot.tools.UltrasonicDistance;
 import org.firstinspires.ftc.teamcode.core.robot.tools.headless.AutoLift;
 import org.firstinspires.ftc.teamcode.core.thread.EventThread;
 import org.firstinspires.ftc.teamcode.opmodes.util.MyToggleButtonReader;
