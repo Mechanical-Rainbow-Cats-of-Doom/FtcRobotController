@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.core.robot.tools.driveop.ControllerCarousel;
 import org.firstinspires.ftc.teamcode.core.robot.tools.driveop.ControllerIntake;
 import org.firstinspires.ftc.teamcode.core.robot.tools.driveop.ControllerLift;
-import org.firstinspires.ftc.teamcode.core.thread.EventThread;
+import org.firstinspires.ftc.teamcode.core.thread.old.EventThread;
 import org.firstinspires.ftc.teamcode.opmodes.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 
