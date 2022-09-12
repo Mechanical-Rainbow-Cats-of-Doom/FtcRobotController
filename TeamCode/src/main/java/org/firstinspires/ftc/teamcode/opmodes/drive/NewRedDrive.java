@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Blinker;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.core.robot.shittyodometry.Movement;
 import org.firstinspires.ftc.teamcode.core.robot.tools.driveop.ControllerIntake;
 import org.firstinspires.ftc.teamcode.core.robot.tools.driveop.ControllerLift;
 import org.firstinspires.ftc.teamcode.core.thread.EventThread;
@@ -59,8 +58,7 @@ public class NewRedDrive extends LinearOpMode {
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
         final ControllerLift lift = new ControllerLift(eventThread, hardwareMap, toolGamepad, null);
-        final Movement move = new Movement(hardwareMap, eventThread, moveGamepad, lift, power != 1);
-        final SampleMecanumDrive drive = move.getDrive();
+        final SampleMecanumDrive drive = new SampleMecanumDrive(this.hardwareMap);
         final MyToggleButtonReader carouselButtonReader = new MyToggleButtonReader(toolGamepad, GamepadKeys.Button.B);
         final DcMotor carouselMotor = hardwareMap.get(DcMotor.class, "spinner");
         // will automatically run update method
@@ -109,7 +107,7 @@ public class NewRedDrive extends LinearOpMode {
             // control to the automatic mode
             switch (currentMode) {
                 case DRIVER_CONTROL:
-                    move.update();
+                    drive.update();
                     break;
                 case AUTOMATIC_CONTROL:
                     // If x is pressed, we break out of the automatic following
