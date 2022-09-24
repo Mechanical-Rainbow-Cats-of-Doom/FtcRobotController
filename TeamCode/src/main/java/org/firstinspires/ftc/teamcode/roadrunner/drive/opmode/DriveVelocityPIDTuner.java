@@ -9,7 +9,6 @@ import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 import com.acmerobotics.roadrunner.util.NanoClock;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -51,10 +50,6 @@ import static org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants.kV;
 @Config
 @Autonomous(group = "drive")
 public class DriveVelocityPIDTuner extends LinearOpMode {
-    // Accel (found max speed with 0.94) 43.15642598389812
-    // max speed 23.15642598389812 (switched first digit to 2 from 4)
-    // 12.95965989722095F
-
     public static double DISTANCE = 72; // in
 
     enum Mode {

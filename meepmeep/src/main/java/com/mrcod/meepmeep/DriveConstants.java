@@ -1,5 +1,9 @@
 package com.mrcod.meepmeep;
 
+import com.noahbres.meepmeep.roadrunner.Constraints;
+
+import javax.swing.SpringLayout;
+
 /*
  * Constants shared between multiple drive types.
  *
@@ -75,6 +79,11 @@ public class DriveConstants {
     public static double MAX_ANG_ACCEL = Math.toRadians(360);
 // 12.955587348170218 KF
 // 13.160383376726081 KF
+
+    public static Constraints CONSTRAINTS = new Constraints(DriveConstants.MAX_VEL,
+            DriveConstants.MAX_ACCEL, DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL,
+            DriveConstants.TRACK_WIDTH);
+
     public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;
     }

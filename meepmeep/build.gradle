@@ -15,6 +15,6 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.noahbres:meepmeep:30980e45cd"
+    implementation "com.github.noahbres:meepmeep:2.0.2"
     implementation 'com.acmerobotics.roadrunner:core:0.5.5'
 }

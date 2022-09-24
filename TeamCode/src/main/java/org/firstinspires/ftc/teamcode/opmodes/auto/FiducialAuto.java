@@ -13,7 +13,7 @@ public class FiducialAuto extends LinearOpMode {
     public static int zeroOrOneRedorBlue = 0;
     public EventThread eventThread = new EventThread();
     @Override
-    public void runOpMode(){
+    public void runOpMode() {
         telemetry.addLine("Starting");
         telemetry.update();
         FiducialDetector webcam = new FiducialDetector(hardwareMap, "webcam", true, zeroOrOneRedorBlue == 0);
