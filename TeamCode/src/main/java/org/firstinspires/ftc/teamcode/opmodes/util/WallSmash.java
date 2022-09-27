@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.util;
 
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.RoadRunnerHelper.inchesToCoordinate;
+
 
 import androidx.annotation.NonNull;
 
@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 
 public class WallSmash {
-    private static final double nextToWall = 70 - inchesToCoordinate(5.8);
+    private static final double nextToWall = 70 - 5.8;
 
     public static ElapsedTime wallSmashTimer = new ElapsedTime();
 

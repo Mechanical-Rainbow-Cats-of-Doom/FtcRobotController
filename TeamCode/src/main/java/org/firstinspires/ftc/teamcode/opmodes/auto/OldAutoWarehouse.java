@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.RoadRunnerHelper.inchesToCoordinate;
-
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -29,7 +27,7 @@ public class OldAutoWarehouse extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         TseDetector detector = new TseDetector(hardwareMap, "webcam", true, isRed);
         final int[] height = {-1};
-        double nextToWall = 70 - inchesToCoordinate(5.8D);
+        double nextToWall = 70 - 5.8D;
 
         MultipleTelemetry goodTelemetry = new MultipleTelemetry(telemetry);
 
@@ -39,7 +37,7 @@ public class OldAutoWarehouse extends LinearOpMode {
         AutoLift lift = new AutoLift(eventThread, hardwareMap);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(this.hardwareMap);
-        final Pose2d initial = new Pose2d(0, multiplier * 70 - inchesToCoordinate(9),
+        final Pose2d initial = new Pose2d(0, multiplier * 70 - 9,
                 Math.toRadians(90 * multiplier));
         drive.setPoseEstimate(initial);
 

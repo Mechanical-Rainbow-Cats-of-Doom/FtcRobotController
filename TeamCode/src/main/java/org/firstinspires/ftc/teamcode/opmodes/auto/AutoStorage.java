@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import static org.firstinspires.ftc.teamcode.opmodes.util.VisionToLiftHeight.getPosition;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.RoadRunnerHelper.inchesToCoordinate;
+
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -43,7 +43,7 @@ public class AutoStorage extends LinearOpMode {
         TseDetector detector = new TseDetector(hardwareMap, "webcam", true, isRed);
         int height;
 
-        final Pose2d initial = new Pose2d(-47, multiplier * (70 - inchesToCoordinate(9)),
+        final Pose2d initial = new Pose2d(-47, multiplier * (70 - 9),
                 Math.toRadians(90 * multiplier));
 
         SampleMecanumDrive drive = new SampleMecanumDrive(this.hardwareMap);

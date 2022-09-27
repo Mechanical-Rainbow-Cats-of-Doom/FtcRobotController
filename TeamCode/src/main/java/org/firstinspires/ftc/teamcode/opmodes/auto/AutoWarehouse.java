@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import static org.firstinspires.ftc.teamcode.opmodes.util.StayInPosition.stayInPose;
 import static org.firstinspires.ftc.teamcode.opmodes.util.VisionToLiftHeight.getPosition;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.RoadRunnerHelper.inchesToCoordinate;
+
 
 import androidx.annotation.NonNull;
 
@@ -34,7 +34,7 @@ public class AutoWarehouse extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         TseDetector detector = new TseDetector(hardwareMap, "webcam", true, isRed);
         int height;
-        double nextToWall = 70 - inchesToCoordinate(5.8D);
+        double nextToWall = 70 - 5.8D;
 
         MultipleTelemetry goodTelemetry = new MultipleTelemetry(telemetry);
 
@@ -44,7 +44,7 @@ public class AutoWarehouse extends LinearOpMode {
         AutoLift lift = new AutoLift(eventThread, hardwareMap);
 
         SampleMecanumDrive drive = new SampleMecanumDrive(this.hardwareMap);
-        final Pose2d initial = new Pose2d(0, multiplier * (70 - inchesToCoordinate(9)),
+        final Pose2d initial = new Pose2d(0, multiplier * (70 - 9),
                 Math.toRadians(90 * multiplier));
         drive.setPoseEstimate(initial);
         final Pose2d liftPosition = isRed ? new Pose2d(-4, -43.3, Math.toRadians(-65)) :

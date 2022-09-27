@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.util;
 
 import static org.firstinspires.ftc.teamcode.opmodes.util.StayInPosition.stayInPose;
-import static org.firstinspires.ftc.teamcode.roadrunner.drive.RoadRunnerHelper.inchesToCoordinate;
+
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -77,7 +77,7 @@ public class PositionConfiguration extends LinearOpMode {
     @Config
     static class PositionConfig {
         public static double x = 0;
-        public static double y = 70 - inchesToCoordinate(9);
+        public static double y = 70 - 9;
         public static double heading = 90;
     }
 
