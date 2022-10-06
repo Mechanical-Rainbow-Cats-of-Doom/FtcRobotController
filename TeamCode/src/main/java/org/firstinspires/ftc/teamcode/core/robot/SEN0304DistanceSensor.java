@@ -31,9 +31,8 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
         return "DFRobot SEN0304 Distance Sensor";
     }
 
-    public short getDistance() {
-        short distance = readShort(Register.Distance_Value_HOBits);
-        return 0x1; //placeholder
+    public int getDistance() {
+        return (int) readShort(Register.Distance_Value_HOBits);
     }
 
     public short getProductIDRaw()
