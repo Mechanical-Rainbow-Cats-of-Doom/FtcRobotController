@@ -99,6 +99,6 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
 
         super.registerArmingStateCallback(false);
         this.deviceClient.engage();
-        this.writeShort(Register.Configure_Registers, 0x20);
+        this.writeShort(Register.Configure_Registers, (short) 0x20);
     }
 }
