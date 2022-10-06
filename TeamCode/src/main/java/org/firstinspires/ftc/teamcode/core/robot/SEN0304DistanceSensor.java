@@ -14,13 +14,13 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
     @Override
     public Manufacturer getManufacturer()
     {
-
         return Manufacturer.Unknown;
     }
 
     @Override
     protected synchronized boolean doInitialize()
     {
+        this.writeShort(Register.Configure_Registers, (short) 0x20);
         return true;
     }
 
@@ -31,17 +31,13 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
         return "DFRobot SEN0304 Distance Sensor";
     }
 
-    public int getDistance() {
-        return (int) readShort(Register.Distance_Value_HOBits);
+    public void readDistance(){
+        writeShort(Register.Command_Registers, (short) 0x01);
     }
 
-    public short getProductIDRaw()
+    public int getDistance()
     {
-        return readShort(Register.Product_ID);
-    }
-
-    public short getVersionNumberRaw(){
-        return readShort(Register.Version_Number);
+        return (int) readShort(Register.Distance_Value_HOBits);
     }
 
     protected void writeShort(final Register reg, short value)
@@ -56,16 +52,9 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
 
     public enum Register
     {
-        FIRST(0),
-        Product_ID(0x01),
-        Version_Number(0x02),
         Distance_Value_HOBits(0x03),
-        Distance_Value_LOBits(0x04),
-        T_Value_HOBits(0x05),
-        T_Value_LOBits(0x06),
         Configure_Registers(0x07),
-        Command_Registers(0x08),
-        LAST(Command_Registers.bVal);
+        Command_Registers(0x08);
 
         public int bVal;
 
@@ -76,28 +65,15 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
 
     }
 
-    protected void setOptimalReadWindow()
-    {
-        // Sensor registers are read repeatedly and stored in a register. This method specifies the
-        // registers and repeat read mode
-        I2cDeviceSynch.ReadWindow readWindow = new I2cDeviceSynch.ReadWindow(
-                Register.FIRST.bVal,
-                Register.LAST.bVal - Register.FIRST.bVal + 1,
-                I2cDeviceSynch.ReadMode.REPEAT);
-        this.deviceClient.setReadWindow(readWindow);
-    }
-
     public final static I2cAddr ADDRESS_I2C_DEFAULT = I2cAddr.create7bit(0x11);
 
     public SEN0304DistanceSensor(I2cDeviceSynch deviceClient)
     {
         super(deviceClient, true);
 
-        this.setOptimalReadWindow();
         this.deviceClient.setI2cAddress(ADDRESS_I2C_DEFAULT);
 
         super.registerArmingStateCallback(false);
         this.deviceClient.engage();
-        this.writeShort(Register.Configure_Registers, (short) 0x20);
     }
 }
