@@ -29,6 +29,6 @@ public class FourDistanceSensors {
         });
     }
     public void init() {
-
+        updateThread.start();
     }
 }
