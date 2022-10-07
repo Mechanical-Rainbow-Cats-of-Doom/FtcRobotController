@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot;
+package org.firstinspires.ftc.teamcode.core.robot.distance;
 
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
@@ -37,7 +37,7 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
 
     public int getDistance()
     {
-        return (int) readShort(Register.Distance_Value_HOBits);
+        return readShort(Register.Distance_Value_HOBits);
     }
 
     protected void writeShort(final Register reg, short value)
