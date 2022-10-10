@@ -37,7 +37,10 @@ public class Main {
         }
 
 //        meep.addEntity(closeBase(meep));
-        meep.addEntity(coordinateBot(meep));
+        RoadRunnerBotEntity bot = coordinateBot(meep);
+        meep.addEntity(bot);
+        bot.setLooping(false);
+
 
         meep.start();
     }
@@ -89,7 +92,6 @@ public class Main {
 
         roadRunnerBot.followTrajectorySequence(builder.build());
         roadRunnerBot.setLooping(false);
-
         return roadRunnerBot;
     }
 
