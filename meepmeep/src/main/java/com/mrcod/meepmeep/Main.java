@@ -22,7 +22,7 @@ public class Main {
 
         MeepMeep meep = new MeepMeep(800);
         meep.setAxesInterval(10);
-        meep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_KAI_DARK);
+        meep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL);
         ColorScheme scheme = new ColorSchemeBlueDark();
         meep.setTheme(scheme);
         meep.setBackgroundAlpha(1);
