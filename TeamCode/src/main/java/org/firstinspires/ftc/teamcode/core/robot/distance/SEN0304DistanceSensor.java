@@ -20,7 +20,7 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
     @Override
     protected synchronized boolean doInitialize()
     {
-        this.writeShort(Register.Configure_Registers, (short) 0x20);
+        this.writeShort(Register.Configure_Registers, (short) 0x00);
         return true;
     }
 

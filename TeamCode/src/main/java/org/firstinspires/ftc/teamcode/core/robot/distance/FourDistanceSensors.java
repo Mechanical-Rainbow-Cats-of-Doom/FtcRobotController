@@ -4,30 +4,51 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.stream.IntStream;
+
 public class FourDistanceSensors {
-    private int[] distances = {0, 0, 0 ,0};
+    private final int[][] distances = { // sensor, last 4 values
+            {100, 100, 100, 100},
+            {100, 100, 100, 100},
+            {100, 100, 100, 100},
+            {100, 100, 100, 100}
+    };
     private final SEN0304DistanceSensor[] sensors;
     final Thread updateThread;
-    public FourDistanceSensors(HardwareMap hardwareMap, Thread updateThread) {
+    public FourDistanceSensors(HardwareMap hardwareMap) {
         this.sensors = new SEN0304DistanceSensor[]{
                 new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "frontSensor")),
                 new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "rightSensor")),
-                new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "leftSensor")),
-                new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "backSensor"))
+                new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "backSensor")),
+                new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "leftSensor"))
         };
+
         this.updateThread = new Thread(() -> {
-            final ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
-            timer.reset();
-            while (!updateThread.isInterrupted()) { // ask fin what to put here idk
-                for (int i = 0; i < sensors.length; i++) {
-                    sensors[(i < 3 ? i + 1 : 0)].readDistance();
-                    //need something to check if timer is greater than 40 ms before moving on
-                    timer.reset();
-                    sensors[i].getDistance();
+            while (true) { // ask fin what to put here idk
+                for (int val = 0; val < distances[0].length; val++) {
+                    for (int i = 0; i < sensors.length; i++) {
+                        sensors[i].readDistance();
+                        try {
+                            //noinspection BusyWait
+                            Thread.sleep(20);
+                        } catch (InterruptedException ignored) {}
+                        distances[i][val] = sensors[(i > 0 ? i - 1 : 3)].getDistance();
+                    }
+
                 }
             }
         });
     }
+
+    //takes 80*repetitions milliseconds
+    public boolean isObject(int side, int minimumDistance){
+        return getDistance(side) < minimumDistance;
+    }
+
+    public int getDistance(int side) {
+        return IntStream.of(distances[side]).sum() / distances.length;
+    }
+
     public void init() {
         updateThread.start();
     }
