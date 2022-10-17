@@ -19,10 +19,10 @@ public class StrafedMovementImpl implements StrafingMovement {
     }
 
     public StrafedMovementImpl(HardwareMap hardwareMap) {
-        this(hardwareMap.get(DcMotorEx.class, "front left wheel"),
-                hardwareMap.get(DcMotorEx.class, "front right wheel"),
-                hardwareMap.get(DcMotorEx.class, "back right wheel"),
-                hardwareMap.get(DcMotorEx.class, "back left wheel"));
+        this(hardwareMap.get(DcMotorEx.class, "leftFront"),
+                hardwareMap.get(DcMotorEx.class, "rightFront"),
+                hardwareMap.get(DcMotorEx.class, "rightRear"),
+                hardwareMap.get(DcMotorEx.class, "leftRear"));
     }
 
     @Override
