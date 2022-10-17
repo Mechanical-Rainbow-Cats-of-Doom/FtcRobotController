@@ -1,5 +1,8 @@
 package com.mrcod.meepmeep;
 
+import static com.mrcod.meepmeep.CoordinateUtil.RRToGridCoordinate;
+import static com.mrcod.meepmeep.CoordinateUtil.goTo;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
@@ -29,11 +32,11 @@ public class Main {
 
         double centers = -60;
         for (double i = centers; i < 72; i += 24) {
-            meep.addEntity(new LineEntity(new Vector2d(i,72), new Vector2d(i, -72), meep));
+            meep.addEntity(new LineEntity(new Vector2d(i, 72), new Vector2d(i, -72), meep));
         }
 
         for (double i = centers; i < 72; i += 24) {
-            meep.addEntity(new LineEntity(new Vector2d(72,i), new Vector2d(-72, i), meep));
+            meep.addEntity(new LineEntity(new Vector2d(72, i), new Vector2d(-72, i), meep));
         }
 
 //        meep.addEntity(closeBase(meep));
@@ -50,7 +53,7 @@ public class Main {
                 Math.toRadians(90));
 
         RoadRunnerBotEntity roadRunnerBot = new RoadRunnerBotEntity(meep, DriveConstants.CONSTRAINTS,
-                18, 18, startPose, new ColorSchemeBlueDark(),
+                16, 16, startPose, new ColorSchemeBlueDark(),
                 0.5D, DriveTrainType.MECANUM, false);
 
         TrajectorySequenceBuilder builder = new TrajectorySequenceBuilder(startPose,
@@ -95,25 +98,11 @@ public class Main {
         return roadRunnerBot;
     }
 
-    static class Vector2i {
-        public final int x;
-        public final int y;
-
-        public Vector2i(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public double distance(Vector2i other) {
-            return Math.sqrt(Math.pow(other.x - this.x, 2) + Math.pow(other.y - this.y, 2));
-        }
-    }
-
 
     static class BotKeyListener implements KeyListener {
         public final RoadRunnerBotEntity bot;
-        public Vector2i previousGridCoordinate;
-        public Vector2i choice;
+        public CoordinateUtil.Vector2i previousGridCoordinate;
+        public CoordinateUtil.Vector2i choice;
         public double heading;
 
         public BotKeyListener(RoadRunnerBotEntity bot) {
@@ -143,7 +132,7 @@ public class Main {
                 chosenX = 3;
             } else if (keyEvent.getKeyCode() == KeyEvent.VK_5) {
                 chosenX = 4;
-            }  else if (keyEvent.getKeyCode() == KeyEvent.VK_6) {
+            } else if (keyEvent.getKeyCode() == KeyEvent.VK_6) {
                 chosenX = 5;
             } else if (keyEvent.getKeyCode() == KeyEvent.VK_Q) {
                 chosenY = 0;
@@ -159,122 +148,40 @@ public class Main {
                 chosenY = 5;
             } else if (keyEvent.getKeyCode() == KeyEvent.VK_A) {
                 heading -= Math.PI / 2;
-                if(heading <= 0) {
+                if (heading <= 0) {
                     heading += Math.PI;
                 }
             } else if (keyEvent.getKeyCode() == KeyEvent.VK_D) {
                 heading += Math.PI / 2;
-                if(heading >= Math.PI * 2) {
+                if (heading >= Math.PI * 2) {
                     heading -= Math.PI;
                 }
             }
 
-            if(chosenX == -1) {
+            if (chosenX == -1) {
                 chosenX = choice.x;
             }
 
-            if(chosenY == -1) {
+            if (chosenY == -1) {
                 chosenY = choice.y;
             }
 
-            choice = new Vector2i(chosenX, chosenY);
+            choice = new CoordinateUtil.Vector2i(chosenX, chosenY);
 
-            Vector2i currentGridCoordinate = RRToGridCoordinate(bot.getPose().vec());
-            if(!(chosenX == currentGridCoordinate.x && chosenY == currentGridCoordinate.y) && keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
-                goTo(currentGridCoordinate);
+            if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
+                Pose2d startPose = bot.getPose();
+
+                bot.followTrajectorySequence(goTo(startPose, choice, heading));
+                bot.setTrajectoryProgressSeconds(0);
+                bot.setLooping(false);
+
+                previousGridCoordinate = choice;
             }
         }
 
         @Override
-        public void keyReleased(KeyEvent keyEvent) {}
-
-        public void goTo(Vector2i currentGridCoordinate) {
-            long startTime = System.currentTimeMillis();
-            Pose2d startPose = bot.getPose();
-
-//                boolean positiveTurn = false;
-//                if(startPose.getHeading() != heading) {
-//                    double direction1 = Math.abs(startPose.getHeading() - heading);
-//                    double direction2 = Math.abs(heading - startPose.getHeading());
-//                    positiveTurn = direction1 > direction2;
-//                }
-
-            TrajectorySequenceBuilder builder = new TrajectorySequenceBuilder(startPose,
-                    new MecanumVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.TRACK_WIDTH),
-                    new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL),
-                    DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL);
-
-            Vector2i gridCoordinateDistance = new Vector2i(Math.abs(currentGridCoordinate.x - choice.x),
-                    currentGridCoordinate.y - choice.y);
-            boolean xFirst = gridCoordinateDistance.x >= gridCoordinateDistance.y;
-
-            Vector2d snapped = gridToRRCoordinate(RRToGridCoordinate(startPose.vec()));
-            if(xFirst) {
-                snapped = new Vector2d(startPose.getX(), snapped.getY());
-            } else {
-                snapped = new Vector2d(snapped.getX(), startPose.getY());
-            }
-
-            Vector2d first = gridToRRCoordinate(xFirst ? new Vector2i(choice.x, currentGridCoordinate.y) : new Vector2i(currentGridCoordinate.x, choice.y));
-            Vector2d finalPosition = gridToRRCoordinate(choice);
-
-            long startWeighting = System.nanoTime();
-
-            double normalizedWeightSnapped;
-            double normalizedWeightFirst;
-
-            {
-                double weightSnapped = startPose.vec().distTo(snapped);
-                double weightFirst = snapped.distTo(first);
-                double weightFinal = first.distTo(finalPosition);
-
-                double normalizingFactor = (weightSnapped + weightFirst + weightFinal);
-                normalizedWeightSnapped = weightSnapped / normalizingFactor;
-                normalizedWeightFirst = weightFirst / normalizingFactor;
-            }
-
-            double snappedHeading = ((heading - startPose.getHeading()) * normalizedWeightSnapped) + startPose.getHeading();
-            double firstHeading = ((heading - startPose.getHeading()) * (normalizedWeightSnapped + normalizedWeightFirst)) + startPose.getHeading();
-
-            System.out.println("Weighting and Heading calculations took " + (System.nanoTime() - startWeighting) + " ns");
-
-            long startBuilding = System.nanoTime();
-
-            if(!snapped.equals(startPose.vec())) {
-                builder.lineToLinearHeading(new Pose2d(snapped, snappedHeading));
-            }
-
-            if(!first.equals(snapped)) {
-                builder.lineToLinearHeading(new Pose2d(first, firstHeading));
-            }
-
-            if(xFirst) {
-                if(!(gridCoordinateDistance.y == 0)) {
-                    builder.lineToLinearHeading(new Pose2d(finalPosition, heading));
-                }
-            } else {
-                if(!(gridCoordinateDistance.x == 0)) {
-                    builder.lineToLinearHeading(new Pose2d(finalPosition, heading));
-                }
-            }
-
-            System.out.println("Building took " + (System.nanoTime() - startBuilding) + " ns");
-
-            bot.followTrajectorySequence(builder.build());
-            bot.setTrajectoryProgressSeconds(0);
-            bot.setLooping(false);
-
-            previousGridCoordinate = choice;
-            System.out.println("Creating trajectory took " + (System.currentTimeMillis() - startTime) + " milliseconds.");
+        public void keyReleased(KeyEvent keyEvent) {
         }
-    }
-
-    public static Vector2d gridToRRCoordinate(Vector2i position) {
-        return new Vector2d((position.x * 24) - 60, (position.y * 24) - 60);
-    }
-
-    public static Vector2i RRToGridCoordinate(Vector2d position) {
-        return new Vector2i((int)(position.getX() + 60) / 24, (int)(position.getY() + 60) / 24);
     }
 }
 
