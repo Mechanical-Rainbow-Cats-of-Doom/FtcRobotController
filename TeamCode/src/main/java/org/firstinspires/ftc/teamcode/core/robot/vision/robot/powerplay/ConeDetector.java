@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.vision.robot;
+package org.firstinspires.ftc.teamcode.core.robot.vision.robot.powerplay;
 
 import android.util.Pair;
 
@@ -6,14 +6,12 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.core.robot.vision.robot.old.TsePipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvWebcam;
 
-import java.lang.reflect.Method;
-
-public class TseDetector {
+public class ConeDetector {
 
     private final OpenCvCamera camera;
     private final String webcamName;
@@ -21,7 +19,7 @@ public class TseDetector {
     private final TsePipeline pipeline;
     public static int CAMERA_WIDTH = 320, CAMERA_HEIGHT = 240;
     public static OpenCvCameraRotation ORIENTATION = OpenCvCameraRotation.UPRIGHT;
-    public TseDetector(HardwareMap hMap, String webcamName, boolean debug, boolean isRed) {
+    public ConeDetector(HardwareMap hMap, String webcamName, boolean debug, boolean isRed) {
         this.hardwareMap = hMap;
         this.webcamName = webcamName;
         OpenCvCameraFactory cameraFactory = OpenCvCameraFactory.getInstance();
@@ -59,11 +57,6 @@ public class TseDetector {
      */
     public int run() {
         pipeline.startPipeline();
-        Pair<Boolean, Integer> result = pipeline.differentSpot();
-        while (!result.first) {
-            result = pipeline.differentSpot();
-        }
-        pipeline.stopPipeline();
-        return result.second;
+        return -1;
     }
 }

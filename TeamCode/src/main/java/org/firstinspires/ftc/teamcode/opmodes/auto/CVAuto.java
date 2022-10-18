@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.core.robot.tools.headless.AutoIntake;
-import org.firstinspires.ftc.teamcode.core.robot.vision.robot.TseDetector;
+import org.firstinspires.ftc.teamcode.core.robot.vision.robot.old.TseDetector;
 import org.firstinspires.ftc.teamcode.core.thread.old.EventThread;
 @Autonomous
 @Config

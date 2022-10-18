@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes.util;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.core.robot.vision.robot.TseDetector;
+import org.firstinspires.ftc.teamcode.core.robot.vision.robot.old.TseDetector;
 
 import androidx.annotation.NonNull;
 

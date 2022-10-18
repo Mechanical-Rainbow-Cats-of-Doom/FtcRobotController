@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.vision.robot;
+package org.firstinspires.ftc.teamcode.core.robot.vision.robot.old;
 
 import android.util.Pair;
 
@@ -11,7 +11,6 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -37,61 +36,26 @@ top width = 0.08
 public class TsePipeline extends OpenCvPipeline {
     public TsePipeline(boolean isRed) {
         if (isRed) {
-            bottomRectHeightPercentage = 0.15D;
-            bottomRectWidthPercentage = 0.79D;
-            middleRectHeightPercentage = 0.23D;
-            middleRectWidthPercentage = 0.56D;
             topRectHeightPercentage = 0.35D;
             topRectWidthPercentage = 0.2D;
         } else {
-            bottomRectHeightPercentage = 0.31D;
-            bottomRectWidthPercentage = 0.72D;
-            middleRectHeightPercentage = 0.26D;
-            middleRectWidthPercentage = 0.35D;
             topRectHeightPercentage = 0.2D;
             topRectWidthPercentage = 0.05D;
         }
     }
     public TsePipeline() {}
 
-    private final Scalar red = new Scalar(255,0,0);
-    private final Scalar yellow = new Scalar(255,255,0);
-    private final Mat matYCrCb = new Mat();
-    private final Mat matCbBottom = new Mat();
-    private final Mat matCbMiddle = new Mat();
-    private final Mat matCbTop = new Mat();
-    private final Mat matCbBottom1 = new Mat();
-    private final Mat matCbMiddle1 = new Mat();
-    private final Mat matCbTop1 = new Mat();
-    private final Mat matCbBottom2 = new Mat();
-    private final Mat matCbMiddle2 = new Mat();
-    private final Mat matCbTop2 = new Mat();
-
-    //Where the average CB value of the rectangles are stored
-    private double topAverage = 0;
-    private double middleAverage = 0;
-    private double bottomAverage = 0;
 
     //The position related to the screen
     public static double topRectWidthPercentage = 0.25;
     public static double topRectHeightPercentage = 0.50;
-    public static double middleRectWidthPercentage = 0.50;
-    public static double middleRectHeightPercentage = 0.50;
-    public static double bottomRectWidthPercentage = 0.75;
-    public static double bottomRectHeightPercentage = 0.50;
-    private int different = 0;
-    private int lastFrameValue = 0;
-    private boolean isComplete = false;
-    private int checks = 0;
-    private Pair<Integer, Integer> greatestConfidence = new Pair<>(0, 0);
-    private int frameCount = 0;
+    //The points needed for the rectangles are calculated here
+    public static int rectangleHeight = 10;
+    //The width and height of the rectangles in terms of pixels
+    public static int rectangleWidth = 10;
     private boolean running = false;
+
     public void startPipeline() {
-        different = 0;
-        lastFrameValue = 0;
-        isComplete = false;
-        checks = 0;
-        frameCount = 0;
         running = true;
     }
     public void stopPipeline() {
@@ -102,42 +66,17 @@ public class TsePipeline extends OpenCvPipeline {
      */
     @Override
     public Mat processFrame(Mat input) {
-        Imgproc.cvtColor(input, matYCrCb, Imgproc.COLOR_RGB2YCrCb);
-        //The points needed for the rectangles are calculated here
-        int rectangleHeight = 10;
-        //The width and height of the rectangles in terms of pixels
-        int rectangleWidth = 10;
-        Rect topRect = new Rect(
-                (int) (matYCrCb.width() * topRectWidthPercentage),
-                (int) (matYCrCb.height() * topRectHeightPercentage),
-                rectangleWidth,
-                rectangleHeight
-        );
-        Rect middleRect = new Rect(
-                (int) (matYCrCb.width() * middleRectWidthPercentage),
-                (int) (matYCrCb.height() * middleRectHeightPercentage),
-                rectangleWidth,
-                rectangleHeight
-        );
-        Rect bottomRect = new Rect(
-                (int) (matYCrCb.width() * bottomRectWidthPercentage),
-                (int) (matYCrCb.height() * bottomRectHeightPercentage),
-                rectangleWidth,
-                rectangleHeight
-        );
         if (running) {
-            Mat topBlock = matYCrCb.submat(topRect);
-            Mat middleBlock = matYCrCb.submat(middleRect);
-            Mat bottomBlock = matYCrCb.submat(bottomRect);
-            Core.extractChannel(topBlock, matCbTop, 0);
-            Core.extractChannel(middleBlock, matCbMiddle, 0);
-            Core.extractChannel(bottomBlock, matCbBottom, 0);
-            Core.extractChannel(topBlock, matCbTop1, 1);
-            Core.extractChannel(middleBlock, matCbMiddle1, 1);
-            Core.extractChannel(bottomBlock, matCbBottom1, 1);
-            Core.extractChannel(topBlock, matCbTop2, 2);
-            Core.extractChannel(middleBlock, matCbMiddle2, 2);
-            Core.extractChannel(bottomBlock, matCbBottom2, 2);
+            Mat rgbMat = input.submat(new Rect(
+                    (int) (input.width() * topRectWidthPercentage),
+                    (int) (input.height() * topRectHeightPercentage),
+                    rectangleWidth,
+                    rectangleHeight
+            ));
+
+            Core.extractChannel(rgbMat, matCbTop, 0);
+            Core.extractChannel(rgbMat, matCbTop1, 1);
+            Core.extractChannel(rgbMat, matCbTop2, 2);
 
             Scalar topMeanY = Core.mean(matCbTop);
             Scalar topMeanCr = Core.mean(matCbTop1);
