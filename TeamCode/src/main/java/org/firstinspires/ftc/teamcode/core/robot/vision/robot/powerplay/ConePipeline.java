@@ -54,6 +54,7 @@ public class ConePipeline extends OpenCvPipeline {
     //The width and height of the rectangles in terms of pixels
     public static int rectangleWidth = 10;
     private boolean running = false;
+    private int whichPos = -1 // 0 = pos1 (cyan), 1 = pos2(magneta), 2 = pos3(yellow)
 
     public void startPipeline() {
         running = true;
@@ -78,13 +79,32 @@ public class ConePipeline extends OpenCvPipeline {
             Core.extractChannel(rgbMat, greenMat, 1);
             Core.extractChannel(rgbMat, blueMat, 2);
 
-            double redMean = Core.mean(redMat).val[0], greenMean = Core.mean(greenMat).val[0], blueMean = Core.mean(blueMat).val[0];
-
+            double[] cmykMean = rgbToCmyk(Core.mean(redMat).val[0], Core.mean(greenMat).val[0], Core.mean(blueMat).val[0]);
+            whichPos = getNumberOfMax3Params(cmykMean[0], cmykMean[1], cmykMean[2]);
         }
         return input;
     }
 
+    public static double[] rgbToCmyk(double r, double g, double b) {
+        double percentageR = r / 255.0 * 100;
+        double percentageG = g / 255.0 * 100;
+        double percentageB = b / 255.0 * 100;
+        double k = 100 - Math.max(Math.max(percentageR, percentageG), percentageB);
+        if (k == 100) {
+            return new double[]{ 0D, 0D, 0D, 100D};
+        }
+        return new double[]{
+            (100 - percentageR - k) / (100 - k) * 100,
+            (100 - percentageG - k) / (100 - k) * 100,
+            (100 - percentageB - k) / (100 - k) * 100,
+            k
+        };
+    }
 
+    public static double getNumberOfMax3Params(double a, double b, double c) {
+        double highMax = Math.max(Math.max(a, b), c);
+        return (highMax == a ? 0 : (highMax == b ? 1 : 2 );
+    }
 
     /**
      * Draw the rectangle onto the desired mat
