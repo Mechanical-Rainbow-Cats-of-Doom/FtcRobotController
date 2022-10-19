@@ -54,7 +54,7 @@ public class ConePipeline extends OpenCvPipeline {
     //The width and height of the rectangles in terms of pixels
     public static int rectangleWidth = 10;
     private boolean running = false;
-    private int whichPos = -1 // 0 = pos1 (cyan), 1 = pos2(magneta), 2 = pos3(yellow)
+    private int whichPos = -1; // 0 = pos1 (cyan), 1 = pos2(magneta), 2 = pos3(yellow)
 
     public void startPipeline() {
         running = true;
@@ -101,9 +101,9 @@ public class ConePipeline extends OpenCvPipeline {
         };
     }
 
-    public static double getNumberOfMax3Params(double a, double b, double c) {
+    public static int getNumberOfMax3Params(double a, double b, double c) {
         double highMax = Math.max(Math.max(a, b), c);
-        return (highMax == a ? 0 : (highMax == b ? 1 : 2 );
+        return (highMax == a ? 0 : (highMax == b ? 1 : 2 ));
     }
 
     /**
