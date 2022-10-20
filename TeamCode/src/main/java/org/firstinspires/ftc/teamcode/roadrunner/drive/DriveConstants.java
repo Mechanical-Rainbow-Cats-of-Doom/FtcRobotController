@@ -22,8 +22,8 @@ public class DriveConstants {
     /*
      * These are motor constants that should be listed online for your motors.
      */
-    public static final double TICKS_PER_REV = 145.6;
-    public static final double MAX_RPM = 1150;
+    public static final double TICKS_PER_REV = 537.7;
+    public static final double MAX_RPM = 312;
 
     /*
      * Set RUN_USING_ENCODER to true to enable built-in hub velocity control using drive encoders.
@@ -45,9 +45,9 @@ public class DriveConstants {
      * angular distances although most angular parameters are wrapped in Math.toRadians() for
      * convenience. Make sure to exclude any gear ratio included in MOTOR_CONFIG from GEAR_RATIO.
      */
-    public static double WHEEL_RADIUS = 1.8898; // in
-    public static double GEAR_RATIO = 0.8333333333333334; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 17; // in
+    public static double WHEEL_RADIUS = 1.9685; // in
+    public static double GEAR_RATIO = 0.3125; // output (wheel) speed / input (motor) speed 30 -> 80 -> 96
+    public static double TRACK_WIDTH = 15.234; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -55,9 +55,9 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
-    public static double kA = 0;
-    public static double kStatic = 0;
+    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);  //return to this later
+    public static double kA = 0;  //return to this later
+    public static double kStatic = 0;  //return to this later
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -99,10 +99,11 @@ public class DriveConstants {
      * https://github.com/acmerobotics/road-runner-quickstart/issues/91
 
      */
-    public static double MAX_VEL = 90;
-    public static double MAX_ACCEL = 90;
-    public static double MAX_ANG_VEL = Math.toRadians(303.3305974222005);
-    public static double MAX_ANG_ACCEL = Math.toRadians(303.3305974222005);
+    //
+    public static double MAX_VEL = 20.0987317004;
+    public static double MAX_ACCEL = 20.0987317004;
+    public static double MAX_ANG_VEL = Math.toRadians(60);
+    public static double MAX_ANG_ACCEL = Math.toRadians(60);
 
 
     public static double encoderTicksToInches(double ticks) {
