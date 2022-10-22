@@ -76,7 +76,7 @@ public class ConePipeline extends OpenCvPipeline {
      * @param input input frame matrix
      */
     @Override
-    public Mat processFrame(Mat input) {
+    public synchronized Mat processFrame(Mat input) {
         if (running) {
             Mat rgbMat = input.submat(new Rect(
                     (int) (input.width() * topRectWidthPercentage),
