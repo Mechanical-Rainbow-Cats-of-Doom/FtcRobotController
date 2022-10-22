@@ -107,9 +107,9 @@ public class ConePipeline extends OpenCvPipeline {
     }
 
     public static double[] rgbToCmyk(double r, double g, double b) {
-        double percentageR = r / 255.0 * 100;
-        double percentageG = g / 255.0 * 100;
-        double percentageB = b / 255.0 * 100;
+        double percentageR = r / 2.55; // r / 255 * 100
+        double percentageG = g / 2.55;
+        double percentageB = b / 2.55;
         double k = 100 - Math.max(Math.max(percentageR, percentageG), percentageB);
         if (k == 100) {
             return new double[]{ 0D, 0D, 0D, 100D};
