@@ -122,6 +122,10 @@ public class ConePipeline extends OpenCvPipeline {
         };
     }
 
+    public static double[] rgbToCmyk(double[] rgbArr) {
+        return rgbToCmyk(rgbArr[0], rgbArr[1], rgbArr[2]);
+    }
+
     public static int getNumberOfMax3Params(double a, double b, double c) {
         double highMax = Math.max(Math.max(a, b), c);
         return (highMax == a ? 0 : (highMax == b ? 1 : 2 ));
