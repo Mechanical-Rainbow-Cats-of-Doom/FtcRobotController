@@ -51,7 +51,7 @@ public class ConeDetector {
      *
      * @return integer 1 - 3, corresponds to cyan magenta or yellow
      */
-    public int run() {
+    public synchronized int run() {
         pipeline.startPipeline();
         Thread thread = new Thread(() -> {
             try {
