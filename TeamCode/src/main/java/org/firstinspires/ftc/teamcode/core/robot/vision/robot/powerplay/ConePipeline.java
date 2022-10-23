@@ -11,10 +11,6 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 /*
 red
 bottom height = 0.2
@@ -54,19 +50,33 @@ public class ConePipeline extends OpenCvPipeline {
     //The width and height of the rectangles in terms of pixels
     public static int rectangleWidth = 10;
     private boolean running = false;
-    private int whichPos = -1; // 0 = pos1 (cyan), 1 = pos2(magneta), 2 = pos3(yellow)
-
+    private int finalPos = -1; // 0 = pos1 (cyan), 1 = pos2(magneta), 2 = pos3(yellow)
+    private Pair<Integer, Integer> curRun = new Pair<>(-1 ,0), greatestConfidence = new Pair<>(-1, 0);
+    private int totalTimesRan = 0;
     public void startPipeline() {
         running = true;
     }
-    public void stopPipeline() {
+
+    public void interruptPipeline() {
         running = false;
     }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    /**
+     * returns the position. position only set after run is completely
+     */
+    public int getPos() {
+        return finalPos;
+    }
+
     /**
      * @param input input frame matrix
      */
     @Override
-    public Mat processFrame(Mat input) {
+    public synchronized Mat processFrame(Mat input) {
         if (running) {
             Mat rgbMat = input.submat(new Rect(
                     (int) (input.width() * topRectWidthPercentage),
@@ -80,15 +90,26 @@ public class ConePipeline extends OpenCvPipeline {
             Core.extractChannel(rgbMat, blueMat, 2);
 
             double[] cmykMean = rgbToCmyk(Core.mean(redMat).val[0], Core.mean(greenMat).val[0], Core.mean(blueMat).val[0]);
-            whichPos = getNumberOfMax3Params(cmykMean[0], cmykMean[1], cmykMean[2]);
+            final int pos = getNumberOfMax3Params(cmykMean[0], cmykMean[1], cmykMean[2]);
+
+            curRun = new Pair<>(pos, pos == curRun.first ? curRun.second + 1 : 0);
+            if (curRun.second > greatestConfidence.second) {
+                greatestConfidence = curRun;
+            }
+            totalTimesRan++;
+            if (greatestConfidence.second >= 3 || totalTimesRan >= 6) {
+                finalPos = greatestConfidence.first;
+                running = false;
+                this.notify();
+            }
         }
         return input;
     }
 
     public static double[] rgbToCmyk(double r, double g, double b) {
-        double percentageR = r / 255.0 * 100;
-        double percentageG = g / 255.0 * 100;
-        double percentageB = b / 255.0 * 100;
+        double percentageR = r / 2.55; // r / 255 * 100
+        double percentageG = g / 2.55;
+        double percentageB = b / 2.55;
         double k = 100 - Math.max(Math.max(percentageR, percentageG), percentageB);
         if (k == 100) {
             return new double[]{ 0D, 0D, 0D, 100D};
@@ -99,6 +120,10 @@ public class ConePipeline extends OpenCvPipeline {
             (100 - percentageB - k) / (100 - k) * 100,
             k
         };
+    }
+
+    public static double[] rgbToCmyk(double[] rgbArr) {
+        return rgbToCmyk(rgbArr[0], rgbArr[1], rgbArr[2]);
     }
 
     public static int getNumberOfMax3Params(double a, double b, double c) {

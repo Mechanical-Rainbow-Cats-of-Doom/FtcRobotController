@@ -14,25 +14,21 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 public class ConeDetector {
 
     private final OpenCvCamera camera;
-    private final String webcamName;
-    private final HardwareMap hardwareMap;
-    private final TsePipeline pipeline;
+    private final ConePipeline pipeline;
     public static int CAMERA_WIDTH = 320, CAMERA_HEIGHT = 240;
     public static OpenCvCameraRotation ORIENTATION = OpenCvCameraRotation.UPRIGHT;
     public ConeDetector(HardwareMap hMap, String webcamName, boolean debug, boolean isRed) {
-        this.hardwareMap = hMap;
-        this.webcamName = webcamName;
         OpenCvCameraFactory cameraFactory = OpenCvCameraFactory.getInstance();
         if (debug) {
-            int cameraMonitorViewId = hardwareMap
+            int cameraMonitorViewId = hMap
                     .appContext.getResources()
-                    .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+                    .getIdentifier("cameraMonitorViewId", "id", hMap.appContext.getPackageName());
 
-            camera = cameraFactory.createWebcam(hardwareMap.get(WebcamName.class, webcamName), cameraMonitorViewId); //for configurating remove isred from here
+            camera = cameraFactory.createWebcam(hMap.get(WebcamName.class, webcamName), cameraMonitorViewId); //for configurating remove isred from here
         } else {
-            camera = cameraFactory.createWebcam(hardwareMap.get(WebcamName.class, webcamName));
+            camera = cameraFactory.createWebcam(hMap.get(WebcamName.class, webcamName));
         }
-        camera.setPipeline(pipeline = new TsePipeline(isRed));
+        camera.setPipeline(pipeline = new ConePipeline(isRed));
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
@@ -53,10 +49,17 @@ public class ConeDetector {
      * Resets pipeline on call
      * Stalls code until pipeline is done with figuring out (max time of around 0.33 seconds)
      *
-     * @return integer 1 - 3, corresponds to barcode slots left to right
+     * @return integer 1 - 3, corresponds to cyan magenta or yellow
      */
-    public int run() {
+    public synchronized int run() {
         pipeline.startPipeline();
-        return -1;
+        Thread thread = new Thread(() -> {
+            try {
+                pipeline.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
+        return pipeline.getPos();
     }
 }
