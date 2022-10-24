@@ -46,8 +46,8 @@ public class StrafedMovementImpl implements StrafingMovement {
     public void driveDRS(double drive, double rotate, double strafe) {
         double frontLeftPower = drive - rotate - strafe;
         double frontRightPower = drive + rotate + strafe;
-        double backLeftPower = -drive + rotate - strafe;
-        double backRightPower = -drive - rotate + strafe;
+        double backLeftPower = drive - rotate + strafe;
+        double backRightPower = drive + rotate - strafe;
 
         this.drivePower(frontLeftPower, frontRightPower, backRightPower, backLeftPower);
     }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.vision.robot2;
+package org.firstinspires.ftc.teamcode.core.robot.vision.old.robot2;
 
 import android.graphics.BitmapFactory;
 
@@ -19,7 +19,7 @@ import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
-import static org.firstinspires.ftc.teamcode.core.robot.vision.robot2.FiducialDetector.CAMERA_WIDTH;
+import static org.firstinspires.ftc.teamcode.core.robot.vision.old.robot2.FiducialDetector.CAMERA_WIDTH;
 /*
 red
 bottom height = 0.2

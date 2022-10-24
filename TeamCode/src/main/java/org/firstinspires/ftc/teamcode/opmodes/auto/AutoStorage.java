@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.core.robot.tools.headless.AutoCarousel;
 import org.firstinspires.ftc.teamcode.core.robot.tools.headless.AutoIntake;
 import org.firstinspires.ftc.teamcode.core.robot.tools.headless.AutoLift;
-import org.firstinspires.ftc.teamcode.core.robot.vision.robot.old.TseDetector;
+import org.firstinspires.ftc.teamcode.core.robot.vision.old.TseDetector;
 import org.firstinspires.ftc.teamcode.core.thread.old.EventThread;
 import org.firstinspires.ftc.teamcode.opmodes.util.AutoLED;
 import org.firstinspires.ftc.teamcode.opmodes.util.DelayStorage;

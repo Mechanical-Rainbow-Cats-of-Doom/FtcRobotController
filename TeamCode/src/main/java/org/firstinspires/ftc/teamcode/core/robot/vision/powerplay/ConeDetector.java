@@ -1,22 +1,19 @@
-package org.firstinspires.ftc.teamcode.core.robot.vision.robot.powerplay;
-
-import android.util.Pair;
+package org.firstinspires.ftc.teamcode.core.robot.vision.powerplay;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.teamcode.core.robot.vision.robot.old.TsePipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 public class ConeDetector {
-
     private final OpenCvCamera camera;
     private final ConePipeline pipeline;
     public static int CAMERA_WIDTH = 320, CAMERA_HEIGHT = 240;
     public static OpenCvCameraRotation ORIENTATION = OpenCvCameraRotation.UPRIGHT;
+
     public ConeDetector(HardwareMap hMap, String webcamName, boolean debug, boolean isRed) {
         OpenCvCameraFactory cameraFactory = OpenCvCameraFactory.getInstance();
         if (debug) {
@@ -51,15 +48,9 @@ public class ConeDetector {
      *
      * @return integer 1 - 3, corresponds to cyan magenta or yellow
      */
-    public synchronized int run() {
+    public synchronized int run() throws InterruptedException {
         pipeline.startPipeline();
-        Thread thread = new Thread(() -> {
-            try {
-                pipeline.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
+        pipeline.wait();
         return pipeline.getPos();
     }
 }
