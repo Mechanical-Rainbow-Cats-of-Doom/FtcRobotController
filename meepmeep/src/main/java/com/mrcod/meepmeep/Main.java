@@ -1,7 +1,7 @@
 package com.mrcod.meepmeep;
 
 import static com.mrcod.meepmeep.CoordinateUtil.RRToGridCoordinate;
-import static com.mrcod.meepmeep.CoordinateUtil.goTo;
+import static com.mrcod.meepmeep.CoordinateUtil.trajectoryTo;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -17,7 +17,6 @@ import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBui
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Vector;
 
 public class Main {
     public static void main(String[] args) {
@@ -171,7 +170,7 @@ public class Main {
             if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
                 Pose2d startPose = bot.getPose();
 
-                bot.followTrajectorySequence(goTo(startPose, choice, heading));
+                bot.followTrajectorySequence(trajectoryTo(startPose, choice, heading));
                 bot.setTrajectoryProgressSeconds(0);
                 bot.setLooping(false);
 

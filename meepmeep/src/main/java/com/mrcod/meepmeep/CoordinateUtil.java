@@ -24,8 +24,7 @@ public class CoordinateUtil {
         }
     }
 
-    public static TrajectorySequence goTo(Pose2d startPose, Vector2i chosenPosition, double heading) {
-        long startTime = System.currentTimeMillis();
+    public static TrajectorySequence trajectoryTo(Pose2d startPose, Vector2i chosenPosition, double heading) {
         Vector2i currentGridCoordinate = RRToGridCoordinate(startPose.vec());
 
         TrajectorySequenceBuilder builder = new TrajectorySequenceBuilder(startPose,
@@ -46,8 +45,6 @@ public class CoordinateUtil {
 
         Vector2d first = gridToRRCoordinate(xFirst ? new Vector2i(chosenPosition.x, currentGridCoordinate.y) : new Vector2i(currentGridCoordinate.x, chosenPosition.y));
         Vector2d finalPosition = gridToRRCoordinate(chosenPosition);
-
-        long startBuilding = System.nanoTime();
 
         if(!snapped.equals(startPose.vec())) {
             builder.strafeTo(snapped);
@@ -70,9 +67,6 @@ public class CoordinateUtil {
                 builder.lineToLinearHeading(new Pose2d(finalPosition, heading));
             }
         }
-
-        System.out.println("Building took " + (System.nanoTime() - startBuilding) + " ns");
-        System.out.println("Creating trajectory took " + (System.currentTimeMillis() - startTime) + " milliseconds.");
 
         return builder.build();
     }
