@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.core.robot.tools.headless.AutoCarousel;
 import org.firstinspires.ftc.teamcode.core.robot.tools.headless.AutoLift;
-import org.firstinspires.ftc.teamcode.core.robot.vision.robot2.FiducialDetector;
+import org.firstinspires.ftc.teamcode.core.robot.vision.old.robot2.FiducialDetector;
 import org.firstinspires.ftc.teamcode.core.thread.old.EventThread;
 import org.firstinspires.ftc.teamcode.core.thread.old.types.impl.RunEveryTimedEvent;
 import org.firstinspires.ftc.teamcode.core.thread.old.types.impl.TimedEvent;

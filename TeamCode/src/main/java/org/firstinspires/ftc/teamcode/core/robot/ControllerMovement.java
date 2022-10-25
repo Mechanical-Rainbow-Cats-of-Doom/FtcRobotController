@@ -20,7 +20,7 @@ public class ControllerMovement {
             move.driveDRS(0, 1, 0);
 
         } else {
-            move.driveDRS(gamepad.getLeftY(), 0, gamepad.getLeftX());
+            move.driveDRS(gamepad.getLeftY(), gamepad.getRightX(), gamepad.getLeftX());
         }
     }
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.vision.robot.old;
+package org.firstinspires.ftc.teamcode.core.robot.vision.old;
 
 import android.util.Pair;
 
@@ -11,7 +11,6 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
