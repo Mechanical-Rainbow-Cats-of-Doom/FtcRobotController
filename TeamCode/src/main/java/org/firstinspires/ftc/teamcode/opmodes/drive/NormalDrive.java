@@ -20,7 +20,7 @@ public class NormalDrive extends LinearOpMode {
         while (opModeIsActive()) {
             drive.update();
             telemetry.addData("left encoder: ", leftencoder.getCurrentPosition());
-
+            telemetry.update();
 
         }
     }
