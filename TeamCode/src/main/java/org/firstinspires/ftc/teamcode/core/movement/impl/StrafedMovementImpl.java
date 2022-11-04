@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.movement.impl;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.movement.api.StrafingMovement;
@@ -16,6 +17,8 @@ public class StrafedMovementImpl implements StrafingMovement {
         this.frontRight = frontRight;
         this.backRight = backRight;
         this.backLeft = backLeft;
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public StrafedMovementImpl(HardwareMap hardwareMap) {
@@ -71,6 +74,5 @@ public class StrafedMovementImpl implements StrafingMovement {
     public void stop() {
         this.drivePower(0, 0, 0, 0);
     }
-
 
 }

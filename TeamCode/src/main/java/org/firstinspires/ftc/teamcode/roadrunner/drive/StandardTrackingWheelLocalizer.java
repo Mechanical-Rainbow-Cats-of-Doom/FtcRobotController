@@ -39,6 +39,9 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 
+    public static double X_MULTIPLIER = 1;
+    public static double Y_MULTIPLIER = 1;
+
     public StandardTrackingWheelLocalizer(HardwareMap hardwareMap) {
         super(Arrays.asList(
                 new Pose2d(0, LATERAL_DISTANCE / 2, 0), // left
@@ -75,9 +78,9 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
         //  compensation method
 
         return Arrays.asList(
-                encoderTicksToInches(leftEncoder.getCorrectedVelocity()),
-                encoderTicksToInches(rightEncoder.getCorrectedVelocity()),
-                encoderTicksToInches(frontEncoder.getCorrectedVelocity())
+                encoderTicksToInches(leftEncoder.getRawVelocity()) * X_MULTIPLIER,
+                encoderTicksToInches(rightEncoder.getRawVelocity()) * X_MULTIPLIER,
+                encoderTicksToInches(frontEncoder.getRawVelocity()) * Y_MULTIPLIER
         );
     }
 }
