@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.headless;
+package org.firstinspires.ftc.teamcode.core.robot.tools.api.headless;
 
 import androidx.annotation.NonNull;
 
@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 /**
  * A controller-less tool with two states, on and off.
  */
-public abstract class HeadlessToggleableTool<T extends DcMotorSimple> {
+public abstract class  HeadlessToggleableTool<T extends DcMotorSimple> {
     protected final T motor;
     protected final double power;
     protected boolean currentState = false;

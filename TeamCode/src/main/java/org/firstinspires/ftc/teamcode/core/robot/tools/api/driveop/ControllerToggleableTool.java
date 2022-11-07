@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.driveop;
+package org.firstinspires.ftc.teamcode.core.robot.tools.api.driveop;
 
 import androidx.annotation.NonNull;
 
@@ -8,7 +8,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.core.robot.tools.headless.HeadlessToggleableTool;
+import org.firstinspires.ftc.teamcode.core.robot.tools.api.headless.HeadlessToggleableTool;
 import org.firstinspires.ftc.teamcode.core.thread.old.EventThread;
 
 /**
