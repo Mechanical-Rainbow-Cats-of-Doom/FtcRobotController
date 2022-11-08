@@ -27,20 +27,25 @@ public class DisatnceSensorTest extends LinearOpMode{
     });
     @Override
     public void runOpMode() {
-        if (gamepad1.x){
-            DSthread.start();
-            while(gamepad1.x){}
-        }
-        if(gamepad1.y){
-            for(int i=0; i<distanceResults.size(); i++){
-                distanceResult += distanceResults.indexOf(i);
-                if(i == distanceResults.size()){
-                    distanceResult /= distanceResults.size();
+        waitForStart();
+        while(opModeIsActive()) {
+            if (gamepad1.x) {
+                DSthread.start();
+                while (gamepad1.x) {
                 }
             }
-            while(gamepad1.y){}
+            if (gamepad1.y) {
+                for (int i = 0; i < distanceResults.size(); i++) {
+                    distanceResult += distanceResults.indexOf(i);
+                    if (i == distanceResults.size()) {
+                        distanceResult /= distanceResults.size();
+                    }
+                }
+                while (gamepad1.y) {
+                }
+            }
+            telemetry.addData("Distance: ", distanceResult);
+            telemetry.update();
         }
-        telemetry.addData("Distance: ",distanceResult);
-        telemetry.update();
     }
 }
