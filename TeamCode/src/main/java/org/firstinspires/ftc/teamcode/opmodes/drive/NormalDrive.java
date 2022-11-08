@@ -19,7 +19,7 @@ public class NormalDrive extends LinearOpMode {
         final Encoder leftencoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftEncoder"));
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final ControllerMovement drive = new ControllerMovement(hardwareMap, moveGamepad);
-        final MultipleTelemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+        final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
 
         while (opModeIsActive()) {
