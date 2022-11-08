@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 @TeleOp
 public class DisatnceSensorTest extends LinearOpMode{
-    SEN0304DistanceSensor distanceSensor = new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "frontSensor"));
+    SEN0304DistanceSensor distanceSensor;
     int distanceResult = 0;
     ArrayList<Integer> distanceResults = new ArrayList<Integer>();
     final MultipleTelemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -28,6 +28,7 @@ public class DisatnceSensorTest extends LinearOpMode{
     });
     @Override
     public void runOpMode() {
+        distanceSensor = new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "frontSensor"));
         telemetry.addData("Distance: ", distanceResult);
         waitForStart();
         while(opModeIsActive()) {
