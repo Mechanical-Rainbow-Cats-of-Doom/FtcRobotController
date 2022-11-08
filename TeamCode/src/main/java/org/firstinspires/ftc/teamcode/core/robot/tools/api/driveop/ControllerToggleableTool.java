@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.tools.api.headless.HeadlessToggleableTool;
+import org.firstinspires.ftc.teamcode.core.thread.EventHelper;
+import org.firstinspires.ftc.teamcode.core.thread.event.impl.ReaderUpdatedEvent;
 import org.firstinspires.ftc.teamcode.core.thread.old.EventThread;
 
 /**
@@ -18,7 +20,7 @@ public abstract class ControllerToggleableTool<T extends DcMotorSimple> extends 
     protected final ButtonReader reader;
 
     /**
-     * @param eventThread local instance of eventThread
+     * @param eventHelper local instance of eventHelper
      * @param map         pass this through, this will be handled by user opmode. hardwaremap instance.
      * @param toolGamepad same as above, instance of GamepadEx from FtcLib
      * @param tClass      Either DcMotor or CRServo, any extension of DcMotorSimple
@@ -26,14 +28,13 @@ public abstract class ControllerToggleableTool<T extends DcMotorSimple> extends 
      * @param button      button to be pushed for toggle, uses GamepadKeys.Button
      * @param power       power motor should be set to upon toggle
      */
-    public ControllerToggleableTool(@NonNull EventThread eventThread, @NonNull HardwareMap map, GamepadEx toolGamepad, Class<T> tClass, String name, GamepadKeys.Button button, double power) {
+    public ControllerToggleableTool(@NonNull EventHelper eventHelper, @NonNull HardwareMap map, GamepadEx toolGamepad, Class<T> tClass, String name, GamepadKeys.Button button, double power) {
         super(map, tClass, name, power);
         this.reader = new ButtonReader(toolGamepad, button);
-        makeEvent(eventThread, reader);
+        makeEvent(eventHelper, reader);
     }
 
     private void run() {
-        reader.readValue();
         if (reader.wasJustReleased()) {
             if (currentState) {
                 this.off();
@@ -43,13 +44,7 @@ public abstract class ControllerToggleableTool<T extends DcMotorSimple> extends 
         }
     }
 
-    protected void makeEvent(@NonNull EventThread eventThread, ButtonReader reader) {
-        final Thread thread = new Thread(() -> {
-            while (!eventThread.isInterrupted()) {
-                run();
-            }
-        });
-        thread.setPriority(Thread.NORM_PRIORITY);
-        thread.start();
+    protected void makeEvent(@NonNull EventHelper eventHelper, ButtonReader reader) {
+        eventHelper.addEvent(new ReaderUpdatedEvent(this::run, reader));
     }
 }
