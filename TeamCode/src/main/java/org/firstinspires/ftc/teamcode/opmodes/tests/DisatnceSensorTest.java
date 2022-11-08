@@ -16,6 +16,7 @@ public class DisatnceSensorTest extends LinearOpMode{
     int distanceResult = 0;
     ArrayList<Integer> distanceResults = new ArrayList<Integer>();
     final MultipleTelemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+
     Thread DSthread = new Thread(() -> {
         this.distanceSensor.readDistance();
         try {
@@ -27,6 +28,7 @@ public class DisatnceSensorTest extends LinearOpMode{
     });
     @Override
     public void runOpMode() {
+        telemetry.addData("Distance: ", distanceResult);
         waitForStart();
         while(opModeIsActive()) {
             if (gamepad1.x) {
@@ -44,7 +46,7 @@ public class DisatnceSensorTest extends LinearOpMode{
                 while (gamepad1.y) {
                 }
             }
-            telemetry.addData("Distance: ", distanceResult);
+
             telemetry.update();
         }
     }
