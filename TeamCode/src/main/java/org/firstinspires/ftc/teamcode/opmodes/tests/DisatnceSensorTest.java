@@ -28,8 +28,8 @@ public class DisatnceSensorTest extends LinearOpMode{
     });
     @Override
     public void runOpMode() {
-        telemetry.addData("Distance: ", distanceResult);
         waitForStart();
+        telemetry.addData("Distance: ", distanceResult);
         while(opModeIsActive()) {
             if (gamepad1.x) {
                 DSthread.start();
