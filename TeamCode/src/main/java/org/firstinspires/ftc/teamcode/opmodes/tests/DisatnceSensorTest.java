@@ -6,47 +6,23 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 
+import org.firstinspires.ftc.robotcontroller.external.samples.SensorMRRangeSensor;
 import org.firstinspires.ftc.teamcode.core.robot.distance.SEN0304DistanceSensor;
 
 import java.util.ArrayList;
 
 @TeleOp
 public class DisatnceSensorTest extends LinearOpMode{
-    SEN0304DistanceSensor distanceSensor = new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "frontSensor"));
-    int distanceResult = 0;
-    ArrayList<Integer> distanceResults = new ArrayList<Integer>();
-    final MultipleTelemetry telemetry = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
-
-    Thread DSthread = new Thread(() -> {
-        this.distanceSensor.readDistance();
-        try {
-            Thread.sleep(20);
-        }  catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        distanceResults.add(this.distanceSensor.getDistance());
-    });
+    SEN0304DistanceSensor distanceSensor;
     @Override
-    public void runOpMode() {
-        waitForStart();
-        telemetry.addData("Distance: ", distanceResult);
-        while(opModeIsActive()) {
-            if (gamepad1.x) {
-                DSthread.start();
-                while (gamepad1.x) {
-                }
-            }
-            if (gamepad1.y) {
-                for (int i = 0; i < distanceResults.size(); i++) {
-                    distanceResult += distanceResults.indexOf(i);
-                    if (i == distanceResults.size()) {
-                        distanceResult /= distanceResults.size();
-                    }
-                }
-                while (gamepad1.y) {
-                }
-            }
+    public void runOpMode() throws InterruptedException {
+        distanceSensor = hardwareMap.get(SEN0304DistanceSensor.class, "frontSensor");
 
+        waitForStart();
+        while(opModeIsActive()) {
+            distanceSensor.readDistance();
+            Thread.sleep(20);
+            telemetry.addData("Distance", distanceSensor.getDistance());
             telemetry.update();
         }
     }

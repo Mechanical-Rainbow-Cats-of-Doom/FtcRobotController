@@ -3,17 +3,20 @@ package org.firstinspires.ftc.teamcode.core.robot.distance;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
+import com.qualcomm.robotcore.hardware.configuration.I2cSensor;
 import com.qualcomm.robotcore.hardware.configuration.annotations.DeviceProperties;
+import com.qualcomm.robotcore.hardware.configuration.annotations.I2cDeviceType;
 import com.qualcomm.robotcore.util.TypeConversion;
 
 //wiki for this device:
 //https://wiki.dfrobot.com/URM09_Ultrasonic_Sensor_(Gravity-I2C)_(V1.0)_SKU_SEN0304#target_8
 
+@I2cDeviceType
 @DeviceProperties(name = "SEN0304 Distance Sensor", description = "Distance Sensor from DF robot", xmlTag = "SEN0304")
 public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> {
     @Override
     public Manufacturer getManufacturer() {
-        return Manufacturer.Unknown;
+        return Manufacturer.Other;
     }
 
     @Override
@@ -45,9 +48,16 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
     }
 
     public enum Register {
+        FIRST(0),
+        Product_ID(0x01),
+        Version_Number(0x02),
         Distance_Value_HOBits(0x03),
+        Distance_Value_LOBits(0x04),
+        T_Value_HOBits(0x05),
+        T_Value_LOBits(0x06),
         Configure_Registers(0x07),
-        Command_Registers(0x08);
+        Command_Registers(0x08),
+        LAST(Command_Registers.bVal);
 
         public int bVal;
 
