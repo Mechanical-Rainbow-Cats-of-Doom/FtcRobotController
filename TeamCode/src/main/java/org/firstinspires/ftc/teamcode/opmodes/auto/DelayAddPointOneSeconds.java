@@ -9,11 +9,11 @@ import org.firstinspires.ftc.teamcode.opmodes.util.DelayStorage;
 public class DelayAddPointOneSeconds extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        telemetry.addLine("Current seconds: " + DelayStorage.seconds);
+        telemetry.addLine("Current delay: " + DelayStorage.seconds + " seconds");
         telemetry.update();
         waitForStart();
         DelayStorage.addSeconds(0.1);
-        telemetry.addLine("Current seconds: " + DelayStorage.seconds);
+        telemetry.addLine("New delay: " + DelayStorage.seconds + " seconds");
         telemetry.update();
         while (!isStopRequested()) {}
     }

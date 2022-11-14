@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 
 public class WallSmash {
-    private static final double nextToWall = 70 - 5.8;
+    private static final double nextToWall = 72 - 5.8;
 
     public static ElapsedTime wallSmashTimer = new ElapsedTime();
 

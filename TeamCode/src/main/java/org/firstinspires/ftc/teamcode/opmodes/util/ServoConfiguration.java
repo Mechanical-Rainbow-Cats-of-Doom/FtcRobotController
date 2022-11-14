@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 
 @TeleOp
 public class ServoConfiguration extends LinearOpMode {
-
     // Utilizes FtcDashboard
     @Config
     static class ServoConfigValue {
