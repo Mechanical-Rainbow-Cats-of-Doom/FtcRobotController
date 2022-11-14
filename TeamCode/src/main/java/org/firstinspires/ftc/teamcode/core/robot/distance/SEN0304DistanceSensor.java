@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.robot.distance;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cRangeSensor;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
@@ -14,6 +15,26 @@ import com.qualcomm.robotcore.util.TypeConversion;
 @I2cDeviceType
 @DeviceProperties(name = "SEN0304 Distance Sensor", description = "Distance Sensor from DF robot", xmlTag = "SEN0304")
 public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> {
+    public final static I2cAddr ADDRESS_I2C_DEFAULT = I2cAddr.create7bit(0x11);
+
+    public SEN0304DistanceSensor(I2cDeviceSynch deviceClient) {
+        super(deviceClient, true);
+
+        this.setOptimalReadWindow();
+        this.deviceClient.setI2cAddress(ADDRESS_I2C_DEFAULT);
+
+        super.registerArmingStateCallback(false);
+        this.deviceClient.engage();
+    }
+
+    protected void setOptimalReadWindow() {
+        I2cDeviceSynch.ReadWindow readWindow = new I2cDeviceSynch.ReadWindow(
+                Register.FIRST.bVal,
+                Register.LAST.bVal - Register.FIRST.bVal + 1,
+                I2cDeviceSynch.ReadMode.REPEAT);
+        this.deviceClient.setReadWindow(readWindow);
+    }
+
     @Override
     public Manufacturer getManufacturer() {
         return Manufacturer.Other;
@@ -21,18 +42,17 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
 
     @Override
     protected synchronized boolean doInitialize() {
-        this.writeShort(Register.Configure_Registers, (short) 0x00);
+        deviceClient.write8(Register.Configure_Registers.bVal, 0x00);
         return true;
     }
 
     @Override
     public String getDeviceName() {
-
         return "DFRobot SEN0304 Distance Sensor";
     }
 
-    public void readDistance(){
-        writeShort(Register.Command_Registers, (short) 0x01);
+    public void readDistance() {
+        deviceClient.write8(Register.Command_Registers.bVal, 0x01);
     }
 
     public int getDistance() {
@@ -48,7 +68,8 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
     }
 
     public enum Register {
-        FIRST(0),
+        FIRST(0x00),
+        Device_Address(0x00),
         Product_ID(0x01),
         Version_Number(0x02),
         Distance_Value_HOBits(0x03),
@@ -59,23 +80,14 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
         Command_Registers(0x08),
         LAST(Command_Registers.bVal);
 
-        public int bVal;
+        public final int bVal;
 
-        Register(int bVal)
-        {
+        Register(int bVal) {
             this.bVal = bVal;
         }
 
     }
 
-    public final static I2cAddr ADDRESS_I2C_DEFAULT = I2cAddr.create7bit(0x11);
 
-    public SEN0304DistanceSensor(I2cDeviceSynch deviceClient) {
-        super(deviceClient, true);
 
-        this.deviceClient.setI2cAddress(ADDRESS_I2C_DEFAULT);
-
-        super.registerArmingStateCallback(false);
-        this.deviceClient.engage();
-    }
 }
