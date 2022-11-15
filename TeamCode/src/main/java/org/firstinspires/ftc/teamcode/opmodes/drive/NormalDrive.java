@@ -16,7 +16,14 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 public class NormalDrive extends LinearOpMode {
     @Override
     public void runOpMode() {
-        final Encoder leftencoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftEncoder"));
+        final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftEncoder"));
+        final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightEncoder"));
+        final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontEncoder"));
+
+        leftEncoder.setDirection(Encoder.Direction.REVERSE);
+        rightEncoder.setDirection(Encoder.Direction.FORWARD);
+        frontEncoder.setDirection(Encoder.Direction.FORWARD);
+
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final ControllerMovement drive = new ControllerMovement(hardwareMap, moveGamepad);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -24,7 +31,9 @@ public class NormalDrive extends LinearOpMode {
 
         while (opModeIsActive()) {
             drive.update();
-            telemetry.addData("left encoder: ", leftencoder.getCurrentPosition());
+            telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition());
+            telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition());
+            telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition());
             telemetry.update();
         }
     }
