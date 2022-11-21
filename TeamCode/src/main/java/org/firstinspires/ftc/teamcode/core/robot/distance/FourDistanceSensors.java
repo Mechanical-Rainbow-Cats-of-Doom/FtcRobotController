@@ -15,12 +15,13 @@ public class FourDistanceSensors {
     };
     private final SEN0304DistanceSensor[] sensors;
     final Thread updateThread;
+
     public FourDistanceSensors(HardwareMap hardwareMap) {
         this.sensors = new SEN0304DistanceSensor[]{
-                new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "frontSensor")),
-                new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "rightSensor")),
-                new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "backSensor")),
-                new SEN0304DistanceSensor(hardwareMap.get(I2cDeviceSynch.class, "leftSensor"))
+                hardwareMap.get(SEN0304DistanceSensor.class, "frontSensor"),
+                hardwareMap.get(SEN0304DistanceSensor.class, "rightSensor"),
+                hardwareMap.get(SEN0304DistanceSensor.class, "backSensor"),
+                hardwareMap.get(SEN0304DistanceSensor.class, "leftSensor")
         };
 
         this.updateThread = new Thread(() -> {

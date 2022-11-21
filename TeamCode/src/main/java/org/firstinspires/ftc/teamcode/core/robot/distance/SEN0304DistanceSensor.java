@@ -54,17 +54,8 @@ public class SEN0304DistanceSensor extends I2cDeviceSynchDevice<I2cDeviceSynch> 
     }
 
     public int getDistance() {
-        return readShort(Register.Distance_Value_HOBits);
+        return TypeConversion.byteArrayToShort(deviceClient.read(Register.Distance_Value_HOBits.bVal, 2));
     }
-
-    protected void writeShort(final Register reg, short value) {
-        deviceClient.write(reg.bVal, TypeConversion.shortToByteArray(value));
-    }
-
-    protected short readShort(Register reg) {
-        return TypeConversion.byteArrayToShort(deviceClient.read(reg.bVal, 2));
-    }
-
     public enum Register {
         FIRST(0x00),
         Device_Address(0x00),
