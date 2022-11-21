@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class FourDistanceSensors {
@@ -43,11 +46,16 @@ public class FourDistanceSensors {
 
     //takes 80*repetitions milliseconds
     public boolean isObject(int side, int minimumDistance){
-        return getDistance(side) < minimumDistance;
+        int distance = getDistance(side);
+        return distance != -1 && distance < minimumDistance;
     }
 
     public int getDistance(int side) {
-        return IntStream.of(distances[side]).sum() / distances.length;
+        // TODO fix this garbage and make sure it doesn't count -1s
+        IntStream stream = IntStream.of(distances[side]).filter((i) -> i != -1);
+        List<Integer> distances = stream.boxed().collect(Collectors.toList());
+        int count = (int)stream.count();
+        return count == 0 ? -1 : stream.sum() / (int)stream.count();
     }
 
     public void init() {
