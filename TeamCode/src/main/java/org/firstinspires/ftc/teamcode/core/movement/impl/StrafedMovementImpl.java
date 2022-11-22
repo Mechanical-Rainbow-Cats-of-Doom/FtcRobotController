@@ -47,8 +47,8 @@ public class StrafedMovementImpl implements StrafingMovement {
 
     @Override
     public void driveDRS(double drive, double rotate, double strafe) {
-        double frontLeftPower = drive - rotate - strafe;
-        double frontRightPower = drive + rotate + strafe;
+        double frontLeftPower = drive - rotate + strafe;
+        double frontRightPower = drive + rotate - strafe;
         double backLeftPower = drive - rotate + strafe;
         double backRightPower = drive + rotate - strafe;
 

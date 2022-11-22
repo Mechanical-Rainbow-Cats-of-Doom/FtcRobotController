@@ -51,11 +51,7 @@ public class FourDistanceSensors {
     }
 
     public int getDistance(int side) {
-        // TODO fix this garbage and make sure it doesn't count -1s
-        IntStream stream = IntStream.of(distances[side]).filter((i) -> i != -1);
-        List<Integer> distances = stream.boxed().collect(Collectors.toList());
-        int count = (int)stream.count();
-        return count == 0 ? -1 : stream.sum() / (int)stream.count();
+        return IntStream.of(distances[side]).filter((x) -> x==-1).count() != 0 ? -1 : IntStream.of(distances[side]).sum() / 4;
     }
 
     public void init() {

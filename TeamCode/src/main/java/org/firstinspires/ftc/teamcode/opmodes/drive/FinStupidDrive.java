@@ -14,7 +14,7 @@ public class FinStupidDrive extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         waitForStart();
         while (opModeIsActive()) {
-            drive.setDrivePower(
+            drive.setWeightedDrivePower(
                     new Pose2d(
                             -gamepad1.left_stick_y,
                             -gamepad1.left_stick_x,
