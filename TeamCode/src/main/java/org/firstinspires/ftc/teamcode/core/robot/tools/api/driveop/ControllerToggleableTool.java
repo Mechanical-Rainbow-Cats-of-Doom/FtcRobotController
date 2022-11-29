@@ -31,7 +31,7 @@ public abstract class ControllerToggleableTool<T extends DcMotorSimple> extends 
     public ControllerToggleableTool(@NonNull EventHelper eventHelper, @NonNull HardwareMap map, GamepadEx toolGamepad, Class<T> tClass, String name, GamepadKeys.Button button, double power) {
         super(map, tClass, name, power);
         this.reader = new ButtonReader(toolGamepad, button);
-        makeEvent(eventHelper, reader);
+        eventHelper.addEvent(new ReaderUpdatedEvent(this::run, reader));
     }
 
     private void run() {
@@ -42,9 +42,5 @@ public abstract class ControllerToggleableTool<T extends DcMotorSimple> extends 
                 this.on();
             }
         }
-    }
-
-    protected void makeEvent(@NonNull EventHelper eventHelper, ButtonReader reader) {
-        eventHelper.addEvent(new ReaderUpdatedEvent(this::run, reader));
     }
 }
