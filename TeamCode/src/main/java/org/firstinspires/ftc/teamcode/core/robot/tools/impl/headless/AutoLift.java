@@ -8,7 +8,7 @@ public class AutoLift {
     public DcMotorEx rotationMotor;
 
     enum Position {
-        HOLDING(10, false),
+        INTAKE(10, false),
         GROUND_TARGET(10, true),
         LOW_TARGET(100, true),
         MEDIUM_TARGET(200, true),
@@ -23,7 +23,8 @@ public class AutoLift {
         }
     }
 
-    Position position;
+    Position position = Position.INTAKE;
+    Position lastPosition = position;
     /*
      * The stage represents how far the robot is from getting to the correct position.
      * 0 - initial position, hasn't started moving
@@ -32,7 +33,8 @@ public class AutoLift {
      * 3 - finished.
      * If the position doesn't dump, stage 2 is skipped.
      */
-    int stage;
+    int stage = 0;
+    int totalUpdates = 0;
 
     public AutoLift(DcMotorEx liftMotor, DcMotorEx rotationMotor) {
         this.liftMotor = liftMotor;
@@ -43,11 +45,43 @@ public class AutoLift {
         try { Thread.sleep(100); } catch (InterruptedException ignored) {}
 //        liftMotor.setTargetPosition(Math.abs(liftMotor.getCurrentPosition()));
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        liftMotor.setPower(1);
 
     }
 
     public void setPosition(Position position) {
         this.position = position;
-        this.liftMotor.setTargetPosition(position.motorPos);
+    }
+
+    public void update() {
+        if(lastPosition != position) {
+            this.stage = 0;
+            this.lastPosition = position;
+        }
+        switch (stage) {
+            // initial position
+            case 0:
+                if(totalUpdates != 0) {
+                    liftMotor.setTargetPosition(position.motorPos);
+                }
+                stage++;
+                break;
+            case 1:
+                /*
+                 * Do nothing for now, if we need to move out of the way of anything we can add it
+                 * in later.
+                 */
+                 if(liftMotor.getCurrentPosition() == position.motorPos) {}
+                 break;
+            case 2:
+                if(position.drop) {
+                    break;
+                }
+            default:
+                stage = 3;
+            case 4:
+                // o7
+        }
+        totalUpdates++;
     }
 }
