@@ -71,7 +71,9 @@ public class AutoLift {
                  * Do nothing for now, if we need to move out of the way of anything we can add it
                  * in later.
                  */
-                 if(liftMotor.getCurrentPosition() == position.motorPos) {}
+                 if(liftMotor.getCurrentPosition() == position.motorPos) {
+                    stage++;
+                 }
                  break;
             case 2:
                 if(position.drop) {
