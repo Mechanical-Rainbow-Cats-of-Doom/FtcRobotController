@@ -11,12 +11,15 @@ import com.mrcod.meepmeep.entity.helper.LineEntity;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.core.colorscheme.ColorScheme;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueDark;
+import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeRedDark;
 import com.noahbres.meepmeep.roadrunner.DriveTrainType;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
+import static com.mrcod.meepmeep.MirroringUtil.cMirrorX;
 
 public class Main {
     public static void main(String[] args) {
@@ -38,21 +41,22 @@ public class Main {
             meep.addEntity(new LineEntity(new Vector2d(72, i), new Vector2d(-72, i), meep));
         }
 
-//        meep.addEntity(closeBase(meep));
-        RoadRunnerBotEntity bot = coordinateBot(meep);
-        meep.addEntity(bot);
-        bot.setLooping(false);
+        meep.addEntity(closeBase(meep, false));
+        meep.addEntity(closeBase(meep, true));
+//        RoadRunnerBotEntity bot = coordinateBot(meep);
+//        meep.addEntity(bot);
+//        bot.setLooping(false);
 
 
         meep.start();
     }
 
-    public static RoadRunnerBotEntity closeBase(MeepMeep meep) {
-        final Pose2d startPose = new Pose2d(-35, 63,
-                Math.toRadians(90));
+    public static RoadRunnerBotEntity closeBase(MeepMeep meep, boolean mirror) {
+        final Pose2d startPose = cMirrorX(new Pose2d(-35, 63,
+                Math.toRadians(90)), mirror);
 
         RoadRunnerBotEntity roadRunnerBot = new RoadRunnerBotEntity(meep, DriveConstants.CONSTRAINTS,
-                16, 16, startPose, new ColorSchemeBlueDark(),
+                16, 16, startPose, mirror ? new ColorSchemeRedDark() : new ColorSchemeBlueDark(),
                 0.5D, DriveTrainType.MECANUM, false);
 
         TrajectorySequenceBuilder builder = new TrajectorySequenceBuilder(startPose,
@@ -60,11 +64,11 @@ public class Main {
                 new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL),
                 DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL);
 
-        builder.strafeTo(new Vector2d(-60, 58));
+        builder.strafeTo(cMirrorX(new Vector2d(-60, 58), mirror));
         for (int i = 0; i < 3; i++) {
-            builder.strafeTo(new Vector2d(-57, 13));
+            builder.strafeTo(cMirrorX(new Vector2d(-57, 13), mirror));
             builder.waitSeconds(0.5);
-            builder.strafeTo(new Vector2d(-22, 13));
+            builder.strafeTo(cMirrorX(new Vector2d(-22, 13), mirror));
             builder.waitSeconds(0.5);
         }
 
@@ -75,7 +79,7 @@ public class Main {
 
     public static RoadRunnerBotEntity coordinateBot(MeepMeep meep) {
         final Pose2d startPose = new Pose2d(10, 63,
-                Math.toRadians(90));
+                Math.toRadians(0));
 
         RoadRunnerBotEntity roadRunnerBot = new RoadRunnerBotEntity(meep, DriveConstants.CONSTRAINTS,
                 18, 18, startPose, new ColorSchemeBlueDark(),
