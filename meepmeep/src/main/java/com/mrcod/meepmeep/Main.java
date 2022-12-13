@@ -19,7 +19,7 @@ import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBui
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import static com.mrcod.meepmeep.MirroringUtil.cMirrorX;
+import static com.mrcod.meepmeep.MirroringUtil.cMirrorY;
 
 public class Main {
     public static void main(String[] args) {
@@ -52,8 +52,8 @@ public class Main {
     }
 
     public static RoadRunnerBotEntity closeBase(MeepMeep meep, boolean mirror) {
-        final Pose2d startPose = cMirrorX(new Pose2d(-35, 63,
-                Math.toRadians(90)), mirror);
+        final Pose2d startPose = cMirrorY(new Pose2d(-35, 63,
+                Math.toRadians(270)), mirror);
 
         RoadRunnerBotEntity roadRunnerBot = new RoadRunnerBotEntity(meep, DriveConstants.CONSTRAINTS,
                 16, 16, startPose, mirror ? new ColorSchemeRedDark() : new ColorSchemeBlueDark(),
@@ -64,11 +64,11 @@ public class Main {
                 new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL),
                 DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL);
 
-        builder.strafeTo(cMirrorX(new Vector2d(-60, 58), mirror));
+        builder.lineToLinearHeading(cMirrorY(new Pose2d(-60, 58, 4*Math.PI/3), mirror));
         for (int i = 0; i < 3; i++) {
-            builder.strafeTo(cMirrorX(new Vector2d(-57, 13), mirror));
+            builder.strafeTo(cMirrorY(new Vector2d(-57, 13), mirror));
             builder.waitSeconds(0.5);
-            builder.strafeTo(cMirrorX(new Vector2d(-22, 13), mirror));
+            builder.strafeTo(cMirrorY(new Vector2d(-22, 13), mirror));
             builder.waitSeconds(0.5);
         }
 
