@@ -10,6 +10,7 @@ import java.util.function.BooleanSupplier;
  * Thread to handle {@link Event events} as requests. Watch out, if it is overloaded with requests,
  * and it's not able to fulfill them faster than they are sent, it will not finish the queue.
  */
+@Deprecated
 public class EventThread extends Thread {
     private final ConcurrentLinkedQueue<Event> queue = new ConcurrentLinkedQueue<>();
     private final BooleanSupplier continueRunning;

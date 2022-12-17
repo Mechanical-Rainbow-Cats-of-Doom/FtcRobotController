@@ -16,30 +16,28 @@ import org.firstinspires.ftc.teamcode.core.thread.old.EventThread;
 /**
  * simple button push toggleable tool
  */
-public abstract class ControllerToggleableTool<T extends DcMotorSimple> extends HeadlessToggleableTool<T> {
+public abstract class ControllerToggleableTool<T extends HeadlessToggleableTool> {
     protected final ButtonReader reader;
+    public final T headlessTool;
 
     /**
-     * @param eventHelper local instance of eventHelper
-     * @param map         pass this through, this will be handled by user opmode. hardwaremap instance.
-     * @param toolGamepad same as above, instance of GamepadEx from FtcLib
-     * @param tClass      Either DcMotor or CRServo, any extension of DcMotorSimple
-     * @param name        Hardware map name of tool motor/CRServo
-     * @param button      button to be pushed for toggle, uses GamepadKeys.Button
-     * @param power       power motor should be set to upon toggle
+     * @param eventHelper  local instance of eventHelper
+     * @param toolGamepad  instance of GamepadEx from FtcLib
+     * @param button       button to be pushed for toggle, uses GamepadKeys.Button
+     * @param headlessTool the headless version of this tool
      */
-    public ControllerToggleableTool(@NonNull EventHelper eventHelper, @NonNull HardwareMap map, GamepadEx toolGamepad, Class<T> tClass, String name, GamepadKeys.Button button, double power) {
-        super(map, tClass, name, power);
+    public ControllerToggleableTool(@NonNull EventHelper eventHelper, GamepadEx toolGamepad, GamepadKeys.Button button, T headlessTool) {
+        this.headlessTool = headlessTool;
         this.reader = new ButtonReader(toolGamepad, button);
         eventHelper.addEvent(new ReaderUpdatedEvent(this::run, reader));
     }
 
     private void run() {
         if (reader.wasJustReleased()) {
-            if (currentState) {
-                this.off();
+            if (headlessTool.isOn()) {
+                headlessTool.off();
             } else {
-                this.on();
+                headlessTool.on();
             }
         }
     }
