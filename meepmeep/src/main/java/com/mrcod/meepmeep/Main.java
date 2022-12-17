@@ -2,6 +2,7 @@ package com.mrcod.meepmeep;
 
 import static com.mrcod.meepmeep.CoordinateUtil.RRToGridCoordinate;
 import static com.mrcod.meepmeep.CoordinateUtil.trajectoryTo;
+import static com.mrcod.meepmeep.MirroringUtil.cMirrorY;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -19,7 +20,6 @@ import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBui
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import static com.mrcod.meepmeep.MirroringUtil.cMirrorY;
 
 public class Main {
     public static void main(String[] args) {
@@ -64,7 +64,7 @@ public class Main {
                 new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL),
                 DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL);
 
-        builder.lineToLinearHeading(cMirrorY(new Pose2d(-60, 58, 4*Math.PI/3), mirror));
+        builder.strafeTo(cMirrorY(new Vector2d(-60, 58), mirror));
         for (int i = 0; i < 3; i++) {
             builder.strafeTo(cMirrorY(new Vector2d(-57, 13), mirror));
             builder.waitSeconds(0.5);
