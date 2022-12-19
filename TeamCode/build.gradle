@@ -25,6 +25,10 @@ android {
         noCompress 'tflite'
     }
     namespace = 'org.firstinspires.ftc.teamcode'
+
+    packagingOptions {
+        jniLibs.useLegacyPackaging true
+    }
 }
 
 dependencies {
