@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.impl.headless;
+package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -77,12 +77,14 @@ public class AutoLift {
                  break;
             case 2:
                 if(position.drop) {
+                    // write code to drop here
                     break;
                 }
             default:
                 stage = 3;
-            case 4:
-                // o7
+            case 3:
+                // youre done!
+                break;
         }
         totalUpdates++;
     }

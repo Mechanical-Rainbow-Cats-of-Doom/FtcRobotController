@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.api.headless;
+package org.firstinspires.ftc.teamcode.core.robot.tools.api.auto;
 
 import androidx.annotation.NonNull;
 
@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 /**
  * A controller-less tool with two states, on and off.
  */
-public abstract class  HeadlessToggleableTool<T extends DcMotorSimple> {
+public abstract class AutoToggleableTool<T extends DcMotorSimple> {
     protected final T motor;
     protected final double power;
     protected boolean currentState = false;
@@ -18,7 +18,7 @@ public abstract class  HeadlessToggleableTool<T extends DcMotorSimple> {
      * @param motor The motor that will be used for the tool.
      * @param power The power that the tool shall run at when on.
      */
-    public HeadlessToggleableTool(T motor, double power) {
+    public AutoToggleableTool(T motor, double power) {
         this.motor = motor;
         this.power = power;
     }
@@ -30,7 +30,7 @@ public abstract class  HeadlessToggleableTool<T extends DcMotorSimple> {
      * @param name The name of the motor that will be used for the tool.
      * @param power The power that the tool shall run at when on.
      */
-    public HeadlessToggleableTool(@NonNull HardwareMap hardwareMap, Class<T> tClass, String name, double power) {
+    public AutoToggleableTool(@NonNull HardwareMap hardwareMap, Class<T> tClass, String name, double power) {
         this(hardwareMap.get(tClass, name), power);
     }
 

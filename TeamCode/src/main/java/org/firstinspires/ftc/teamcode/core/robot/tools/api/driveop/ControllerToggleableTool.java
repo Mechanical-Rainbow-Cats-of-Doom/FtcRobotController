@@ -5,18 +5,15 @@ import androidx.annotation.NonNull;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.core.robot.tools.api.headless.HeadlessToggleableTool;
+import org.firstinspires.ftc.teamcode.core.robot.tools.api.auto.AutoToggleableTool;
 import org.firstinspires.ftc.teamcode.core.thread.EventHelper;
 import org.firstinspires.ftc.teamcode.core.thread.event.impl.ReaderUpdatedEvent;
-import org.firstinspires.ftc.teamcode.core.thread.old.EventThread;
 
 /**
  * simple button push toggleable tool
  */
-public abstract class ControllerToggleableTool<T extends HeadlessToggleableTool> {
+public abstract class ControllerToggleableTool<T extends AutoToggleableTool> {
     protected final ButtonReader reader;
     public final T headlessTool;
 

@@ -76,8 +76,4 @@ public class CoordinateUtil {
     public static Vector2i RRToGridCoordinate(Vector2d position) {
         return new Vector2i((int)Math.round((position.getX() + 60) / 24), (int)Math.round((position.getY() + 60) / 24));
     }
-
-    private static double angleBetween(Vector2d from, Vector2d to) {
-        return Math.atan2(from.getY() - to.getY(), from.getX() - to.getX());
-    }
 }

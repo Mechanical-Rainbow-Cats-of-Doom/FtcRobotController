@@ -1,70 +1,63 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
-import static org.firstinspires.ftc.teamcode.roadrunner.util.MirroringUtil.cMirrorY;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.opmodes.util.DelayStorage;
 import org.firstinspires.ftc.teamcode.opmodes.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.opmodes.util.StayInPosition;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 
-import java.util.Timer;
+import static org.firstinspires.ftc.teamcode.roadrunner.util.MirroringUtil.cMirrorY;
 
 @Autonomous
-public class BlueAutoClose extends LinearOpMode {
-    public TrajectorySequence sequence;
-    public boolean isRed = false;
+public class PatrickDriverOPmode extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        //
+        //set up
+        TrajectorySequence sequence;
+
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        ElapsedTime timer = new ElapsedTime();
 
-        // start pose
-        final Pose2d startPose = cMirrorY(new Pose2d(-35, 63, Math.toRadians(270)), isRed);
+        //defining the starting position
+        final Pose2d startPose = cMirrorY(new Pose2d(-40,40), false);
 
-        // build trajectory
         TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(startPose);
 
-        builder.strafeTo(cMirrorY(new Vector2d(-60, 58), isRed));
-        for (int i = 0; i < 3; i++) {
-            builder.strafeTo(cMirrorY(new Vector2d(-57, 13), isRed));
-            builder.waitSeconds(0.5);
-            builder.strafeTo(cMirrorY(new Vector2d(-22, 13), isRed));
-            builder.waitSeconds(0.5);
-        }
-
+        //building the route
+        builder.strafeTo(cMirrorY(new Vector2d(40, 30), false));
         sequence = builder.build();
 
-        // set starting position
+        //setting the starting position
         drive.setPoseEstimate(startPose);
-        // wait for the start button to be pressed
-        waitForStart();
-        // Run delay
-        timer.reset();
-        DelayStorage.waitForDelay(timer);
 
-        //set to follow the sequence
+        //play is pressed
+        waitForStart();
+
+        //starting to follow the route
         drive.followTrajectorySequenceAsync(sequence);
-        // runs until the trajectory sequence is complete
-        while(!isStopRequested() && drive.isBusy()) {
-            // update the position
+
+        //if the program is running, loops while you are following the route
+        while(!isStopRequested() && drive.isBusy()){
+            // update roadrunner
             drive.update();
-            // keep the current position updated in
+
+            //store your location to PoseStorage
+            //for driver op
             PoseStorage.currentPose = drive.getPoseEstimate();
         }
-        if (isStopRequested()) return;
 
-        // after the trajectory sequence is complete
+        //checks if the program has been stopped, failsafe
+        if(isStopRequested()) return;
+
+        //loops if the program is not stopped but you have finished the route
         while(!isStopRequested()) {
+            //forces the robot to maintain the last position of the route
             StayInPosition.stayInPose(drive, sequence.end());
         }
     }

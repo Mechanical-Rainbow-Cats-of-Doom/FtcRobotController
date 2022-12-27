@@ -12,7 +12,9 @@ import com.mrcod.meepmeep.entity.helper.LineEntity;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.core.colorscheme.ColorScheme;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueDark;
+import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeBlueLight;
 import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeRedDark;
+import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeRedLight;
 import com.noahbres.meepmeep.roadrunner.DriveTrainType;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 import com.noahbres.meepmeep.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
@@ -25,7 +27,7 @@ public class Main {
     public static void main(String[] args) {
         System.setProperty("sun.java2d.opengl", "true");
 
-        MeepMeep meep = new MeepMeep(800);
+        MeepMeep meep = new MeepMeep(700);
         meep.setAxesInterval(10);
         meep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_KAI_DARK);
         ColorScheme scheme = new ColorSchemeBlueDark();
@@ -43,6 +45,8 @@ public class Main {
 
         meep.addEntity(closeBase(meep, false));
         meep.addEntity(closeBase(meep, true));
+        meep.addEntity(patrickOpMODe(meep,false));
+        meep.addEntity(patrickOpMODe(meep,true));
 //        RoadRunnerBotEntity bot = coordinateBot(meep);
 //        meep.addEntity(bot);
 //        bot.setLooping(false);
@@ -101,6 +105,24 @@ public class Main {
         return roadRunnerBot;
     }
 
+    public static RoadRunnerBotEntity patrickOpMODe(MeepMeep meep, boolean mirror) {
+        final Pose2d startPose = cMirrorY(new Pose2d(-40,40), mirror);
+
+        RoadRunnerBotEntity roadRunnerBot = new RoadRunnerBotEntity(meep, DriveConstants.CONSTRAINTS,
+                18, 18, startPose, mirror ? new ColorSchemeRedLight() : new ColorSchemeBlueLight(),
+                0.2, DriveTrainType.MECANUM, false);
+
+        TrajectorySequenceBuilder builder = new TrajectorySequenceBuilder(startPose,
+                new MecanumVelocityConstraint(DriveConstants.MAX_VEL, DriveConstants.TRACK_WIDTH),
+                new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL),
+                DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL);
+
+        builder.strafeTo(cMirrorY(new Vector2d(40, 30), mirror));
+
+        roadRunnerBot.followTrajectorySequence(builder.build());
+
+        return roadRunnerBot;
+    }
 
     static class BotKeyListener implements KeyListener {
         public final RoadRunnerBotEntity bot;

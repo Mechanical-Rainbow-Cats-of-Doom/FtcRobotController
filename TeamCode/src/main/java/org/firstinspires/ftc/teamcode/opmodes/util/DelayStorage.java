@@ -16,11 +16,7 @@ public class DelayStorage {
     }
 
     public static void subtractSeconds(double seconds) {
-        if (DelayStorage.seconds - seconds < 0) {
-            DelayStorage.seconds = 0;
-        } else {
-            DelayStorage.seconds -= seconds;
-        }
+        DelayStorage.seconds = Math.max(DelayStorage.seconds - seconds, 0);
     }
 
     /**
