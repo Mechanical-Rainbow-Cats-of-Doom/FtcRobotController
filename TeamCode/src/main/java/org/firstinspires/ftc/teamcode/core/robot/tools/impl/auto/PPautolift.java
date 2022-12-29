@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-public class AutoLift {
+public class PPautolift {
     public DcMotorEx liftMotor;
     public DcMotorEx rotationMotor;
 
@@ -36,7 +36,7 @@ public class AutoLift {
     int stage = 0;
     int totalUpdates = 0;
 
-    public AutoLift(DcMotorEx liftMotor, DcMotorEx rotationMotor) {
+    public PPautolift(DcMotorEx liftMotor, DcMotorEx rotationMotor) {
         this.liftMotor = liftMotor;
         this.rotationMotor = rotationMotor;
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
