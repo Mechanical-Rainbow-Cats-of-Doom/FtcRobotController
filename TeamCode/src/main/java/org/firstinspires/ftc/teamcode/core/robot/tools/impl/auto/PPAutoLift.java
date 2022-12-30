@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 public class PPAutoLift {
     public final DcMotorEx liftMotor;
+    private final Turret turret;
 
     enum Position {
         INTAKE(10, false),
@@ -39,8 +40,9 @@ public class PPAutoLift {
     int stage = 0;
     int totalUpdates = 0;
 
-    public PPAutoLift(@NonNull DcMotorEx liftMotor) {
+    public PPAutoLift(@NonNull DcMotorEx liftMotor, Turret turret) {
         this.liftMotor = liftMotor;
+        this.turret = turret;
         ZeroMotorEncoder.zero(liftMotor);
     }
 
