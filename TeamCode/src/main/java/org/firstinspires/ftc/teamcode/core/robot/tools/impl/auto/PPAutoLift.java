@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.core.robot.tools.api.ZeroMotorEncoder;
+import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import androidx.annotation.NonNull;
 
@@ -11,7 +11,7 @@ public class PPAutoLift {
     public final DcMotorEx liftMotor;
     private final Turret turret;
 
-    enum Position {
+    public enum Position {
         INTAKE(10, false),
         GROUND_TARGET(10, true),
         LOW_TARGET(100, true),
@@ -26,7 +26,6 @@ public class PPAutoLift {
             this.drop = drop;
         }
     }
-
     Position position = Position.INTAKE;
     Position lastPosition = position;
     /*
@@ -43,7 +42,7 @@ public class PPAutoLift {
     public PPAutoLift(@NonNull DcMotorEx liftMotor, Turret turret) {
         this.liftMotor = liftMotor;
         this.turret = turret;
-        ZeroMotorEncoder.zero(liftMotor);
+        ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void setPosition(Position position) {

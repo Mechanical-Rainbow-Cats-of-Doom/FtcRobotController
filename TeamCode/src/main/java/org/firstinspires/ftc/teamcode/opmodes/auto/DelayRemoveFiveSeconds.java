@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.opmodes.util.DelayStorage;
+import org.firstinspires.ftc.teamcode.core.robot.util.DelayStorage;
 
 public class DelayRemoveFiveSeconds extends LinearOpMode {
     @Override

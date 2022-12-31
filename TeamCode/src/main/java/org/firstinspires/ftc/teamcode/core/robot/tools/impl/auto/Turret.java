@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import org.firstinspires.ftc.teamcode.core.robot.tools.api.ZeroMotorEncoder;
+import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 import androidx.annotation.NonNull;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
@@ -25,7 +26,7 @@ public class Turret {
     public Turret(@NonNull DcMotorEx motor) {
         this.motor = motor;
         motor.setZeroPowerBehavior(BRAKE);
-        ZeroMotorEncoder.zero(motor);
+        ZeroMotorEncoder.zero(motor, DcMotor.RunMode.RUN_TO_POSITION);
         motor.setTargetPosition((int) Math.round(startOffset * ticksperdeg));
         Thread thread = new Thread(() -> {
             while (motor.isBusy()){
@@ -33,7 +34,7 @@ public class Turret {
                     Thread.sleep(150);
                 } catch (InterruptedException ignored) {}
             }
-            ZeroMotorEncoder.zero(motor);
+            ZeroMotorEncoder.zero(motor, DcMotor.RunMode.RUN_TO_POSITION);
         });
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
