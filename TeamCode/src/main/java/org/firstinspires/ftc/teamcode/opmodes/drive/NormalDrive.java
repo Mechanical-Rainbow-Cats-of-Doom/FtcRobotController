@@ -22,6 +22,9 @@ public class NormalDrive extends LinearOpMode {
         leftEncoder.setDirection(Encoder.Direction.REVERSE);
         rightEncoder.setDirection(Encoder.Direction.FORWARD);
         frontEncoder.setDirection(Encoder.Direction.FORWARD);
+        int LEP = leftEncoder.getCurrentPosition();
+        int REP = rightEncoder.getCurrentPosition();
+        int FEP = frontEncoder.getCurrentPosition();
 
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final ControllerMovement drive = new ControllerMovement(hardwareMap, moveGamepad);
@@ -30,9 +33,12 @@ public class NormalDrive extends LinearOpMode {
 
         while (opModeIsActive()) {
             drive.update();
-            telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition());
-            telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition());
-            telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition());
+            telemetry.addData("left encoder pos: ", leftEncoder.getCurrentPosition() - LEP);
+            telemetry.addData("right encoder pos: ", rightEncoder.getCurrentPosition() - REP);
+            telemetry.addData("front encoder pos: ", frontEncoder.getCurrentPosition() - FEP);
+            telemetry.addData("left encoder vel: ", leftEncoder.getCorrectedVelocity());
+            telemetry.addData("right encoder vel: ", rightEncoder.getCorrectedVelocity());
+            telemetry.addData("front encoder vel: ", frontEncoder.getCorrectedVelocity());
             telemetry.update();
         }
     }
