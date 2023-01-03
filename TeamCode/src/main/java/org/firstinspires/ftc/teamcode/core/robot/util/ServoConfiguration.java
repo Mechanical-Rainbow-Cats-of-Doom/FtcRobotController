@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes.util;
+package org.firstinspires.ftc.teamcode.core.robot.util;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;

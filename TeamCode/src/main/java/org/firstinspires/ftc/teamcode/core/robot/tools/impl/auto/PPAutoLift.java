@@ -3,11 +3,15 @@ package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-public class PPautolift {
-    public DcMotorEx liftMotor;
-    public DcMotorEx rotationMotor;
+import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
-    enum Position {
+import androidx.annotation.NonNull;
+
+public class PPAutoLift {
+    public final DcMotorEx liftMotor;
+    private final Turret turret;
+
+    public enum Position {
         INTAKE(10, false),
         GROUND_TARGET(10, true),
         LOW_TARGET(100, true),
@@ -22,7 +26,6 @@ public class PPautolift {
             this.drop = drop;
         }
     }
-
     Position position = Position.INTAKE;
     Position lastPosition = position;
     /*
@@ -36,17 +39,10 @@ public class PPautolift {
     int stage = 0;
     int totalUpdates = 0;
 
-    public PPautolift(DcMotorEx liftMotor, DcMotorEx rotationMotor) {
+    public PPAutoLift(@NonNull DcMotorEx liftMotor, Turret turret) {
         this.liftMotor = liftMotor;
-        this.rotationMotor = rotationMotor;
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        try { Thread.sleep(100); } catch (InterruptedException ignored) {}
-//        liftMotor.setTargetPosition(Math.abs(liftMotor.getCurrentPosition()));
-        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftMotor.setPower(1);
-
+        this.turret = turret;
+        ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void setPosition(Position position) {
