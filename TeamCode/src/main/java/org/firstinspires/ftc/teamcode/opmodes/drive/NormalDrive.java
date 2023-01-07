@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.core.robot.drive.ControllerMovement;
+import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 
 @TeleOp
@@ -23,10 +24,14 @@ public class NormalDrive extends LinearOpMode {
     @Override
     public void runOpMode() {
         drive = createDrive();
-        final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftEncoder"));
-        final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightEncoder"));
-        final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "frontEncoder"));
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
+        final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
+        final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
+        final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
+
+        telemetry.addLine("PATRICK I REMOVED THE LEP DELTA SORRY IF YOU WANTED THAT");
+        telemetry.update();
         leftEncoder.setDirection(Encoder.Direction.REVERSE);
         rightEncoder.setDirection(Encoder.Direction.FORWARD);
         frontEncoder.setDirection(Encoder.Direction.FORWARD);
@@ -38,7 +43,11 @@ public class NormalDrive extends LinearOpMode {
             telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition());
             telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition());
             telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition());
+            telemetry.addData("left encoder vel: ", leftEncoder.getCorrectedVelocity());
+            telemetry.addData("right encoder vel: ", rightEncoder.getCorrectedVelocity());
+            telemetry.addData("front encoder vel: ", frontEncoder.getCorrectedVelocity());
             telemetry.update();
+
         }
     }
 }

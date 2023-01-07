@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 /**
  * A controller-less tool with two states, on and off.
  */
-public abstract class AutoToggleableTool<T extends DcMotorSimple> {
+public class AutoToggleableTool<T extends DcMotorSimple> {
     protected final T motor;
     protected final double power;
     protected boolean currentState = false;
@@ -46,5 +46,13 @@ public abstract class AutoToggleableTool<T extends DcMotorSimple> {
 
     public boolean isOn() {
         return currentState;
+    }
+
+    public void setState(boolean state) {
+        if (state) {
+            on();
+        } else {
+            off();
+        }
     }
 }

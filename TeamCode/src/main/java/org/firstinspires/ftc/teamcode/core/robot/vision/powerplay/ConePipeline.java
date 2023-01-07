@@ -4,12 +4,15 @@ import android.util.Pair;
 
 import com.acmerobotics.dashboard.config.Config;
 
+import org.jetbrains.annotations.Contract;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
+
+import androidx.annotation.NonNull;
 
 /*
 red
@@ -106,6 +109,8 @@ public class ConePipeline extends OpenCvPipeline {
         return input;
     }
 
+    @NonNull
+    @Contract("_, _, _ -> new")
     public static double[] rgbToCmyk(double r, double g, double b) {
         double percentageR = r / 2.55; // r / 255 * 100
         double percentageG = g / 2.55;
@@ -122,7 +127,9 @@ public class ConePipeline extends OpenCvPipeline {
         };
     }
 
-    public static double[] rgbToCmyk(double[] rgbArr) {
+    @NonNull
+    @Contract("_ -> new")
+    public static double[] rgbToCmyk(@NonNull double[] rgbArr) {
         return rgbToCmyk(rgbArr[0], rgbArr[1], rgbArr[2]);
     }
 

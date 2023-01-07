@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.robot.util;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import androidx.annotation.NonNull;
 
@@ -22,6 +21,12 @@ public class ZeroMotorEncoder {
         if (endRunMode == DcMotor.RunMode.RUN_TO_POSITION) {
             motor.setPower(1);
         }
+    }
 
+    /**
+     * default is just running to position see other javadoc
+     */
+    public static void zero(@NonNull DcMotor motor) {
+        zero(motor, DcMotor.RunMode.RUN_TO_POSITION);
     }
 }

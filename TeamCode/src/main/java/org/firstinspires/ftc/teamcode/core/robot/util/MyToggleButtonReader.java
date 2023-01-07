@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.core.robot.util;
 
-import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
@@ -9,7 +8,7 @@ import java.util.function.BooleanSupplier;
 /**
  * Class gets the current state of a toggle button
  */
-public class MyToggleButtonReader extends ButtonReader {
+public class MyToggleButtonReader extends BetterButtonReader {
 
     public boolean currToggleState;
 
@@ -21,19 +20,6 @@ public class MyToggleButtonReader extends ButtonReader {
      */
     public MyToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button) {
         super(gamepad, button);
-
-        currToggleState = false;
-    }
-
-    /**
-     * The constructor that checks the values returned by a boolean supplier
-     * object.
-     *
-     * @param buttonValue the value supplier
-     */
-    public MyToggleButtonReader(BooleanSupplier buttonValue) {
-        super(buttonValue);
-
         currToggleState = false;
     }
 

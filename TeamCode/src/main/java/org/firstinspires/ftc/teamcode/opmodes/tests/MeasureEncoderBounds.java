@@ -17,7 +17,7 @@ import androidx.annotation.NonNull;
 @Config
 @TeleOp
 public class MeasureEncoderBounds extends LinearOpMode {
-    public static String motorName = "";
+    public static String motorName = "turret";
     public static int loopCount = 5;
 
     public static void waitForButtonReader(@NonNull BetterButtonReader reader) {
@@ -37,6 +37,7 @@ public class MeasureEncoderBounds extends LinearOpMode {
         final int[] motorVals = new int[loopCount];
         for (int i = 1; i <= loopCount; i++) {
             ZeroMotorEncoder.zero(motor, DcMotor.RunMode.RUN_USING_ENCODER);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             telemetry.addLine("Loop count " + i + "of " + loopCount);
             telemetry.addLine("Press A once lift is at top");
             telemetry.update();

@@ -1,8 +1,7 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
+package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 import androidx.annotation.NonNull;
 
@@ -15,7 +14,7 @@ public class Turret {
     public static double maxRot = 110;
     public static double minRot = -200;
 
-    private final DcMotorEx motor;
+    private final DcMotor motor;
     private final double tpr = (((1+(46D/17))) * (1+(46D/11))) * 28 * 5; // 5 for gear
     private final double ticksperdeg = tpr / 360;
 
@@ -23,10 +22,10 @@ public class Turret {
      * Only run after init, robot crashes otherwise
      * @param motor turret motor
      */
-    public Turret(@NonNull DcMotorEx motor) {
+    public Turret(@NonNull DcMotor motor) {
         this.motor = motor;
         motor.setZeroPowerBehavior(BRAKE);
-        ZeroMotorEncoder.zero(motor, DcMotor.RunMode.RUN_TO_POSITION);
+        ZeroMotorEncoder.zero(motor);
         motor.setTargetPosition((int) Math.round(startOffset * ticksperdeg));
         Thread thread = new Thread(() -> {
             while (motor.isBusy()){
@@ -34,7 +33,7 @@ public class Turret {
                     Thread.sleep(150);
                 } catch (InterruptedException ignored) {}
             }
-            ZeroMotorEncoder.zero(motor, DcMotor.RunMode.RUN_TO_POSITION);
+            ZeroMotorEncoder.zero(motor);
         });
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();

@@ -1,31 +1,37 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
+package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 
+import org.firstinspires.ftc.teamcode.core.robot.tools.api.auto.AutoToggleableTool;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import androidx.annotation.NonNull;
 
-public class PPAutoLift {
-    public final DcMotorEx liftMotor;
-    private final Turret turret;
+public class AutoLift {
+    final DcMotor liftMotor;
+    final DcMotor armMotor;
+    final Turret turret;
+    final AutoToggleableTool<CRServo> intake;
 
-    public enum Position {
-        INTAKE(10, false),
-        GROUND_TARGET(10, true),
-        LOW_TARGET(100, true),
-        MEDIUM_TARGET(200, true),
-        HIGH_TARGET(300, true);
+    public enum Position { // THESE VALUES ARE JUST GUESSES
+        NEUTRAL(40, 50),
+        INTAKE(10, 25),
+        GROUND_TARGET(10, 25),
+        LOW_TARGET(100, 300),
+        MEDIUM_TARGET(200, 500),
+        HIGH_TARGET(300,800),
+        MAX(10000, 1000); //armpos max is verified
 
         final int motorPos;
-        final boolean drop;
+        final int armPos;
 
-        Position(int motorPos, boolean drop) {
+        Position(int motorPos, int armPos) {
             this.motorPos = motorPos;
-            this.drop = drop;
+            this.armPos = armPos;
         }
     }
+
     Position position = Position.INTAKE;
     Position lastPosition = position;
     /*
@@ -39,10 +45,17 @@ public class PPAutoLift {
     int stage = 0;
     int totalUpdates = 0;
 
-    public PPAutoLift(@NonNull DcMotorEx liftMotor, Turret turret) {
+    public AutoLift(@NonNull DcMotor liftMotor, @NonNull DcMotor armMotor, Turret turret, CRServo intakeServo) {
         this.liftMotor = liftMotor;
+        this.armMotor = armMotor;
         this.turret = turret;
-        ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_TO_POSITION);
+        this.intake = new AutoToggleableTool<>(intakeServo, 1);
+        initMotors();
+    }
+
+    void initMotors() {
+        ZeroMotorEncoder.zero(liftMotor);
+        ZeroMotorEncoder.zero(armMotor);
     }
 
     public void setPosition(Position position) {
@@ -72,10 +85,12 @@ public class PPAutoLift {
                  }
                  break;
             case 2:
+                /*
                 if(position.drop) {
                     // write code to drop here
                     break;
                 }
+                 */
             default:
                 stage = 3;
             case 3:
