@@ -10,7 +10,7 @@ public class MyToggleButtonReader extends BetterButtonReader {
 
     private boolean currToggleState;
     
-    public MyToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button, startState) {
+    public MyToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button, boolean startState) {
         super(gamepad, button);
         currToggleState = startState;
     }
