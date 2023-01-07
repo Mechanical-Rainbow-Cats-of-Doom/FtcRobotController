@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.core.robot.tools.api.auto.AutoToggleableTool;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import androidx.annotation.NonNull;
@@ -12,7 +11,7 @@ public class AutoLift {
     final DcMotor liftMotor;
     final DcMotor armMotor;
     final AutoTurret turret;
-    final AutoToggleableTool<CRServo> intake;
+    final CRServo intake;
 
     public enum Position { // THESE VALUES ARE JUST GUESSES
         NEUTRAL(40, 50),
@@ -49,7 +48,7 @@ public class AutoLift {
         this.liftMotor = liftMotor;
         this.armMotor = armMotor;
         this.turret = turret;
-        this.intake = new AutoToggleableTool<>(intakeServo, 1);
+        this.intake = intakeServo;
         initMotors();
     }
 
