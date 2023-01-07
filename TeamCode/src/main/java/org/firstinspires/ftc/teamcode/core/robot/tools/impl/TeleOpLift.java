@@ -14,6 +14,7 @@ public class TeleOpLift extends AutoLift{
     private final GamepadEx gamepad;
     private final MyToggleButtonReader xReader;
     private final TeleOpTurret turret;
+    
     @Override
     void initMotors() {
         ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -26,13 +27,15 @@ public class TeleOpLift extends AutoLift{
         gamepad = toolGamepad;
         xReader = new MyToggleButtonReader(gamepad, GamepadKeys.Button.X); // this button reader kind of sus yo might not work
     }
+    
     @Override
     public void update() {
         runBoundedTool(liftMotor, Position.MAX.motorPos, gamepad.getLeftY());
         runBoundedTool(armMotor, Position.MAX.armPos, gamepad.getRightY());
-        intake.setState(xReader.getState());
+        intake.setPower(xReader.update() ? 1 : -1);
         this.turret.update();
     }
+    
     public static void runBoundedTool(DcMotor motor, int minBound, int maxBound, double power) {
         int motorPos = motor.getCurrentPosition();
         if (((power < 0) && (motorPos > minBound + 4)) || ((power > 0) && (motorPos < maxBound - 4))) {
@@ -41,6 +44,7 @@ public class TeleOpLift extends AutoLift{
             motor.setPower(0);
         }
     }
+    
     public static void runBoundedTool(DcMotor motor, int maxBound, double power) {
         runBoundedTool(motor, 0, maxBound, power);
     }
