@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 public class AutoLift {
     final DcMotor liftMotor;
     final DcMotor armMotor;
-    final Turret turret;
+    final AutoTurret turret;
     final AutoToggleableTool<CRServo> intake;
 
     public enum Position { // THESE VALUES ARE JUST GUESSES
@@ -45,7 +45,7 @@ public class AutoLift {
     int stage = 0;
     int totalUpdates = 0;
 
-    public AutoLift(@NonNull DcMotor liftMotor, @NonNull DcMotor armMotor, Turret turret, CRServo intakeServo) {
+    public AutoLift(@NonNull DcMotor liftMotor, @NonNull DcMotor armMotor, AutoTurret turret, CRServo intakeServo) {
         this.liftMotor = liftMotor;
         this.armMotor = armMotor;
         this.turret = turret;

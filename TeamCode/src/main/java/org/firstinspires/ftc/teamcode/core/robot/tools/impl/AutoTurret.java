@@ -9,20 +9,20 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 @SuppressWarnings("BusyWait")
 @Config
-public class Turret {
+public class AutoTurret {
     public static double startOffset = 45;
     public static double maxRot = 110;
     public static double minRot = -200;
 
-    private final DcMotor motor;
-    private final double tpr = (((1+(46D/17))) * (1+(46D/11))) * 28 * 5; // 5 for gear
-    private final double ticksperdeg = tpr / 360;
+    final DcMotor motor;
+    public static final double tpr = (((1+(46D/17))) * (1+(46D/11))) * 28 * 5; // 5 for gear
+    public static final double ticksperdeg = tpr / 360;
 
     /**
      * Only run after init, robot crashes otherwise
-     * @param motor turret motor
+     * @param motor autoTurret motor
      */
-    public Turret(@NonNull DcMotor motor) {
+    public AutoTurret(@NonNull DcMotor motor) {
         this.motor = motor;
         motor.setZeroPowerBehavior(BRAKE);
         ZeroMotorEncoder.zero(motor);
@@ -40,7 +40,7 @@ public class Turret {
     }
 
     /**
-     * sets position of turret in degrees, goes around if it would result in going through start pos
+     * sets position of autoTurret in degrees, goes around if it would result in going through start pos
      * @param pos MUST BE BETWEEN {@value maxRot} & {@value minRot} OR THE ROBOT WILL KILL ITSELF
      */
     public void setPosDeg(double pos) {
