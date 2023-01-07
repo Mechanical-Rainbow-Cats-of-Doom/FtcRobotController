@@ -3,15 +3,18 @@ package org.firstinspires.ftc.teamcode.core.robot.util;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
-import java.util.function.BooleanSupplier;
-
 /**
  * Class gets the current state of a toggle button
  */
 public class MyToggleButtonReader extends BetterButtonReader {
 
-    public boolean currToggleState;
-
+    private boolean currToggleState;
+    
+    public MyToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button, startState) {
+        super(gamepad, button);
+        currToggleState = startState;
+    }
+            
     /**
      * The constructor that uses the gamepad and button to refer to a certain state toggler.
      *
@@ -19,18 +22,17 @@ public class MyToggleButtonReader extends BetterButtonReader {
      * @param button  the button on the oject
      */
     public MyToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button) {
-        super(gamepad, button);
-        currToggleState = false;
+        MyToggleButtonReader(gamepad, button, false);
     }
 
     /**
-     * @return the current state of the toggler
+     * @return updates and returns the toggler
      */
-    public boolean getState() {
-        if (wasJustReleased()) {
+    public boolean update() {
+        if (wasJustReleased()) { // this is the sus part because it prbly reads but idk
             currToggleState = !currToggleState;
         }
-        return (currToggleState);
+        return currToggleState;
     }
 
 }
