@@ -22,7 +22,7 @@ public class MyToggleButtonReader extends BetterButtonReader {
      * @param button  the button on the oject
      */
     public MyToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button) {
-        MyToggleButtonReader(gamepad, button, false);
+        this(gamepad, button, false);
     }
 
     /**
