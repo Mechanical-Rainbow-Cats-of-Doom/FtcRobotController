@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.MyToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
@@ -21,8 +22,8 @@ public class TeleOpLift extends AutoLift{
         ZeroMotorEncoder.zero(armMotor, DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public TeleOpLift(@NonNull DcMotor liftMotor, @NonNull DcMotor armMotor, TeleOpTurret turret, CRServo intakeServo, GamepadEx toolGamepad) {
-        super(liftMotor, armMotor, turret, intakeServo);
+    public TeleOpLift(HardwareMap hardwareMap, TeleOpTurret turret, GamepadEx toolGamepad) {
+        super(hardwareMap, turret);
         this.turret = turret;
         gamepad = toolGamepad;
         xReader = new MyToggleButtonReader(gamepad, GamepadKeys.Button.X); // this button reader kind of sus yo might not work
@@ -36,7 +37,7 @@ public class TeleOpLift extends AutoLift{
         this.turret.update();
     }
     
-    public static void runBoundedTool(DcMotor motor, int minBound, int maxBound, double power) {
+    public static void runBoundedTool(@NonNull DcMotor motor, int minBound, int maxBound, double power) {
         int motorPos = motor.getCurrentPosition();
         if (((power < 0) && (motorPos > minBound + 4)) || ((power > 0) && (motorPos < maxBound - 4))) {
             motor.setPower(power);

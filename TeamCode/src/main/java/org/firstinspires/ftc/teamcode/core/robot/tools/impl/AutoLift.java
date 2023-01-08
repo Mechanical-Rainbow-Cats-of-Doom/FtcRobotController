@@ -2,14 +2,14 @@ package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import androidx.annotation.NonNull;
 
 public class AutoLift {
-    final DcMotor liftMotor;
-    final DcMotor armMotor;
+    final DcMotor liftMotor, armMotor;
     final AutoTurret turret;
     final CRServo intake;
 
@@ -44,11 +44,11 @@ public class AutoLift {
     int stage = 0;
     int totalUpdates = 0;
 
-    public AutoLift(@NonNull DcMotor liftMotor, @NonNull DcMotor armMotor, AutoTurret turret, CRServo intakeServo) {
-        this.liftMotor = liftMotor;
-        this.armMotor = armMotor;
+    public AutoLift(@NonNull HardwareMap hardwareMap, AutoTurret turret) {
+        this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
+        this.armMotor = hardwareMap.get(DcMotor.class, "arm");
+        this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
-        this.intake = intakeServo;
         initMotors();
     }
 

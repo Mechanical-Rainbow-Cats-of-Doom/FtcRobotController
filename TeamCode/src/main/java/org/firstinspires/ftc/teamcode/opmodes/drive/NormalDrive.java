@@ -6,15 +6,19 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.core.robot.drive.ControllerMovement;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.TeleOpLift;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.TeleOpTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 
 @TeleOp
 public class NormalDrive extends LinearOpMode {
     final GamepadEx moveGamepad = new GamepadEx(gamepad1);
+    final GamepadEx toolGamepad = new GamepadEx(gamepad2);
     ControllerMovement drive;
 
     ControllerMovement createDrive() {
@@ -29,7 +33,7 @@ public class NormalDrive extends LinearOpMode {
         final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
         final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
         final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
-
+        final TeleOpLift lift = new TeleOpLift(hardwareMap, new TeleOpTurret(hardwareMap, toolGamepad), toolGamepad);
         telemetry.addLine("PATRICK I REMOVED THE LEP DELTA SORRY IF YOU WANTED THAT");
         telemetry.update();
         leftEncoder.setDirection(Encoder.Direction.REVERSE);
@@ -40,6 +44,7 @@ public class NormalDrive extends LinearOpMode {
 
         while (opModeIsActive()) {
             drive.update();
+            lift.update();
             telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition());
             telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition());
             telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition());

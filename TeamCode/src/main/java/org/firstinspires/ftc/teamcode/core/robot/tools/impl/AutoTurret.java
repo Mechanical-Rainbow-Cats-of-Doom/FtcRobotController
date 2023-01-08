@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 import androidx.annotation.NonNull;
 
@@ -20,10 +22,9 @@ public class AutoTurret {
 
     /**
      * Only run after init, robot crashes otherwise
-     * @param motor autoTurret motor
      */
-    public AutoTurret(@NonNull DcMotor motor) {
-        this.motor = motor;
+    public AutoTurret(@NonNull HardwareMap hardwareMap) {
+        this.motor = hardwareMap.get(DcMotor.class, "turret");
         motor.setZeroPowerBehavior(BRAKE);
         ZeroMotorEncoder.zero(motor);
         motor.setTargetPosition((int) Math.round(startOffset * ticksperdeg));
