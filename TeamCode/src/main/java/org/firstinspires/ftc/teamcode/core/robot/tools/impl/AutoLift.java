@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
@@ -22,11 +23,11 @@ public class AutoLift {
         HIGH_TARGET(300,800),
         MAX(10000, 1000); //armpos max is verified
 
-        final int motorPos;
+        final int liftPos;
         final int armPos;
 
-        Position(int motorPos, int armPos) {
-            this.motorPos = motorPos;
+        Position(int liftPos, int armPos) {
+            this.liftPos = liftPos;
             this.armPos = armPos;
         }
     }
@@ -46,6 +47,7 @@ public class AutoLift {
 
     public AutoLift(@NonNull HardwareMap hardwareMap, AutoTurret turret) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
@@ -70,7 +72,7 @@ public class AutoLift {
             // initial position
             case 0:
                 if(totalUpdates != 0) {
-                    liftMotor.setTargetPosition(position.motorPos);
+                    liftMotor.setTargetPosition(position.liftPos);
                 }
                 stage++;
                 break;
@@ -79,7 +81,7 @@ public class AutoLift {
                  * Do nothing for now, if we need to move out of the way of anything we can add it
                  * in later.
                  */
-                 if(liftMotor.getCurrentPosition() == position.motorPos) {
+                 if(liftMotor.getCurrentPosition() == position.liftPos) {
                     stage++;
                  }
                  break;
