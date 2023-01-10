@@ -12,7 +12,6 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 @SuppressWarnings("BusyWait")
 @Config
 public class AutoTurret {
-    public static double startOffset = 45;
     public static double maxRot = 110;
     public static double minRot = -200;
 
@@ -20,24 +19,17 @@ public class AutoTurret {
     public static final double tpr = (((1+(46D/17))) * (1+(46D/11))) * 28 * 5; // 5 for gear
     public static final double ticksperdeg = tpr / 360;
 
+    void initMotors() {
+        ZeroMotorEncoder.zero(motor);
+    }
+
     /**
      * Only run after init, robot crashes otherwise
      */
     public AutoTurret(@NonNull HardwareMap hardwareMap) {
         this.motor = hardwareMap.get(DcMotor.class, "turret");
         motor.setZeroPowerBehavior(BRAKE);
-        ZeroMotorEncoder.zero(motor);
-        motor.setTargetPosition((int) Math.round(startOffset * ticksperdeg));
-        Thread thread = new Thread(() -> {
-            while (motor.isBusy()){
-                try {
-                    Thread.sleep(150);
-                } catch (InterruptedException ignored) {}
-            }
-            ZeroMotorEncoder.zero(motor);
-        });
-        thread.setPriority(Thread.MIN_PRIORITY);
-        thread.start();
+        initMotors();
     }
 
     /**
