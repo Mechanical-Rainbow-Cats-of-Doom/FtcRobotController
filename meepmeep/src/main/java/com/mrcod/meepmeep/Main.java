@@ -69,7 +69,12 @@ public class Main {
                 DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL);
 
         builder.strafeTo(cMirrorY(new Vector2d(-60, 58), mirror));
-        for (int i = 0; i < 3; i++) {
+
+        builder.strafeTo(cMirrorY(new Vector2d(-57, 13), mirror));
+        builder.strafeTo(cMirrorY(new Vector2d(-22, 13), mirror));
+        builder.waitSeconds(0.5);
+
+        for (int i = 0; i < 2; i++) {
             builder.strafeTo(cMirrorY(new Vector2d(-57, 13), mirror));
             builder.waitSeconds(0.5);
             builder.strafeTo(cMirrorY(new Vector2d(-22, 13), mirror));
