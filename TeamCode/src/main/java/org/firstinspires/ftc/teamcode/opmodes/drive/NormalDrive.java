@@ -41,10 +41,11 @@ public class NormalDrive extends LinearOpMode {
         frontEncoder.setDirection(Encoder.Direction.FORWARD);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
-
+        lift.init();
         while (opModeIsActive()) {
             drive.update();
             lift.update();
+
             telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition());
             telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition());
             telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition());

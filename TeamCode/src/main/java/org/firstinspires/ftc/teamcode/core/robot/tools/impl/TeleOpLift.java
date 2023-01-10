@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,10 +12,14 @@ import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import androidx.annotation.NonNull;
 
+@Config
 public class TeleOpLift extends AutoLift{
+    public static double armZeroPower = 0, liftZeroPower = 0;
+    public double test;
     private final GamepadEx gamepad;
     private final TeleOpTurret turret;
     private final Telemetry telemetry;
+    private final Thread thread;
     @Override
     void initMotors() {
         ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -26,15 +31,21 @@ public class TeleOpLift extends AutoLift{
         this.turret = turret;
         gamepad = toolGamepad;
         this.telemetry = telemetry;
+        thread = new Thread(() -> intake.setPower(gamepad.getButton(GamepadKeys.Button.Y) ? -1 : gamepad.getButton(GamepadKeys.Button.X) ? 1 : 0));
+        thread.setPriority(Thread.NORM_PRIORITY+1);
     }
-    
+
+    public void init() {
+        thread.start();
+    }
+
     @Override
     public void update() {
-        runBoundedTool(liftMotor, Position.MAX.liftPos, gamepad.getLeftY(), false, 0.08);
+        runBoundedTool(liftMotor, Position.MAX.liftPos, gamepad.getLeftY(), false, liftZeroPower);
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
-        runBoundedTool(armMotor, Position.MAX.armPos, -gamepad.getRightY(), false, 0.08);
-        intake.setPower(gamepad.getButton(GamepadKeys.Button.X) ? -1 : 1);
-        //this.turret.update();
+        final double armPower = -gamepad.getRightY();
+        armMotor.setPower(armPower == 0 ? armZeroPower : armPower);
+        this.turret.update();
         telemetry.update();
     }
 
@@ -43,7 +54,7 @@ public class TeleOpLift extends AutoLift{
         if (((power < 0) && (motorPos > minBound + 4)) || ((power > 0) && (motorPos < maxBound - 4))) {
             motor.setPower(power);
         } else {
-            motor.setPower(0);
+            motor.setPower(zeroPower);
         }
     }
 
