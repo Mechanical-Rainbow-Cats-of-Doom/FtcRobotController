@@ -32,8 +32,12 @@ public class BlueAutoClose extends LinearOpMode {
         // build trajectory
         TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(startPose);
 
+        builder.strafeTo(cMirrorY(new Vector2d(-57, 13), isRed));
+        builder.strafeTo(cMirrorY(new Vector2d(-22, 13), isRed));
+        builder.waitSeconds(0.5);
+
         builder.strafeTo(cMirrorY(new Vector2d(-60, 58), isRed));
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             builder.strafeTo(cMirrorY(new Vector2d(-57, 13), isRed));
             builder.waitSeconds(0.5);
             builder.strafeTo(cMirrorY(new Vector2d(-22, 13), isRed));
