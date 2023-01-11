@@ -7,13 +7,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.core.robot.util.MyToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import androidx.annotation.NonNull;
 
 @Config
-public class TeleOpLift extends AutoLift{
+public class TeleOpTools extends AutoTools {
     public static double armZeroPower = 0, liftZeroPower = 0;
     public double test;
     private final GamepadEx gamepad;
@@ -26,7 +25,7 @@ public class TeleOpLift extends AutoLift{
         ZeroMotorEncoder.zero(armMotor, DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public TeleOpLift(HardwareMap hardwareMap, TeleOpTurret turret, GamepadEx toolGamepad, Telemetry telemetry) {
+    public TeleOpTools(HardwareMap hardwareMap, TeleOpTurret turret, GamepadEx toolGamepad, Telemetry telemetry) {
         super(hardwareMap, turret);
         this.turret = turret;
         gamepad = toolGamepad;
@@ -43,12 +42,12 @@ public class TeleOpLift extends AutoLift{
     public void update() {
         runBoundedTool(liftMotor, Position.MAX.liftPos, gamepad.getLeftY(), false, liftZeroPower);
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
-        final double armPower = -gamepad.getRightY();
-        armMotor.setPower(armPower == 0 ? armZeroPower : armPower);
+        double armPower = -gamepad.getRightY();
+        armMotor.setPower(armPower < 0 ? Math.min(armPower, -armZeroPower) : Math.max(armPower, armZeroPower));
+        telemetry.addData("armpos", armMotor.getCurrentPosition());
         this.turret.update();
         telemetry.update();
     }
-
     public static void runBoundedTool(@NonNull DcMotor motor, int minBound, int maxBound, double power, boolean negative, double zeroPower) {
         int motorPos = motor.getCurrentPosition() * (negative ? -1 : 1);
         if (((power < 0) && (motorPos > minBound + 4)) || ((power > 0) && (motorPos < maxBound - 4))) {

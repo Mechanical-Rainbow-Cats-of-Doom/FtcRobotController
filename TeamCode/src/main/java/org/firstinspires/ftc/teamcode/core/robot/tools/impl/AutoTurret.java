@@ -1,17 +1,30 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
+
 import androidx.annotation.NonNull;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
-@SuppressWarnings("BusyWait")
-@Config
 public class AutoTurret {
+    public enum Position {
+        FRONT(0),
+        FRONTRIGHT(45),
+        RIGHT(90),
+        BACKRIGHT(135),
+        BACK(180),
+        BACKLEFT(225),
+        LEFT(270),
+        FRONTLEFT(315);
+
+        final double turretPos;
+        Position(double turretPos) {
+            this.turretPos = turretPos * ticksperdeg;
+        }
+    }
     public static double maxRot = 110;
     public static double minRot = -200;
 
@@ -39,6 +52,10 @@ public class AutoTurret {
     public void setPosDeg(double pos) {
         assert pos <= maxRot && pos >= minRot;
         motor.setTargetPosition((int) Math.round(pos * ticksperdeg));
+    }
+
+    public boolean isMoving() {
+        return motor.isBusy();
     }
 
     /**

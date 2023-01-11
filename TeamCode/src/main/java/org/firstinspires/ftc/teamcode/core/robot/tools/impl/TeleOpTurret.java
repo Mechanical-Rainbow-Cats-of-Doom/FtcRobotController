@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
-import androidx.annotation.NonNull;
-
 public class TeleOpTurret extends AutoTurret {
     private final GamepadEx gamepad;
 
@@ -25,6 +23,7 @@ public class TeleOpTurret extends AutoTurret {
     }
 
     public void update() {
-        TeleOpLift.runBoundedTool(motor, (int)Math.round(minRot*ticksperdeg), (int)Math.round(maxRot*ticksperdeg), gamepad.getLeftX(), false);
+        TeleOpTools.runBoundedTool(motor, (int)Math.round(minRot*ticksperdeg), (int)Math.round(maxRot*ticksperdeg), gamepad.getLeftX(), false);
     }
+
 }
