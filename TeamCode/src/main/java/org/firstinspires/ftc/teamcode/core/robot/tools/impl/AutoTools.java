@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
-import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
@@ -56,6 +54,8 @@ public class AutoTools {
      */
     int stage = 0;
     boolean waiting = true;
+    boolean dumping = false;
+
     public AutoTools(@NonNull HardwareMap hardwareMap, AutoTurret turret) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -70,10 +70,37 @@ public class AutoTools {
         ZeroMotorEncoder.zero(armMotor);
     }
 
-    public void setPosition(Position position) {
+    public void setPosition(@NonNull Position position) {
         this.position = position;
     }
 
+    void dump(boolean incrementStage) {
+        dumping = true;
+        final int startPos = armMotor.getCurrentPosition();
+        armMotor.setTargetPosition(startPos-50);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                intake.setPower(1);
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        armMotor.setTargetPosition(startPos);
+                        Thread thread = new Thread(() -> {
+                            if (!armMotor.isBusy()) {
+                                //rotate turret so you don't smack yourself then
+                                if (incrementStage) stage++;
+                                dumping = false;
+                            } else try {
+                                Thread.sleep(60);
+                            } catch (InterruptedException ignored) {}
+                        });
+                        thread.start();
+                    }
+                }, 300);
+            }
+        }, 60);
+    }
     public void update() {
         if(lastPosition != position) {
             this.stage = 0;
@@ -100,28 +127,7 @@ public class AutoTools {
                 if (!waiting) {
                     waiting = true;
                     if (position.action == Action.DUMP) {
-                        armMotor.setTargetPosition(position.armPos-50);
-                        timer.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                intake.setPower(1);
-                                timer.schedule(new TimerTask() {
-                                    @Override
-                                    public void run() {
-                                        armMotor.setTargetPosition(position.armPos);
-                                        Thread thread = new Thread(() -> {
-                                            if (!armMotor.isBusy()) {
-                                                //rotate turret so you don't smack yourself then
-                                                stage++;
-                                            } else { try {
-                                                Thread.sleep(60);
-                                            } catch (InterruptedException ignored) {}}
-                                        });
-                                        thread.start();
-                                    }
-                                }, 300);
-                            }
-                        }, 60);
+                        dump(true);
                     } else if (position.action == Action.INTAKE) {
                         timer.schedule(new TimerTask() {
                             @Override
@@ -130,7 +136,7 @@ public class AutoTools {
                                 stage++;
                                 waiting = false;
                             }
-                        }, 400);
+                        }, 350);
                     } else {
                         stage++;
                         waiting = false;

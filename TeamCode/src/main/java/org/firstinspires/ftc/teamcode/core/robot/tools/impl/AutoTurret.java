@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 public class AutoTurret {
-    public enum Position {
+    public enum Rotation {
         FRONT(0),
         FRONTRIGHT(45),
         RIGHT(90),
@@ -21,12 +21,13 @@ public class AutoTurret {
         FRONTLEFT(315);
 
         final double turretPos;
-        Position(double turretPos) {
+        Rotation(double turretPos) {
             this.turretPos = turretPos * ticksperdeg;
         }
     }
-    public static double maxRot = 110;
-    public static double minRot = -200;
+
+    public static double maxRot = 1100;
+    public static double minRot = -2000;
 
     final DcMotor motor;
     public static final double tpr = (((1+(46D/17))) * (1+(46D/11))) * 28 * 5; // 5 for gear
@@ -49,9 +50,12 @@ public class AutoTurret {
      * sets position of autoTurret in degrees, goes around if it would result in going through start pos
      * @param pos MUST BE BETWEEN {@value maxRot} & {@value minRot} OR THE ROBOT WILL KILL ITSELF
      */
-    public void setPosDeg(double pos) {
-        assert pos <= maxRot && pos >= minRot;
-        motor.setTargetPosition((int) Math.round(pos * ticksperdeg));
+    public void setPos(double pos, boolean isDeg) {
+        assert pos <= maxRot + 1 && pos >= minRot -1;
+        if (isDeg) {
+            pos *= ticksperdeg;
+        }
+        motor.setTargetPosition((int) Math.round(pos));
     }
 
     public boolean isMoving() {
@@ -62,7 +66,7 @@ public class AutoTurret {
      * don't call too often, relatively resource intensive
      * @return current pos in degrees
      */
-    public double getPosDeg() {
-        return motor.getCurrentPosition() / ticksperdeg;
+    public double getPos(boolean deg) {
+        return deg ? motor.getCurrentPosition() / ticksperdeg : motor.getCurrentPosition();
     }
 }

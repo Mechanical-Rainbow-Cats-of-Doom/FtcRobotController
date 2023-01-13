@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import androidx.annotation.NonNull;
@@ -18,7 +20,8 @@ public class TeleOpTools extends AutoTools {
     private final GamepadEx gamepad;
     private final TeleOpTurret turret;
     private final Telemetry telemetry;
-    private final Thread thread;
+    private final ToggleableToggleButtonReader xReader, yReader;
+    private final ButtonReader bReader;
     @Override
     void initMotors() {
         ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -30,13 +33,11 @@ public class TeleOpTools extends AutoTools {
         this.turret = turret;
         gamepad = toolGamepad;
         this.telemetry = telemetry;
-        thread = new Thread(() -> intake.setPower(gamepad.getButton(GamepadKeys.Button.Y) ? -1 : gamepad.getButton(GamepadKeys.Button.X) ? 1 : 0));
-        thread.setPriority(Thread.NORM_PRIORITY+1);
+        this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
+        this.yReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.Y);
+        this.bReader = new ButtonReader(gamepad, GamepadKeys.Button.B);
     }
 
-    public void init() {
-        thread.start();
-    }
 
     @Override
     public void update() {
@@ -46,6 +47,18 @@ public class TeleOpTools extends AutoTools {
         armMotor.setPower(armPower < 0 ? Math.min(armPower, -armZeroPower) : Math.max(armPower, armZeroPower));
         telemetry.addData("armpos", armMotor.getCurrentPosition());
         this.turret.update();
+        xReader.readValue();
+        if (xReader.getState()) {
+            intake.setPower(1);
+            yReader.forceVal(false);
+        } else {
+            yReader.readValue();
+            intake.setPower(yReader.getState() ? -1 : 0);
+        }
+        bReader.readValue();
+        if (bReader.wasJustReleased() && !dumping) {
+            dump(false);
+        }
         telemetry.update();
     }
     public static void runBoundedTool(@NonNull DcMotor motor, int minBound, int maxBound, double power, boolean negative, double zeroPower) {
