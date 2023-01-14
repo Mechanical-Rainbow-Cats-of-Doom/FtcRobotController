@@ -24,13 +24,17 @@ public class AutoTools {
     }
     //armpos on dump is above
     public enum Position { // THESE VALUES ARE JUST GUESSES
-        NEUTRAL(40, 80, Action.NOTHING),
-        INTAKE(10, 25, Action.INTAKE),
-        GROUND_TARGET(10, 25, Action.DUMP),
+        NEUTRAL(0, 80, Action.NOTHING),
+        INTAKE(0, 25, Action.INTAKE),
+        GROUND_TARGET(INTAKE.liftPos, 25, Action.DUMP),
         LOW_TARGET(100, 300, Action.DUMP),
         MEDIUM_TARGET(200, 500, Action.DUMP),
         HIGH_TARGET(300,800, Action.DUMP),
-        MAX(10000, 1000, Action.NOTHING); //armpos max is verified
+        MAX(10000, 1000, Action.NOTHING), //armpos max is verified
+        GROUND_TARGET_NODUMP(GROUND_TARGET.liftPos, GROUND_TARGET.armPos, Action.NOTHING),
+        LOW_TARGET_NODUMP(LOW_TARGET.liftPos, LOW_TARGET.armPos, Action.NOTHING),
+        MEDIUM_TARGET_NODUMP(MEDIUM_TARGET.liftPos, MEDIUM_TARGET.armPos, Action.NOTHING),
+        HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING);
 
         final int liftPos;
         final int armPos;
@@ -54,8 +58,8 @@ public class AutoTools {
      */
     int stage = 0;
     boolean waiting = true;
-    boolean dumping = false;
-
+    boolean doingstuff = false;
+    boolean isAuto = true;
     public AutoTools(@NonNull HardwareMap hardwareMap, AutoTurret turret) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -74,8 +78,12 @@ public class AutoTools {
         this.position = position;
     }
 
-    void dump(boolean incrementStage) {
-        dumping = true;
+    void dump() {
+        doingstuff = true;
+        if (!isAuto) {
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
         final int startPos = armMotor.getCurrentPosition();
         armMotor.setTargetPosition(startPos-50);
         timer.schedule(new TimerTask() {
@@ -89,8 +97,13 @@ public class AutoTools {
                         Thread thread = new Thread(() -> {
                             if (!armMotor.isBusy()) {
                                 //rotate turret so you don't smack yourself then
-                                if (incrementStage) stage++;
-                                dumping = false;
+                                if (isAuto) stage++;
+                                else {
+                                    armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                                    liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                                }
+                                intake.setPower(0);
+                                doingstuff = false;
                             } else try {
                                 Thread.sleep(60);
                             } catch (InterruptedException ignored) {}
@@ -102,6 +115,7 @@ public class AutoTools {
         }, 60);
     }
     public void update() {
+        if (isAuto) doingstuff = true;
         if(lastPosition != position) {
             this.stage = 0;
             this.lastPosition = position;
@@ -127,7 +141,7 @@ public class AutoTools {
                 if (!waiting) {
                     waiting = true;
                     if (position.action == Action.DUMP) {
-                        dump(true);
+                        dump();
                     } else if (position.action == Action.INTAKE) {
                         timer.schedule(new TimerTask() {
                             @Override
@@ -144,11 +158,12 @@ public class AutoTools {
                 }
                 break;
             case 3:
-                if (position == Position.NEUTRAL) {
-                    waiting = true;
-                    stage = 0;
+                if (position == Position.NEUTRAL) waiting = true;
+                else if (isAuto || position == Position.INTAKE) position = Position.NEUTRAL;
+                if (!isAuto) {
+                    doingstuff = false;
                 }
-                else position = Position.NEUTRAL;
+                stage = 0;
                 break;
         }
     }

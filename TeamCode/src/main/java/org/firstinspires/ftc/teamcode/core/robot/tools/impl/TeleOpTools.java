@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
 
+import android.util.Pair;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -11,6 +13,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import androidx.annotation.NonNull;
 
 @Config
@@ -21,7 +29,10 @@ public class TeleOpTools extends AutoTools {
     private final TeleOpTurret turret;
     private final Telemetry telemetry;
     private final ToggleableToggleButtonReader xReader, yReader;
-    private final ButtonReader bReader;
+    private final ButtonReader bReader, up, right, down, left_dpad;
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final HashMap<ButtonReader, Position> liftButtons;
+    private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>();
     @Override
     void initMotors() {
         ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -30,21 +41,40 @@ public class TeleOpTools extends AutoTools {
 
     public TeleOpTools(HardwareMap hardwareMap, TeleOpTurret turret, GamepadEx toolGamepad, Telemetry telemetry) {
         super(hardwareMap, turret);
+        isAuto = false;
         this.turret = turret;
         gamepad = toolGamepad;
         this.telemetry = telemetry;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
         this.yReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.Y);
         this.bReader = new ButtonReader(gamepad, GamepadKeys.Button.B);
+        this.up = new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP);
+        this.right = new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT);
+        this.down = new ButtonReader(gamepad, GamepadKeys.Button.DPAD_DOWN);
+        this.left_dpad = new ButtonReader(gamepad, GamepadKeys.Button.DPAD_LEFT);
+        this.liftButtons = new HashMap<ButtonReader, Position>(){{
+            put(up, Position.HIGH_TARGET_NODUMP);
+            put(down, Position.GROUND_TARGET_NODUMP);
+            put(left_dpad, Position.LOW_TARGET_NODUMP);
+            put(right, Position.MEDIUM_TARGET_NODUMP);
+        }};
     }
 
-
+    private void readLiftButtons() {
+        for (ButtonReader button : liftButtons.keySet()) {
+            button.readValue();
+            liftButtonVals.put(button, button.wasJustReleased());
+        }
+    }
+    private boolean wasDoingStuff;
     @Override
     public void update() {
+        if (wasDoingStuff != doingstuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wasDoingStuff = doingstuff;
         runBoundedTool(liftMotor, Position.MAX.liftPos, gamepad.getLeftY(), false, liftZeroPower);
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         double armPower = -gamepad.getRightY();
-        armMotor.setPower(armPower < 0 ? Math.min(armPower, -armZeroPower) : Math.max(armPower, armZeroPower));
+        armMotor.setPower(armPower < -armZeroPower ? armZeroPower * 0.5 : Math.max(armPower, armZeroPower));
         telemetry.addData("armpos", armMotor.getCurrentPosition());
         this.turret.update();
         xReader.readValue();
@@ -56,10 +86,17 @@ public class TeleOpTools extends AutoTools {
             intake.setPower(yReader.getState() ? -1 : 0);
         }
         bReader.readValue();
-        if (bReader.wasJustReleased() && !dumping) {
-            dump(false);
+        if (bReader.wasJustReleased() && !doingstuff) {
+            dump();
         }
         telemetry.update();
+        readLiftButtons();
+        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
+            if (entry.getValue() && !doingstuff) {
+                liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
+            }
+        }
     }
     public static void runBoundedTool(@NonNull DcMotor motor, int minBound, int maxBound, double power, boolean negative, double zeroPower) {
         int motorPos = motor.getCurrentPosition() * (negative ? -1 : 1);
