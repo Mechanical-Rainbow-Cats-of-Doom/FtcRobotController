@@ -75,6 +75,8 @@ public class TeleOpTools extends AutoTools {
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         double armPower = -gamepad.getRightY();
         runBoundedTool(armMotor, Position.MAX.armPos, armPower, false, armZeroPower);
+        telemetry.addData("liftMotorPower", liftMotor.getPower());
+        telemetry.addData("liftMotorInput", gamepad.getLeftY());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
         telemetry.addData("armpower", armPower);
         this.turret.update();
