@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -12,14 +14,14 @@ import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
-import androidx.annotation.NonNull;
+import java.util.Timer;
 
 @Config
-public class TeleOpTools extends AutoTools {
+public class ControllerTools extends AutoTools {
     public static double armZeroPower = 0, liftZeroPower = 0;
     public double test;
     private final GamepadEx gamepad;
-    private final TeleOpTurret turret;
+    private final ControllerToolRotation rotation;
     private final Telemetry telemetry;
     private final ToggleableToggleButtonReader xReader, yReader;
     private final ButtonReader bReader;
@@ -29,9 +31,9 @@ public class TeleOpTools extends AutoTools {
         ZeroMotorEncoder.zero(armMotor, DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public TeleOpTools(HardwareMap hardwareMap, TeleOpTurret turret, GamepadEx toolGamepad, Telemetry telemetry) {
-        super(hardwareMap, turret);
-        this.turret = turret;
+    public ControllerTools(HardwareMap hardwareMap, Timer timer, ControllerToolRotation rotation, GamepadEx toolGamepad, Telemetry telemetry) {
+        super(hardwareMap, timer, rotation);
+        this.rotation = rotation;
         gamepad = toolGamepad;
         this.telemetry = telemetry;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
@@ -47,7 +49,7 @@ public class TeleOpTools extends AutoTools {
         double armPower = -gamepad.getRightY();
         armMotor.setPower(armPower < 0 ? Math.min(armPower, -armZeroPower) : Math.max(armPower, armZeroPower));
         telemetry.addData("armpos", armMotor.getCurrentPosition());
-        this.turret.update();
+        this.rotation.update();
         xReader.readValue();
         if (xReader.getState()) {
             intake.setPower(1);

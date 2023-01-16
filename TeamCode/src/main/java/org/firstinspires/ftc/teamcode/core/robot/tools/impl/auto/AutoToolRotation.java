@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
-public class AutoTurret {
+public class AutoToolRotation {
     public enum Rotation {
         FRONT(0),
         FRONTRIGHT(45),
@@ -20,9 +20,9 @@ public class AutoTurret {
         LEFT(270),
         FRONTLEFT(315);
 
-        final double turretPos;
-        Rotation(double turretPos) {
-            this.turretPos = turretPos * ticksperdeg;
+        final double motorPos;
+        Rotation(double motorPos) {
+            this.motorPos = motorPos * ticksperdeg;
         }
     }
 
@@ -42,14 +42,14 @@ public class AutoTurret {
     /**
      * Only run after init, robot crashes otherwise
      */
-    public AutoTurret(@NonNull HardwareMap hardwareMap) {
+    public AutoToolRotation(@NonNull HardwareMap hardwareMap) {
         this.motor = hardwareMap.get(DcMotor.class, "turret");
         motor.setZeroPowerBehavior(BRAKE);
         initMotors();
     }
 
     /**
-     * sets position of autoTurret in degrees, goes around if it would result in going through start pos
+     * sets the rotation of the tool in degrees, goes around if it would result in going through start pos
      * @param pos MUST BE BETWEEN {@value maxRot} & {@value minRot} OR THE ROBOT WILL KILL ITSELF
      */
     public void setPos(double pos, boolean isDeg) {

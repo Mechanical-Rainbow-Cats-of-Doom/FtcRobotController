@@ -14,9 +14,9 @@ import androidx.annotation.NonNull;
 
 public class AutoTools {
     protected final DcMotor liftMotor, armMotor;
-    protected final AutoTurret turret;
+    protected final AutoToolRotation rotation;
     protected final CRServo intake;
-    protected final Timer timer = new Timer();
+    protected final Timer timer;
     public enum Action {
         INTAKE,
         DUMP,
@@ -56,12 +56,13 @@ public class AutoTools {
     protected boolean waiting = true;
     protected boolean dumping = false;
 
-    public AutoTools(@NonNull HardwareMap hardwareMap, AutoTurret turret) {
+    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoToolRotation rotation) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
         this.intake = hardwareMap.get(CRServo.class, "intake");
-        this.turret = turret;
+        this.rotation = rotation;
+        this.timer = timer;
         initMotors();
     }
 
@@ -88,7 +89,7 @@ public class AutoTools {
                         armMotor.setTargetPosition(startPos);
                         Thread thread = new Thread(() -> {
                             if (!armMotor.isBusy()) {
-                                //rotate turret so you don't smack yourself then
+                                //rotate the tool so you don't smack yourself then
                                 if (incrementStage) stage++;
                                 dumping = false;
                             } else try {
