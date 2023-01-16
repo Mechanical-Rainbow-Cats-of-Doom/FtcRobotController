@@ -23,7 +23,7 @@ import androidx.annotation.NonNull;
 
 @Config
 public class TeleOpTools extends AutoTools {
-    public static double armZeroPower = 0, liftZeroPower = 0;
+    public static double armZeroPower = 0.15, liftZeroPower = 0.001;
     public double test;
     private final GamepadEx gamepad;
     private final TeleOpTurret turret;
@@ -36,7 +36,7 @@ public class TeleOpTools extends AutoTools {
     @Override
     void initMotors() {
         ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_USING_ENCODER);
-        ZeroMotorEncoder.zero(armMotor, DcMotor.RunMode.RUN_USING_ENCODER);
+        ZeroMotorEncoder.zero(armMotor, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public TeleOpTools(HardwareMap hardwareMap, TeleOpTurret turret, GamepadEx toolGamepad, Telemetry telemetry) {
@@ -52,7 +52,7 @@ public class TeleOpTools extends AutoTools {
         this.right = new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT);
         this.down = new ButtonReader(gamepad, GamepadKeys.Button.DPAD_DOWN);
         this.left_dpad = new ButtonReader(gamepad, GamepadKeys.Button.DPAD_LEFT);
-        this.liftButtons = new HashMap<ButtonReader, Position>(){{
+        this.liftButtons = new HashMap<ButtonReader, Position>() {{
             put(up, Position.HIGH_TARGET_NODUMP);
             put(down, Position.GROUND_TARGET_NODUMP);
             put(left_dpad, Position.LOW_TARGET_NODUMP);
@@ -74,8 +74,9 @@ public class TeleOpTools extends AutoTools {
         runBoundedTool(liftMotor, Position.MAX.liftPos, gamepad.getLeftY(), false, liftZeroPower);
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         double armPower = -gamepad.getRightY();
-        armMotor.setPower(armPower < -armZeroPower ? armZeroPower * 0.5 : Math.max(armPower, armZeroPower));
+        runBoundedTool(armMotor, Position.MAX.armPos, armPower, false, armZeroPower);
         telemetry.addData("armpos", armMotor.getCurrentPosition());
+        telemetry.addData("armpower", armPower);
         this.turret.update();
         xReader.readValue();
         if (xReader.getState()) {

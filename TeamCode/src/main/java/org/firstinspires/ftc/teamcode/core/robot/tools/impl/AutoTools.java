@@ -62,7 +62,6 @@ public class AutoTools {
     boolean isAuto = true;
     public AutoTools(@NonNull HardwareMap hardwareMap, AutoTurret turret) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
-        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
