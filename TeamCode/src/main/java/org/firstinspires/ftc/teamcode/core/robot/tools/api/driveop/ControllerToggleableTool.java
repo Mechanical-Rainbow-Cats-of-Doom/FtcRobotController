@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.core.thread.event.impl.ReaderUpdatedEvent;
 /**
  * simple button push toggleable tool
  */
-public abstract class ControllerToggleableTool<T extends AutoToggleableTool> {
+public class ControllerToggleableTool<T extends AutoToggleableTool> {
     protected final ButtonReader reader;
     public final T headlessTool;
 
