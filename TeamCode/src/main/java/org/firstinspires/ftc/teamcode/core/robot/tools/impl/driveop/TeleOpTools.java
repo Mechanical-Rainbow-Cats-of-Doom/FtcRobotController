@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
+package org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
@@ -23,7 +24,7 @@ public class TeleOpTools extends AutoTools {
     private final ToggleableToggleButtonReader xReader, yReader;
     private final ButtonReader bReader;
     @Override
-    void initMotors() {
+    protected void initMotors() {
         ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_USING_ENCODER);
         ZeroMotorEncoder.zero(armMotor, DcMotor.RunMode.RUN_USING_ENCODER);
     }

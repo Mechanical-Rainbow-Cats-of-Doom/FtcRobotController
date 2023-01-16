@@ -1,16 +1,17 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
+package org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 public class TeleOpTurret extends AutoTurret {
     private final GamepadEx gamepad;
 
     @Override
-    void initMotors() {
+    protected void initMotors() {
         ZeroMotorEncoder.zero(motor, DcMotor.RunMode.RUN_USING_ENCODER);
     }
 

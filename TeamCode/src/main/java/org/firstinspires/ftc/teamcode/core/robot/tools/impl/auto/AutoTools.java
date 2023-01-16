@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
+package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,10 +13,10 @@ import java.util.TimerTask;
 import androidx.annotation.NonNull;
 
 public class AutoTools {
-    final DcMotor liftMotor, armMotor;
-    final AutoTurret turret;
-    final CRServo intake;
-    final Timer timer = new Timer();
+    protected final DcMotor liftMotor, armMotor;
+    protected final AutoTurret turret;
+    protected final CRServo intake;
+    protected final Timer timer = new Timer();
     public enum Action {
         INTAKE,
         DUMP,
@@ -32,7 +32,7 @@ public class AutoTools {
         HIGH_TARGET(300,800, Action.DUMP),
         MAX(10000, 1000, Action.NOTHING); //armpos max is verified
 
-        final int liftPos;
+        public final int liftPos;
         final int armPos;
         final Action action;
         Position(int liftPos, int armPos, Action action) {
@@ -52,9 +52,9 @@ public class AutoTools {
      * 3 - finished.
      * If the position doesn't dump, stage 2 is skipped.
      */
-    int stage = 0;
-    boolean waiting = true;
-    boolean dumping = false;
+    protected int stage = 0;
+    protected boolean waiting = true;
+    protected boolean dumping = false;
 
     public AutoTools(@NonNull HardwareMap hardwareMap, AutoTurret turret) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
@@ -65,7 +65,7 @@ public class AutoTools {
         initMotors();
     }
 
-    void initMotors() {
+    protected void initMotors() {
         ZeroMotorEncoder.zero(liftMotor);
         ZeroMotorEncoder.zero(armMotor);
     }
@@ -74,7 +74,7 @@ public class AutoTools {
         this.position = position;
     }
 
-    void dump(boolean incrementStage) {
+    protected void dump(boolean incrementStage) {
         dumping = true;
         final int startPos = armMotor.getCurrentPosition();
         armMotor.setTargetPosition(startPos-50);

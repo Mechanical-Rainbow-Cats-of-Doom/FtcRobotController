@@ -9,8 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.core.robot.drive.ControllerMovement;
-import org.firstinspires.ftc.teamcode.core.robot.tools.impl.TeleOpTools;
-import org.firstinspires.ftc.teamcode.core.robot.tools.impl.TeleOpTurret;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.TeleOpTools;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.TeleOpTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 
@@ -40,7 +40,7 @@ public class NormalDrive extends LinearOpMode {
         frontEncoder.setDirection(Encoder.Direction.FORWARD);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
-        lift.init();
+//      lift.init(); // ?????
         while (opModeIsActive()) {
             drive.update();
             lift.update();
