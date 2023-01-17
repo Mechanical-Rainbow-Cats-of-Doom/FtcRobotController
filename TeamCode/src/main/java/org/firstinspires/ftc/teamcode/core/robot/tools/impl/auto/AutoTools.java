@@ -37,7 +37,7 @@ public class AutoTools {
         HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING);
 
         public final int liftPos;
-        final int armPos;
+        public final int armPos;
         final Action action;
         Position(int liftPos, int armPos, Action action) {
             this.liftPos = liftPos;
@@ -59,7 +59,7 @@ public class AutoTools {
     protected int stage = 0;
     protected boolean waiting = true;
     protected boolean doingstuff = false;
-    boolean isAuto = true;
+    protected boolean isAuto = true;
     public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoToolRotation rotation) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
