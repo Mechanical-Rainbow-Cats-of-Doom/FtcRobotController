@@ -14,9 +14,8 @@ public class ZeroMotorEncoder {
             motor.setPower(0);
         }
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(endRunMode);
         if (endRunMode == DcMotor.RunMode.RUN_TO_POSITION) {
             motor.setPower(1);

@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.auto;
 
-import static org.firstinspires.ftc.teamcode.roadrunner.util.MirroringUtil.cMirrorY;
-
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -15,8 +15,10 @@ import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 
+import static org.firstinspires.ftc.teamcode.roadrunner.util.MirroringUtil.cMirrorY;
+
 @Autonomous
-public class BlueAutoClose extends LinearOpMode {
+public class AutoTest extends LinearOpMode {
     public TrajectorySequence sequence;
     public boolean isRed = false;
 
@@ -25,6 +27,8 @@ public class BlueAutoClose extends LinearOpMode {
         //
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         ElapsedTime timer = new ElapsedTime();
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
 
         // start pose
         final Pose2d startPose = cMirrorY(new Pose2d(-35, 63, Math.toRadians(270)), isRed);
@@ -32,31 +36,8 @@ public class BlueAutoClose extends LinearOpMode {
         // build trajectory
         TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(startPose);
 
-//        builder.strafeTo(cMirrorY(new Vector2d(-60, 58), isRed));
-//
-//        builder.strafeTo(cMirrorY(new Vector2d(-57, 13), isRed));
-//        builder.strafeTo(cMirrorY(new Vector2d(-22, 13), isRed));
-//        builder.waitSeconds(0.5);
-//
-//        for (int i = 0; i < 2; i++) {
-//            builder.strafeTo(cMirrorY(new Vector2d(-57, 13), isRed));
-//            builder.waitSeconds(0.5);
-//            builder.strafeTo(cMirrorY(new Vector2d(-22, 13), isRed));
-//            builder.waitSeconds(0.5);
-//        }
+        builder.strafeTo(cMirrorY(new Vector2d(-60, 63), isRed));
 
-        builder.lineToLinearHeading(new Pose2d(-60, 58, Math.toRadians(270)));
-
-        builder.lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)));
-        builder.lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)));
-        builder.waitSeconds(0.5);
-
-        for (int i = 0; i < 2; i++) {
-            builder.lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)));
-            builder.waitSeconds(0.5);
-            builder.lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)));
-            builder.waitSeconds(0.5);
-        }
 
         sequence = builder.build();
 
@@ -76,7 +57,6 @@ public class BlueAutoClose extends LinearOpMode {
             drive.update();
             // keep the current position updated in
             PoseStorage.currentPose = drive.getPoseEstimate();
-
             telemetry.addData("pose estimate", drive.getPoseEstimate());
             telemetry.update();
         }
