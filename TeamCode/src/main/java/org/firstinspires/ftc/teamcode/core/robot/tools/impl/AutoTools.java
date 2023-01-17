@@ -26,11 +26,11 @@ public class AutoTools {
     public enum Position { // THESE VALUES ARE JUST GUESSES
         NEUTRAL(0, 80, Action.NOTHING),
         INTAKE(0, 25, Action.INTAKE),
-        GROUND_TARGET(INTAKE.liftPos, 25, Action.DUMP),
-        LOW_TARGET(100, 300, Action.DUMP),
-        MEDIUM_TARGET(200, 500, Action.DUMP),
-        HIGH_TARGET(300,800, Action.DUMP),
-        MAX(10000, 1000, Action.NOTHING), //armpos max is verified
+        GROUND_TARGET(INTAKE.liftPos, 280, Action.DUMP),
+        LOW_TARGET(0, 752, Action.DUMP),
+        MEDIUM_TARGET(1251, 671, Action.DUMP),
+        MAX(2523, 1000, Action.NOTHING), //armpos max is verified
+        HIGH_TARGET(MAX.liftPos, 603, Action.DUMP),
         GROUND_TARGET_NODUMP(GROUND_TARGET.liftPos, GROUND_TARGET.armPos, Action.NOTHING),
         LOW_TARGET_NODUMP(LOW_TARGET.liftPos, LOW_TARGET.armPos, Action.NOTHING),
         MEDIUM_TARGET_NODUMP(MEDIUM_TARGET.liftPos, MEDIUM_TARGET.armPos, Action.NOTHING),
@@ -94,18 +94,19 @@ public class AutoTools {
                     public void run() {
                         armMotor.setTargetPosition(startPos);
                         Thread thread = new Thread(() -> {
-                            if (!armMotor.isBusy()) {
-                                //rotate turret so you don't smack yourself then
-                                if (isAuto) stage++;
-                                else {
-                                    armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                                    liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                                }
-                                intake.setPower(0);
-                                doingstuff = false;
-                            } else try {
-                                Thread.sleep(60);
-                            } catch (InterruptedException ignored) {}
+                            while (armMotor.isBusy()) {
+                                try {
+                                    //noinspection BusyWait
+                                    Thread.sleep(60);
+                                } catch (InterruptedException ignored) {}
+                            }
+                            if (isAuto) stage++;
+                            else {
+                                armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                                liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                            }
+                            intake.setPower(0);
+                            doingstuff = false;
                         });
                         thread.start();
                     }
@@ -115,6 +116,10 @@ public class AutoTools {
     }
     public void update() {
         if (isAuto) doingstuff = true;
+        else {
+            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
         if(lastPosition != position) {
             this.stage = 0;
             this.lastPosition = position;
@@ -157,10 +162,13 @@ public class AutoTools {
                 }
                 break;
             case 3:
-                if (position == Position.NEUTRAL) waiting = true;
-                else if (isAuto || position == Position.INTAKE) position = Position.NEUTRAL;
+                if (position == Position.NEUTRAL) {
+                    waiting = true;
+                } else if ((isAuto && position.action != Action.NOTHING) || position == Position.INTAKE) position = Position.NEUTRAL;
                 if (!isAuto) {
                     doingstuff = false;
+                    armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 stage = 0;
                 break;

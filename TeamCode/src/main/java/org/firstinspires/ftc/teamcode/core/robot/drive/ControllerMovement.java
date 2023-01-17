@@ -20,7 +20,7 @@ public class ControllerMovement {
     }
 
     public void update() {
-        drive.setWeightedDrivePower(new Pose2d(gamepad.getLeftY(), gamepad.getLeftX(), gamepad.getRightX()));
+        drive.setWeightedDrivePower(new Pose2d(gamepad.getLeftY(), -gamepad.getLeftX(), gamepad.getRightX()));
     }
 
     public ArrayList<Double> motorVelocities() {

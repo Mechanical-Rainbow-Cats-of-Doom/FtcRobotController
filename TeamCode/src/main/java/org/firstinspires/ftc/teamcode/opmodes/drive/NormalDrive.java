@@ -16,8 +16,6 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 
 @TeleOp
 public class NormalDrive extends LinearOpMode {
-    ControllerMovement drive;
-
     ControllerMovement createDrive(GamepadEx gamepad) {
         return new ControllerMovement(hardwareMap, gamepad);
     }
@@ -26,7 +24,7 @@ public class NormalDrive extends LinearOpMode {
     public void runOpMode() {
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
-        drive = createDrive(moveGamepad);
+        final ControllerMovement drive = createDrive(moveGamepad);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));

@@ -66,27 +66,24 @@ public class TeleOpTools extends AutoTools {
             liftButtonVals.put(button, button.wasJustReleased());
         }
     }
-    private boolean wasDoingStuff;
+    private boolean wasDoingStuff = false;
     @Override
     public void update() {
         if (wasDoingStuff != doingstuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wasDoingStuff = doingstuff;
         runBoundedTool(liftMotor, Position.MAX.liftPos, gamepad.getLeftY(), false, liftZeroPower);
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
-        double armPower = -gamepad.getRightY();
-        runBoundedTool(armMotor, Position.MAX.armPos, armPower, false, armZeroPower);
+        runBoundedTool(armMotor, Position.MAX.armPos, -gamepad.getRightY(), false, armZeroPower);
         telemetry.addData("liftMotorPower", liftMotor.getPower());
-        telemetry.addData("liftMotorInput", gamepad.getLeftY());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
-        telemetry.addData("armpower", armPower);
         this.turret.update();
-        xReader.readValue();
-        if (xReader.getState()) {
-            intake.setPower(1);
-            yReader.forceVal(false);
+        yReader.readValue();
+        if (yReader.getState()) {
+            intake.setPower(-1);
+            xReader.forceVal(false);
         } else {
-            yReader.readValue();
-            intake.setPower(yReader.getState() ? -1 : 0);
+            xReader.readValue();
+            intake.setPower(xReader.getState() ? -1 : 0);
         }
         bReader.readValue();
         if (bReader.wasJustReleased() && !doingstuff) {
