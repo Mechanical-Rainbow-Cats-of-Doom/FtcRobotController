@@ -57,7 +57,7 @@ public class Main {
 
     public static RoadRunnerBotEntity closeBase(MeepMeep meep, boolean mirror) {
         final Pose2d startPose = cMirrorY(new Pose2d(-35, 63,
-                Math.toRadians(270)), mirror);
+                Math.toRadians(90)), mirror);
 
         RoadRunnerBotEntity roadRunnerBot = new RoadRunnerBotEntity(meep, DriveConstants.CONSTRAINTS,
                 16, 16, startPose, mirror ? new ColorSchemeRedDark() : new ColorSchemeBlueDark(),

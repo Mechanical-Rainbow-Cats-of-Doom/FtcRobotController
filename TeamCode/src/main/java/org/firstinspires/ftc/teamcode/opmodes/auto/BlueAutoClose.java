@@ -50,14 +50,14 @@ public class BlueAutoClose extends LinearOpMode {
            }
         });
         // start pose
-        final Pose2d startPose = cMirrorY(new Pose2d(-35, 63, Math.toRadians(270)), isRed);
+        final Pose2d startPose = cMirrorY(new Pose2d(-35, 63, Math.toRadians(90)), isRed);
 
         TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(startPose);
 
 
         // build trajectories
-        Pose2d placeEndPose = new Pose2d(-22, 13, Math.toRadians(270));
-        Pose2d refillEndPose = new Pose2d(-57, 13, Math.toRadians(270));
+        Pose2d placeEndPose = new Pose2d(-22, 13, Math.toRadians(90));
+        Pose2d refillEndPose = new Pose2d(-57, 13, Math.toRadians(90));
 
         /** Trajectory: Start
          * __________________
@@ -70,8 +70,8 @@ public class BlueAutoClose extends LinearOpMode {
          *|—————————————————|
         */
         TrajectorySequence trajectoryStart = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-60, 58, Math.toRadians(270)))
-                .lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-60, 58, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(90)))
                 .build();
 
         /** Trajectory: Refill
@@ -85,7 +85,7 @@ public class BlueAutoClose extends LinearOpMode {
          *|—————————————————|
          */
         TrajectorySequence trajectoryRefill = drive.trajectorySequenceBuilder(placeEndPose)
-                .lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(90)))
                 .build();
 
         /** Trajectory: Place
@@ -99,7 +99,7 @@ public class BlueAutoClose extends LinearOpMode {
          *|—————————————————|
          */
         TrajectorySequence trajectoryPlace = drive.trajectorySequenceBuilder(refillEndPose)
-                .lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(90)))
                 .build();
 
 
@@ -117,7 +117,7 @@ public class BlueAutoClose extends LinearOpMode {
 //        }
 
 
-        sequence = builder.build();
+
         drive.setPoseEstimate(startPose);
         waitForStart();
         thread.start();
@@ -127,16 +127,16 @@ public class BlueAutoClose extends LinearOpMode {
 
         //set to follow the sequence
         drive.followTrajectorySequence(trajectoryStart);
-        WaitForDrive(drive);
-//        while(!isStopRequested() && drive.isBusy()) {
-//            // update the position
-//            drive.update();
-//            // keep the current position updated in
-//            PoseStorage.currentPose = drive.getPoseEstimate();
-//
-//            telemetry.addData("pose estimate", drive.getPoseEstimate());
-//            telemetry.update();
-//        }
+//        WaitForDrive(drive);
+        while(!isStopRequested() && drive.isBusy()) {
+            // update the position
+            drive.update();
+            // keep the current position updated in
+            PoseStorage.currentPose = drive.getPoseEstimate();
+
+            telemetry.addData("pose estimate", drive.getPoseEstimate());
+            telemetry.update();
+        }
 //        WaitForDrive(drive);
 
 
