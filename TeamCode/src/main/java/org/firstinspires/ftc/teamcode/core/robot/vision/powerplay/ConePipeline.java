@@ -36,19 +36,17 @@ top width = 0.08
  */
 @Config
 public class ConePipeline extends OpenCvPipeline {
-    public ConePipeline(boolean isRed, Telemetry telemetry, boolean debug, ArrayBlockingQueue<Integer> queue) {
+    public ConePipeline(boolean isRed, boolean debug, ArrayBlockingQueue<Integer> queue) {
         if (!debug && isRed) {
             topRectWidthPercentage = redWidthPercent;
             topRectHeightPercentage = redHeightPercent;
         }
-        this.telemetry = telemetry;
         this.debug = debug;
         this.queue = queue;
     }
 
     public void reset() {
         running = true;
-        finalPos = -1;
         totalTimesRan = 0;
         curRun = new Pair<>(-1, 0);
         greatestConfidence = new Pair<>(-1, 0);
@@ -65,12 +63,16 @@ public class ConePipeline extends OpenCvPipeline {
     //The width and height of the rectangles in terms of pixels
     public static int rectangleWidth = 10;
     private boolean running = false;
-    private final Telemetry telemetry;
-    private int finalPos = -1; // 0 = pos1 (red), 1 = pos2(green), 2 = pos3(blue)
     private Pair<Integer, Integer> curRun = new Pair<>(-1, 0), greatestConfidence = new Pair<>(-1, 0);
     private final ArrayBlockingQueue<Integer> queue;
     private int totalTimesRan = 0;
     private final boolean debug;
+    private static Rect rect = new Rect(
+            (int) (ConeDetector.CAMERA_WIDTH * topRectWidthPercentage),
+            (int) (ConeDetector.CAMERA_HEIGHT* topRectHeightPercentage),
+            rectangleWidth,
+            rectangleHeight
+    );
 
     public void startPipeline() {
         running = true;
@@ -84,15 +86,19 @@ public class ConePipeline extends OpenCvPipeline {
         return running;
     }
 
+    public static Rect getRect() {
+        return rect;
+    }
+
     /**
      * @param input input frame matrix
      */
     @Override
     public synchronized Mat processFrame(Mat input) {
         if (running) {
-            final Rect rect = new Rect(
-                    (int) (input.width() * topRectWidthPercentage),
-                    (int) (input.height() * topRectHeightPercentage),
+            rect = new Rect(
+                    (int) (ConeDetector.CAMERA_WIDTH * topRectWidthPercentage),
+                    (int) (ConeDetector.CAMERA_HEIGHT* topRectHeightPercentage),
                     rectangleWidth,
                     rectangleHeight
             );
@@ -100,7 +106,6 @@ public class ConePipeline extends OpenCvPipeline {
             if (debug) {
                 drawRectOnToMat(input, rect, yellow);
             }
-
             Mat redMat = new Mat(), greenMat = new Mat(), blueMat = new Mat();
             Core.extractChannel(rgbMat, redMat, 0);
             Core.extractChannel(rgbMat, greenMat, 1);
@@ -139,7 +144,7 @@ public class ConePipeline extends OpenCvPipeline {
      * @param rect  The rectangle
      * @param color The color the rectangle will be
      */
-    private void drawRectOnToMat(Mat mat, Rect rect, Scalar color) {
+    public static void drawRectOnToMat(Mat mat, Rect rect, Scalar color) {
         Imgproc.rectangle(mat, rect, color, 1);
     }
 }

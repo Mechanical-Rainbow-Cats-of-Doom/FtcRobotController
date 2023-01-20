@@ -12,7 +12,7 @@ public class ConeVisionTester extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        final ConeDetector detector = new ConeDetector(hardwareMap, "webcam", true, false, telemetry);
+        final ConeDetector detector = new ConeDetector(hardwareMap, "webcam", true, false);
         waitForStart();
         while (!isStopRequested() && opModeIsActive()) {
             telemetry.addData("rgb", detector.run());
