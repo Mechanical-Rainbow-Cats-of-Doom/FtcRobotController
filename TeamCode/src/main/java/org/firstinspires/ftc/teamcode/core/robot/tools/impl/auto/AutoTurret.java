@@ -26,9 +26,6 @@ public class AutoTurret {
         }
     }
 
-    public static double maxRot = 1100;
-    public static double minRot = -2000;
-
     protected final DcMotor motor;
     // thanks ethan for the unlabeled magic numbers!
     // well i assume it was you but you were on logans computer or something
@@ -50,10 +47,8 @@ public class AutoTurret {
 
     /**
      * sets the rotation of the tool in degrees, goes around if it would result in going through start pos
-     * @param pos MUST BE BETWEEN {@value maxRot} & {@value minRot} OR THE ROBOT WILL KILL ITSELF
      */
     public void setPos(double pos, boolean isDeg) {
-        assert pos <= maxRot + 1 && pos >= minRot -1;
         if (isDeg) {
             pos *= ticksperdeg;
         }

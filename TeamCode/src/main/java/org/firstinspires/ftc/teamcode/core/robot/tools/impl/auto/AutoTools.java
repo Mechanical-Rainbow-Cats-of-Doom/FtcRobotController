@@ -25,6 +25,7 @@ public class AutoTools {
     public enum Position { // THESE VALUES ARE JUST GUESSES
         NEUTRAL(0, 80, Action.NOTHING),
         INTAKE(0, 25, Action.INTAKE),
+        INTAKE_NO_INTAKE(INTAKE.liftPos, INTAKE.armPos, Action.NOTHING),
         GROUND_TARGET(INTAKE.liftPos, 280, Action.DUMP),
         LOW_TARGET(0, 752, Action.DUMP),
         MEDIUM_TARGET(1251, 671, Action.DUMP),
@@ -171,7 +172,11 @@ public class AutoTools {
                     liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 stage = 0;
+                notifyAll();
                 break;
         }
+    }
+    public void setIntake(boolean state) {
+        intake.setPower(state ? 1 : -1);
     }
 }
