@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 import static org.firstinspires.ftc.teamcode.roadrunner.util.MirroringUtil.cMirrorY;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -171,20 +169,21 @@ public class BlueAutoClose extends LinearOpMode {
 //        }
 
 
-
-
-
         // set starting position
         // wait for the start button to be pressed
 
         // runs until the trajectory sequence is complete
 
-        if (isStopRequested()) return;
+        //idk why this is there
+        if (isStopRequested()) {
+            tools.cleanup();
+        }
 
         // after the trajectory sequence is complete
         Pose2d finalPose = drive.getPoseEstimate();
-        while(!isStopRequested()) {
+        while (!isStopRequested()) {
             StayInPosition.stayInPose(drive, finalPose);
         }
+        tools.cleanup();
     }
 }

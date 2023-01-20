@@ -88,5 +88,5 @@ lint/outputs/
 lint/tmp/
 # lint/reports/
 
-TeamCode/src/main/java/org/firstinspires/ftc/teamcode/vision/simulator/eocvsim_workspace.json
+**/eocvsim_workspace.*
 *.hprof
