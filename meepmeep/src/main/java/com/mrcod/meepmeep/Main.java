@@ -152,40 +152,55 @@ public class Main {
             int chosenX = -1;
             int chosenY = -1;
 
-            if (keyEvent.getKeyCode() == KeyEvent.VK_1) {
-                chosenX = 0;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_2) {
-                chosenX = 1;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_3) {
-                chosenX = 2;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_4) {
-                chosenX = 3;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_5) {
-                chosenX = 4;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_6) {
-                chosenX = 5;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_Q) {
-                chosenY = 0;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_W) {
-                chosenY = 1;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_E) {
-                chosenY = 2;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_R) {
-                chosenY = 3;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_T) {
-                chosenY = 4;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_Y) {
-                chosenY = 5;
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_A) {
-                heading -= Math.PI / 2;
-                if (heading <= 0) {
-                    heading += Math.PI;
-                }
-            } else if (keyEvent.getKeyCode() == KeyEvent.VK_D) {
-                heading += Math.PI / 2;
-                if (heading >= Math.PI * 2) {
-                    heading -= Math.PI;
-                }
+            switch (keyEvent.getKeyCode()) {
+                case KeyEvent.VK_1:
+                    chosenX = 0;
+                    break;
+                case KeyEvent.VK_2:
+                    chosenX = 1;
+                    break;
+                case KeyEvent.VK_3:
+                    chosenX = 2;
+                    break;
+                case KeyEvent.VK_4:
+                    chosenX = 3;
+                    break;
+                case KeyEvent.VK_5:
+                    chosenX = 4;
+                    break;
+                case KeyEvent.VK_6:
+                    chosenX = 5;
+                    break;
+                case KeyEvent.VK_Q:
+                    chosenY = 0;
+                    break;
+                case KeyEvent.VK_W:
+                    chosenY = 1;
+                    break;
+                case KeyEvent.VK_E:
+                    chosenY = 2;
+                    break;
+                case KeyEvent.VK_R:
+                    chosenY = 3;
+                    break;
+                case KeyEvent.VK_T:
+                    chosenY = 4;
+                    break;
+                case KeyEvent.VK_Y:
+                    chosenY = 5;
+                    break;
+                case KeyEvent.VK_A:
+                    heading -= Math.PI / 2;
+                    if (heading <= 0) {
+                        heading += Math.PI;
+                    }
+                    break;
+                case KeyEvent.VK_D:
+                    heading += Math.PI / 2;
+                    if (heading >= Math.PI * 2) {
+                        heading -= Math.PI;
+                    }
+                    break;
             }
 
             if (chosenX == -1) {
