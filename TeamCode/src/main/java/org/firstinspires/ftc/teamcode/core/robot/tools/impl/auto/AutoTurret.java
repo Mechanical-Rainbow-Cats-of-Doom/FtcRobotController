@@ -12,7 +12,6 @@ import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 public class AutoTurret {
     /**
      * sets the rotation of the tool in degrees, goes around if it would result in going through start pos
-     *
      * @param unit give a unit type from this eunm {@link Units}
      */
     public void setPos(double pos, @NonNull Units unit) {
@@ -63,7 +62,6 @@ public class AutoTurret {
 
     /**
      * don't call too often, relatively resource intensive
-     *
      * @param unit give a unit type from this eunm {@link Units}
      * @return current pos in degrees
      */
