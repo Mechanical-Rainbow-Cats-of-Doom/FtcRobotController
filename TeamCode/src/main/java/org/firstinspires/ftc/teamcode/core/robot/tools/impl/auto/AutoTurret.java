@@ -10,19 +10,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 public class AutoTurret {
-    /**
-     * sets the rotation of the tool in degrees, goes around if it would result in going through start pos
-     * @param unit give a unit type from this eunm {@link Units}
-     */
-    public void setPos(double pos, @NonNull Units unit) {
-        switch (unit) {
-            case RADIANS:
-                pos = Math.toDegrees(pos);
-            case DEGREES:
-                pos *= ticksperdeg;
-                break;
-        }
-        motor.setTargetPosition((int) Math.round(pos));
+    public enum Units {
+        DEGREES,
+        RADIANS,
+        MOTOR_TICKS
     }
 
     public enum Rotation {
@@ -60,8 +51,29 @@ public class AutoTurret {
         initMotors();
     }
 
+    public boolean isMoving() {
+        return motor.isBusy();
+    }
+
+    /**
+     * sets the rotation of the tool in degrees, goes around if it would result in going through start pos
+     *
+     * @param unit give a unit type from this eunm {@link Units}
+     */
+    public void setPos(double pos, @NonNull Units unit) {
+        switch (unit) {
+            case RADIANS:
+                pos = Math.toDegrees(pos);
+            case DEGREES:
+                pos *= ticksperdeg;
+                break;
+        }
+        motor.setTargetPosition((int) Math.round(pos));
+    }
+
     /**
      * don't call too often, relatively resource intensive
+     *
      * @param unit give a unit type from this eunm {@link Units}
      * @return current pos in degrees
      */
@@ -77,15 +89,5 @@ public class AutoTurret {
                 break;
         }
         return output;
-    }
-
-    public boolean isMoving() {
-        return motor.isBusy();
-    }
-
-    public enum Units {
-        DEGREES,
-        RADIANS,
-        MOTOR_TICKS
     }
 }
