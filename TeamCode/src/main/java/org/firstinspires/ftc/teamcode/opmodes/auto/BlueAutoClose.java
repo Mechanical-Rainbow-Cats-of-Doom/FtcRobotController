@@ -8,12 +8,16 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.DelayStorage;
 import org.firstinspires.ftc.teamcode.core.robot.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.core.robot.util.StayInPosition;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
+
+import java.util.Timer;
 
 @Autonomous
 public class BlueAutoClose extends LinearOpMode {
@@ -25,7 +29,13 @@ public class BlueAutoClose extends LinearOpMode {
         //
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         ElapsedTime timer = new ElapsedTime();
-
+        final AutoTurret turret = new AutoTurret(hardwareMap);
+        final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret);
+        Thread thread = new Thread(() -> {
+           while (opModeIsActive()) {
+               tools.update();
+           }
+        });
         // start pose
         final Pose2d startPose = cMirrorY(new Pose2d(-35, 63, Math.toRadians(270)), isRed);
 
@@ -51,25 +61,34 @@ public class BlueAutoClose extends LinearOpMode {
         builder.lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)));
         builder.waitSeconds(0.5);
 
-        for (int i = 0; i < 2; i++) {
-            builder.lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)));
-            builder.waitSeconds(0.5);
-            builder.lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)));
-            builder.waitSeconds(0.5);
-        }
-
         sequence = builder.build();
-
-        // set starting position
         drive.setPoseEstimate(startPose);
-        // wait for the start button to be pressed
         waitForStart();
+        thread.start();
         // Run delay
         timer.reset();
         DelayStorage.waitForDelay(timer);
 
         //set to follow the sequence
-        drive.followTrajectorySequenceAsync(sequence);
+        drive.followTrajectorySequence(sequence);
+
+        for (int i = 1; i <= 4; i++) {
+            builder.lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)));
+            //end
+            ///tools.setIntake(true);
+            tools.setPosition(AutoTools.Position.INTAKE_NO_INTAKE);
+            //tools.wait();
+            //turret.setPos(50, true);
+            builder.waitSeconds(0.5);
+            builder.lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)));
+            builder.waitSeconds(0.5);
+        }
+
+
+
+        // set starting position
+        // wait for the start button to be pressed
+
         // runs until the trajectory sequence is complete
         while(!isStopRequested() && drive.isBusy()) {
             // update the position

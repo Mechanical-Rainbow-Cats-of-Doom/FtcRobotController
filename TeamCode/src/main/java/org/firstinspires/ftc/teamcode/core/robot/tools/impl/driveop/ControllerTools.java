@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop;
 
 import androidx.annotation.NonNull;
 
-import android.util.Pair;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -26,7 +25,7 @@ public class ControllerTools extends AutoTools {
     public static double armZeroPower = 0.15, liftZeroPower = 0.001;
     public double test;
     private final GamepadEx gamepad;
-    private final ControllerToolRotation rotation;
+    private final ControllerTurret rotation;
     private final Telemetry telemetry;
     private final ToggleableToggleButtonReader xReader, yReader;
     private final ButtonReader bReader, up, right, down, left_dpad;
@@ -39,7 +38,7 @@ public class ControllerTools extends AutoTools {
         ZeroMotorEncoder.zero(armMotor, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public ControllerTools(HardwareMap hardwareMap, Timer timer, ControllerToolRotation rotation, GamepadEx toolGamepad, Telemetry telemetry) {
+    public ControllerTools(HardwareMap hardwareMap, Timer timer, ControllerTurret rotation, GamepadEx toolGamepad, Telemetry telemetry) {
         super(hardwareMap, timer, rotation);
         isAuto = false;
         this.rotation = rotation;
@@ -83,7 +82,7 @@ public class ControllerTools extends AutoTools {
             xReader.forceVal(false);
         } else {
             xReader.readValue();
-            intake.setPower(xReader.getState() ? -1 : 0);
+            intake.setPower(xReader.getState() ? 1 : 0);
         }
         bReader.readValue();
         if (bReader.wasJustReleased() && !doingstuff) {

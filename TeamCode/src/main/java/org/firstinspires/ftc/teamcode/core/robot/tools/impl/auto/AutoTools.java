@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
@@ -14,7 +13,7 @@ import androidx.annotation.NonNull;
 
 public class AutoTools {
     protected final DcMotor liftMotor, armMotor;
-    protected final AutoToolRotation rotation;
+    protected final AutoTurret rotation;
     protected final CRServo intake;
     protected final Timer timer;
     public enum Action {
@@ -26,6 +25,7 @@ public class AutoTools {
     public enum Position { // THESE VALUES ARE JUST GUESSES
         NEUTRAL(0, 80, Action.NOTHING),
         INTAKE(0, 25, Action.INTAKE),
+        INTAKE_NO_INTAKE(INTAKE.liftPos, INTAKE.armPos, Action.NOTHING),
         GROUND_TARGET(INTAKE.liftPos, 280, Action.DUMP),
         LOW_TARGET(0, 752, Action.DUMP),
         MEDIUM_TARGET(1251, 671, Action.DUMP),
@@ -60,7 +60,7 @@ public class AutoTools {
     protected boolean waiting = true;
     protected boolean doingstuff = false;
     protected boolean isAuto = true;
-    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoToolRotation rotation) {
+    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret rotation) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
         this.intake = hardwareMap.get(CRServo.class, "intake");
@@ -172,7 +172,11 @@ public class AutoTools {
                     liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 stage = 0;
+                notifyAll();
                 break;
         }
+    }
+    public void setIntake(boolean state) {
+        intake.setPower(state ? 1 : -1);
     }
 }
