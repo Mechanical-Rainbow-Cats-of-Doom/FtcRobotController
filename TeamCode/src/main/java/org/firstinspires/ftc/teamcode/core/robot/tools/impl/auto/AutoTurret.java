@@ -79,15 +79,9 @@ public class AutoTurret {
      */
     public double getPos(@NonNull Units unit) {
         double output = motor.getCurrentPosition();
-        switch (unit) {
-            case MOTOR_TICKS:
-                return output;
-            default:
-                output /= ticksperdeg;
-            case RADIANS:
-                output = Math.toRadians(output);
-                break;
-        }
+        if (unit == Units.MOTOR_TICKS) return output;
+        else output /= ticksperdeg;
+        if (unit == Units.RADIANS) output = Math.toRadians(output);
         return output;
     }
 }
