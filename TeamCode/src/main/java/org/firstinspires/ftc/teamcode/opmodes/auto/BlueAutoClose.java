@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.roadrunner.util.MirroringUtil.cMirr
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -53,6 +54,7 @@ public class BlueAutoClose extends LinearOpMode {
 
         TrajectorySequenceBuilder builder = drive.trajectorySequenceBuilder(startPose);
 
+
         // build trajectories
         Pose2d placeEndPose = new Pose2d(-22, 13, Math.toRadians(270));
         Pose2d refillEndPose = new Pose2d(-57, 13, Math.toRadians(270));
@@ -63,15 +65,14 @@ public class BlueAutoClose extends LinearOpMode {
          *|  |  |  |  |  |  |
          *|  |  |  |  |  |  |
          *|  |  |  |  |  |  |
-         *|\ |  | ∆|  |  |  |
-         *| —|——|— |  |  |  |
+         *|\ |  |  |  |  |  |
+         *| —|——|∆ |  |  |  |
          *|—————————————————|
         */
-        TrajectorySequenceBuilder trajectoryStart = drive.trajectorySequenceBuilder(startPose);
-        trajectoryStart.lineToLinearHeading(new Pose2d(-60, 58, Math.toRadians(270)));
-
-        trajectoryStart.lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)));
-        trajectoryStart.lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)));
+        TrajectorySequence trajectoryStart = drive.trajectorySequenceBuilder(startPose)
+                .lineToLinearHeading(new Pose2d(-60, 58, Math.toRadians(270)))
+                .lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)))
+                .build();
 
         /** Trajectory: Refill
          * __________________
@@ -83,8 +84,9 @@ public class BlueAutoClose extends LinearOpMode {
          *|  |  | ∆|  |  |  |
          *|—————————————————|
          */
-        TrajectorySequenceBuilder trajectoryRefill = drive.trajectorySequenceBuilder(placeEndPose);
-        trajectoryRefill.lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)));
+        TrajectorySequence trajectoryRefill = drive.trajectorySequenceBuilder(placeEndPose)
+                .lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)))
+                .build();
 
         /** Trajectory: Place
          * __________________
@@ -96,9 +98,9 @@ public class BlueAutoClose extends LinearOpMode {
          *|  |  | ⏐|  |  |  |
          *|—————————————————|
          */
-        TrajectorySequenceBuilder trajectoryPlace = drive.trajectorySequenceBuilder(refillEndPose);
-        builder.lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)));
-
+        TrajectorySequence trajectoryPlace = drive.trajectorySequenceBuilder(refillEndPose)
+                .lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)))
+                .build();
 
 
 //        builder.strafeTo(cMirrorY(new Vector2d(-60, 58), isRed));
@@ -124,16 +126,17 @@ public class BlueAutoClose extends LinearOpMode {
         DelayStorage.waitForDelay(timer);
 
         //set to follow the sequence
-        drive.followTrajectorySequence(trajectoryStart.build());
-        while(!isStopRequested() && drive.isBusy()) {
-            // update the position
-            drive.update();
-            // keep the current position updated in
-            PoseStorage.currentPose = drive.getPoseEstimate();
-
-            telemetry.addData("pose estimate", drive.getPoseEstimate());
-            telemetry.update();
-        }
+        drive.followTrajectorySequence(trajectoryStart);
+        WaitForDrive(drive);
+//        while(!isStopRequested() && drive.isBusy()) {
+//            // update the position
+//            drive.update();
+//            // keep the current position updated in
+//            PoseStorage.currentPose = drive.getPoseEstimate();
+//
+//            telemetry.addData("pose estimate", drive.getPoseEstimate());
+//            telemetry.update();
+//        }
 //        WaitForDrive(drive);
 
 
