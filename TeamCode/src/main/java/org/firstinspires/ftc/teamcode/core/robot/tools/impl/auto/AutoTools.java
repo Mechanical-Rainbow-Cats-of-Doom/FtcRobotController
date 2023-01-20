@@ -132,6 +132,8 @@ public class AutoTools {
                 if(!waiting) {
                     liftMotor.setTargetPosition(position.liftPos);
                     armMotor.setTargetPosition(position.armPos);
+                    liftMotor.setPower(1);
+                    armMotor.setPower(1);
                     if (position.action == Action.INTAKE) intake.setPower(-1);
                 }
                 stage++;
@@ -168,15 +170,26 @@ public class AutoTools {
                 } else if ((isAuto && position.action != Action.NOTHING) || position == Position.INTAKE) position = Position.NEUTRAL;
                 if (!isAuto) {
                     doingstuff = false;
+                    armMotor.setPower(0);
+                    liftMotor.setPower(0);
                     armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 stage = 0;
-                notifyAll();
+                synchronized (this) {
+                    notifyAll();
+                }
                 break;
         }
     }
     public void setIntake(boolean state) {
         intake.setPower(state ? 1 : -1);
+    }
+
+    public void cleanup() {
+        armMotor.setPower(0);
+        liftMotor.setPower(0);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 }

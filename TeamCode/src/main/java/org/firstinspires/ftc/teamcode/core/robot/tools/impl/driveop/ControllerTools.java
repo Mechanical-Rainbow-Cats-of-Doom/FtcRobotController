@@ -22,7 +22,7 @@ import java.util.Timer;
 
 @Config
 public class ControllerTools extends AutoTools {
-    public static double armZeroPower = 0.15, liftZeroPower = 0.001;
+    public static double armZeroPower = 0.075, liftZeroPower = 0.001;
     public double test;
     private final GamepadEx gamepad;
     private final ControllerTurret rotation;
@@ -68,35 +68,39 @@ public class ControllerTools extends AutoTools {
     private boolean wasDoingStuff = false;
     @Override
     public void update() {
-        if (wasDoingStuff != doingstuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wasDoingStuff = doingstuff;
-        runBoundedTool(liftMotor, Position.MAX.liftPos, gamepad.getLeftY(), false, liftZeroPower);
-        telemetry.addData("liftpos", liftMotor.getCurrentPosition());
-        runBoundedTool(armMotor, Position.MAX.armPos, -gamepad.getRightY(), false, armZeroPower);
-        telemetry.addData("liftMotorPower", liftMotor.getPower());
-        telemetry.addData("armpos", armMotor.getCurrentPosition());
-        this.rotation.update();
-        yReader.readValue();
-        if (yReader.getState()) {
-            intake.setPower(-1);
-            xReader.forceVal(false);
+        if(doingstuff) {
+            super.update();
         } else {
-            xReader.readValue();
-            intake.setPower(xReader.getState() ? 1 : 0);
-        }
-        bReader.readValue();
-        if (bReader.wasJustReleased() && !doingstuff) {
-            dump();
-        }
-        telemetry.update();
-        readLiftButtons();
-        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
-            if (entry.getValue() && !doingstuff) {
-                liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
+            if (wasDoingStuff != doingstuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            wasDoingStuff = doingstuff;
+            runBoundedTool(liftMotor, Position.MAX.liftPos, gamepad.getLeftY(), false, liftZeroPower);
+            runBoundedTool(armMotor, Position.MAX.armPos, -gamepad.getRightY(), false, armZeroPower);
+            telemetry.addData("liftpos", liftMotor.getCurrentPosition());
+            telemetry.addData("liftMotorPower", liftMotor.getPower());
+            telemetry.addData("armpos", armMotor.getCurrentPosition());
+            this.rotation.update();
+            yReader.readValue();
+            if (yReader.getState()) {
+                intake.setPower(-1);
+                xReader.forceVal(false);
+            } else {
+                xReader.readValue();
+                intake.setPower(xReader.getState() ? 1 : 0);
+            }
+            bReader.readValue();
+            if (bReader.wasJustReleased() && !doingstuff) {
+                dump();
+            }
+            readLiftButtons();
+            for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
+                if (entry.getValue() && !doingstuff) {
+                    setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
+                    doingstuff = true;
+                }
             }
         }
     }
+
     public static void runBoundedTool(@NonNull DcMotor motor, int minBound, int maxBound, double power, boolean negative, double zeroPower) {
         int motorPos = motor.getCurrentPosition() * (negative ? -1 : 1);
         if (((power < 0) && (motorPos > minBound + 4)) || ((power > 0) && (motorPos < maxBound - 4))) {

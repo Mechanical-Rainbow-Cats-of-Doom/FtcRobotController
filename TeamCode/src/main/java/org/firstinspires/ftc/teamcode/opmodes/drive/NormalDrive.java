@@ -33,14 +33,12 @@ public class NormalDrive extends LinearOpMode {
         final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
         final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
         final ControllerTools lift = new ControllerTools(hardwareMap, new Timer(), new ControllerTurret(hardwareMap, toolGamepad), toolGamepad, telemetry);
-        telemetry.addLine("PATRICK I REMOVED THE LEP DELTA SORRY IF YOU WANTED THAT");
-        telemetry.update();
         leftEncoder.setDirection(Encoder.Direction.REVERSE);
         rightEncoder.setDirection(Encoder.Direction.FORWARD);
         frontEncoder.setDirection(Encoder.Direction.FORWARD);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
-        while (opModeIsActive()) {
+        while (!isStopRequested()) {
             drive.update();
             lift.update();
 
@@ -51,7 +49,7 @@ public class NormalDrive extends LinearOpMode {
             telemetry.addData("right encoder vel: ", rightEncoder.getCorrectedVelocity());
             telemetry.addData("front encoder vel: ", frontEncoder.getCorrectedVelocity());
             telemetry.update();
-
         }
+        lift.cleanup();
     }
 }
