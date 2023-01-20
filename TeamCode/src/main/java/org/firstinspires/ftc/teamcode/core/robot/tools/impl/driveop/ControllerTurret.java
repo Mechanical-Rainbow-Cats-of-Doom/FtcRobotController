@@ -24,7 +24,7 @@ public class ControllerTurret extends AutoTurret {
     }
 
     public void update() {
-        ControllerTools.runBoundedTool(motor, (int)Math.round(minRot*ticksperdeg), (int)Math.round(maxRot*ticksperdeg), gamepad.getLeftX(), false);
+        motor.setPower(gamepad.getLeftX());
     }
 
 }

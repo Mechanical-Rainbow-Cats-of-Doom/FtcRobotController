@@ -56,8 +56,8 @@ public class TsePipeline extends OpenCvPipeline {
     }
     public TsePipeline() {}
 
-    private final Scalar red = new Scalar(255,0,0);
-    private final Scalar yellow = new Scalar(255,255,0);
+    public static final Scalar red = new Scalar(255,0,0);
+    public static final Scalar yellow = new Scalar(255,255,0);
     private final Mat matYCrCb = new Mat();
     private final Mat matCbBottom = new Mat();
     private final Mat matCbMiddle = new Mat();

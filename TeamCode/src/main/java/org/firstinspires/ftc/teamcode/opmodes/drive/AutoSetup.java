@@ -40,7 +40,7 @@ public class AutoSetup extends LinearOpMode {
                 case DELAY:
                     telemetry.addLine("---Delay Setup---");
                     telemetry.addLine();
-                    telemetry.addData();
+
 
                     break;
 
