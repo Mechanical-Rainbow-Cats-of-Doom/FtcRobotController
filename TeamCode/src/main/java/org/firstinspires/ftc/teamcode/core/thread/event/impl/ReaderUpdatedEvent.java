@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.core.thread.event.impl;
 import com.arcrobotics.ftclib.gamepad.KeyReader;
 
 import org.firstinspires.ftc.teamcode.core.thread.event.api.AbstractEvent;
-import org.firstinspires.ftc.teamcode.core.thread.event.api.Event;
 
 public class ReaderUpdatedEvent extends AbstractEvent {
     private final Runnable runnable;
