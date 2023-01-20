@@ -1,15 +1,31 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
+
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
-import androidx.annotation.NonNull;
-
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
-
 public class AutoTurret {
+    /**
+     * sets the rotation of the tool in degrees, goes around if it would result in going through start pos
+     *
+     * @param unit give a unit type from this eunm {@link Units}
+     */
+    public void setPos(double pos, @NonNull Units unit) {
+        switch (unit) {
+            case RADIANS:
+                pos = Math.toDegrees(pos);
+            case DEGREES:
+                pos *= ticksperdeg;
+                break;
+        }
+        motor.setTargetPosition((int) Math.round(pos));
+    }
+
     public enum Rotation {
         FRONT(0),
         FRONTRIGHT(45),
@@ -46,24 +62,32 @@ public class AutoTurret {
     }
 
     /**
-     * sets the rotation of the tool in degrees, goes around if it would result in going through start pos
+     * don't call too often, relatively resource intensive
+     *
+     * @param unit give a unit type from this eunm {@link Units}
+     * @return current pos in degrees
      */
-    public void setPos(double pos, boolean isDeg) {
-        if (isDeg) {
-            pos *= ticksperdeg;
+    public double getPos(@NonNull Units unit) {
+        double output = motor.getCurrentPosition();
+        switch (unit) {
+            case MOTOR_TICKS:
+                return output;
+            default:
+                output /= ticksperdeg;
+            case RADIANS:
+                output = Math.toRadians(output);
+                break;
         }
-        motor.setTargetPosition((int) Math.round(pos));
+        return output;
     }
 
     public boolean isMoving() {
         return motor.isBusy();
     }
 
-    /**
-     * don't call too often, relatively resource intensive
-     * @return current pos in degrees
-     */
-    public double getPos(boolean deg) {
-        return deg ? motor.getCurrentPosition() / ticksperdeg : motor.getCurrentPosition();
+    public enum Units {
+        DEGREES,
+        RADIANS,
+        MOTOR_TICKS
     }
 }
