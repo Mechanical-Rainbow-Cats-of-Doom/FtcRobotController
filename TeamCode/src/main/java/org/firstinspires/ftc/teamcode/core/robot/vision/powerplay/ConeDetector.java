@@ -14,14 +14,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class ConeDetector {
     private final OpenCvCamera camera;
     private final boolean debug, isRed;
-    private final Telemetry telemetry;
     public static int CAMERA_WIDTH = 320, CAMERA_HEIGHT = 240;
     public static OpenCvCameraRotation ORIENTATION = OpenCvCameraRotation.UPRIGHT;
     private final ArrayBlockingQueue<Integer> visionVals = new ArrayBlockingQueue<>(1);
-    public ConeDetector(HardwareMap hMap, String webcamName, boolean debug, boolean isRed, Telemetry telemetry) {
+    public ConeDetector(HardwareMap hMap, String webcamName, boolean debug, boolean isRed) {
         this.isRed = isRed;
         this.debug = debug;
-        this.telemetry = telemetry;
         OpenCvCameraFactory cameraFactory = OpenCvCameraFactory.getInstance();
         if (debug) {
             int cameraMonitorViewId = hMap
@@ -29,6 +27,7 @@ public class ConeDetector {
                     .getIdentifier("cameraMonitorViewId", "id", hMap.appContext.getPackageName());
 
             camera = cameraFactory.createWebcam(hMap.get(WebcamName.class, webcamName), cameraMonitorViewId); //for configurating remove isred from here
+            camera.setPipeline(new HighlightSelectionZonePipeline());
         } else {
             camera = cameraFactory.createWebcam(hMap.get(WebcamName.class, webcamName));
         }
@@ -55,7 +54,7 @@ public class ConeDetector {
      * @return integer 1 - 3, corresponds to cyan magenta or yellow
      */
     public int run() throws InterruptedException {
-        final ConePipeline pipeline = new ConePipeline(isRed, telemetry, debug, visionVals);
+        final ConePipeline pipeline = new ConePipeline(isRed, debug, visionVals);
         camera.setPipeline(pipeline);
         pipeline.startPipeline();
         return visionVals.take();
