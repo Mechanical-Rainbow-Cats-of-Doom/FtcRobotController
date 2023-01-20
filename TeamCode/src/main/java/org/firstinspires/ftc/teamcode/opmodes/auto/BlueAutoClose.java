@@ -121,10 +121,12 @@ public class BlueAutoClose extends LinearOpMode {
         thread.start();
         // Run delay
         timer.reset();
+        drive.followTrajectorySequence(trajectoryStart.build());
         DelayStorage.waitForDelay(timer);
 
         //set to follow the sequence
-        drive.followTrajectorySequence(trajectoryStart.build());
+
+
         WaitForDrive(drive);
 
 
