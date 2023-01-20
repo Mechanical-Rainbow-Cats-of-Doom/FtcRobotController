@@ -5,6 +5,7 @@ import android.util.Pair;
 import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.opmodes.tests.ConeVisionTester;
 import org.jetbrains.annotations.Contract;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -111,7 +112,15 @@ public class ConePipeline extends OpenCvPipeline {
             telemetry.addData("blue", cmykMean[2]);
             final int pos = getIndexOfMaxOf3Params(cmykMean[0], cmykMean[1], cmykMean[2]);
 */
-            final int pos = getIndexOfMaxOf3Params(Core.mean(redMat).val[0], Core.mean(greenMat).val[0], Core.mean(blueMat).val[0]);
+            final double red = Core.mean(redMat).val[0];
+            final double green = Core.mean(greenMat).val[0];
+            final double blue = Core.mean(blueMat).val[0]*2.1;
+            if (debug) {
+                ConeVisionTester.redMean = red;
+                ConeVisionTester.greenMean = green;
+                ConeVisionTester.blueMean = blue;
+            }
+            final int pos = getIndexOfMaxOf3Params(red, green, blue);
             curRun = new Pair<>(pos, pos == curRun.first ? curRun.second + 1 : 0);
             if (curRun.second > greatestConfidence.second) {
                 greatestConfidence = curRun;
