@@ -21,10 +21,10 @@ public class AutoSetup extends LinearOpMode {
     }
     final GamepadEx configureGamepad = new GamepadEx(gamepad1);
     final MultipleTelemetry goodTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-    final ButtonReader yButton = new ToggleableToggleButtonReader(configureGamepad, GamepadKeys.Button.Y);
-    final ButtonReader xButton = new ToggleableToggleButtonReader(configureGamepad, GamepadKeys.Button.X);
-    final ButtonReader bButton = new ToggleableToggleButtonReader(configureGamepad, GamepadKeys.Button.B);
-    final ButtonReader aButton = new ToggleableToggleButtonReader(configureGamepad, GamepadKeys.Button.A);
+    final ButtonReader yButton = new ButtonReader(configureGamepad, GamepadKeys.Button.Y);
+    final ButtonReader xButton = new ButtonReader(configureGamepad, GamepadKeys.Button.X);
+    final ButtonReader bButton = new ButtonReader(configureGamepad, GamepadKeys.Button.B);
+    final ButtonReader aButton = new ButtonReader(configureGamepad, GamepadKeys.Button.A);
     final ButtonReader[] buttonReaders = {yButton, xButton, bButton, aButton};
     enum Setup {
         DELAY,
@@ -38,7 +38,10 @@ public class AutoSetup extends LinearOpMode {
             readButtons(buttonReaders);
             switch (window) {
                 case DELAY:
-                    telemetry.addLine("Delay Setup");
+                    telemetry.addLine("---Delay Setup---");
+                    telemetry.addLine();
+                    telemetry.addData();
+
                     break;
 
                 case SIDE:
