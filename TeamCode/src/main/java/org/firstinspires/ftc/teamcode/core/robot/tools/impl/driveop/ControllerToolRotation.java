@@ -1,29 +1,30 @@
-package org.firstinspires.ftc.teamcode.core.robot.tools.impl;
+package org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoToolRotation;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
-public class TeleOpTurret extends AutoTurret {
+public class ControllerToolRotation extends AutoToolRotation {
     private final GamepadEx gamepad;
 
     @Override
-    void initMotors() {
+    protected void initMotors() {
         ZeroMotorEncoder.zero(motor, DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     /**
      * Only run after init, robot crashes otherwise
      */
-    public TeleOpTurret(HardwareMap hardwareMap, GamepadEx toolGamepad) {
+    public ControllerToolRotation(HardwareMap hardwareMap, GamepadEx toolGamepad) {
         super(hardwareMap);
         this.gamepad = toolGamepad;
     }
 
     public void update() {
-        TeleOpTools.runBoundedTool(motor, (int)Math.round(minRot*ticksperdeg), (int)Math.round(maxRot*ticksperdeg), gamepad.getLeftX(), false);
+        ControllerTools.runBoundedTool(motor, (int)Math.round(minRot*ticksperdeg), (int)Math.round(maxRot*ticksperdeg), gamepad.getLeftX(), false);
     }
 
 }
