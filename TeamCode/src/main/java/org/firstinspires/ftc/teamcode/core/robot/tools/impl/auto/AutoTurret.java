@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
-public class AutoToolRotation {
+public class AutoTurret {
     public enum Rotation {
         FRONT(0),
         FRONTRIGHT(45),
@@ -42,7 +42,7 @@ public class AutoToolRotation {
     /**
      * Only run after init, robot crashes otherwise
      */
-    public AutoToolRotation(@NonNull HardwareMap hardwareMap) {
+    public AutoTurret(@NonNull HardwareMap hardwareMap) {
         this.motor = hardwareMap.get(DcMotor.class, "turret");
         motor.setZeroPowerBehavior(BRAKE);
         initMotors();

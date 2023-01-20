@@ -10,9 +10,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.core.robot.drive.ControllerMovement;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
-import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerToolRotation;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
-import org.firstinspires.ftc.teamcode.core.thread.EventHelper;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 
 import java.util.Timer;
@@ -33,7 +32,7 @@ public class NormalDrive extends LinearOpMode {
         final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
         final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
         final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
-        final ControllerTools lift = new ControllerTools(hardwareMap, new Timer(), new ControllerToolRotation(hardwareMap, toolGamepad), toolGamepad, telemetry);
+        final ControllerTools lift = new ControllerTools(hardwareMap, new Timer(), new ControllerTurret(hardwareMap, toolGamepad), toolGamepad, telemetry);
         telemetry.addLine("PATRICK I REMOVED THE LEP DELTA SORRY IF YOU WANTED THAT");
         telemetry.update();
         leftEncoder.setDirection(Encoder.Direction.REVERSE);

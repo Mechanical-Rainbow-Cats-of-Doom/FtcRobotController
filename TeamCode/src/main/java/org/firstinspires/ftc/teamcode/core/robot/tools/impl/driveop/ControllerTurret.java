@@ -4,10 +4,10 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoToolRotation;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
-public class ControllerToolRotation extends AutoToolRotation {
+public class ControllerTurret extends AutoTurret {
     private final GamepadEx gamepad;
 
     @Override
@@ -18,7 +18,7 @@ public class ControllerToolRotation extends AutoToolRotation {
     /**
      * Only run after init, robot crashes otherwise
      */
-    public ControllerToolRotation(HardwareMap hardwareMap, GamepadEx toolGamepad) {
+    public ControllerTurret(HardwareMap hardwareMap, GamepadEx toolGamepad) {
         super(hardwareMap);
         this.gamepad = toolGamepad;
     }

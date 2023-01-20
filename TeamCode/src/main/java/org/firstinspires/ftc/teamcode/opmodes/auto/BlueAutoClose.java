@@ -51,8 +51,11 @@ public class BlueAutoClose extends LinearOpMode {
         builder.lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)));
         builder.waitSeconds(0.5);
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 1; i <= 4; i++) {
             builder.lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(270)));
+            builder.addDisplacementMarker(() -> {
+                //intake
+            });
             builder.waitSeconds(0.5);
             builder.lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(270)));
             builder.waitSeconds(0.5);
