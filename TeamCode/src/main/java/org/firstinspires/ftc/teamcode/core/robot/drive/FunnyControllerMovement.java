@@ -34,5 +34,6 @@ public class FunnyControllerMovement extends ControllerMovement {
                 input.getY(),
                 -gamepad.right_stick_x
         ));
+        drive.updatePoseEstimate();
     }
 }
