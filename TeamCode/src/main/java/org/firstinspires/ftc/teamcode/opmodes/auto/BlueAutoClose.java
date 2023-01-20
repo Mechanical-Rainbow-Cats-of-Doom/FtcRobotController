@@ -65,13 +65,13 @@ public class BlueAutoClose extends LinearOpMode {
          *|  |  |  |  |  |  |
          *|  |  |  |  |  |  |
          *|  |  |  |  |  |  |
-         *|\ |  |  |  |  |  |
-         *| —|——|∆ |  |  |  |
+         *|——|——|—∆|  |  |  |
+         *|  |  |  |  |  |  |
          *|—————————————————|
         */
         TrajectorySequence trajectoryStart = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-60, 58, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-57, 13, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-35, 13, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(90)))
                 .build();
 
         /** Trajectory: Refill
@@ -119,15 +119,29 @@ public class BlueAutoClose extends LinearOpMode {
 
 
         drive.setPoseEstimate(startPose);
+        TrajectorySequence wait = drive.trajectorySequenceBuilder(startPose).waitSeconds(10).build();
         waitForStart();
         thread.start();
         // Run delay
         timer.reset();
         DelayStorage.waitForDelay(timer);
 
+        tools.setPosition(AutoTools.Position.NEUTRAL);
+
+
         //set to follow the sequence
         drive.followTrajectorySequence(trajectoryStart);
 //        WaitForDrive(drive);
+        while(!isStopRequested() && drive.isBusy()) {
+            // update the position
+            drive.update();
+            // keep the current position updated in
+            PoseStorage.currentPose = drive.getPoseEstimate();
+
+            telemetry.addData("pose estimate", drive.getPoseEstimate());
+            telemetry.update();
+        }
+        drive.followTrajectorySequence(trajectoryPlace);
         while(!isStopRequested() && drive.isBusy()) {
             // update the position
             drive.update();
@@ -168,8 +182,9 @@ public class BlueAutoClose extends LinearOpMode {
         if (isStopRequested()) return;
 
         // after the trajectory sequence is complete
+        Pose2d finalPose = drive.getPoseEstimate();
         while(!isStopRequested()) {
-            StayInPosition.stayInPose(drive, sequence.end());
+            StayInPosition.stayInPose(drive, finalPose);
         }
     }
 }
