@@ -17,7 +17,7 @@ public class ConeDetector {
     private final Telemetry telemetry;
     public static int CAMERA_WIDTH = 320, CAMERA_HEIGHT = 240;
     public static OpenCvCameraRotation ORIENTATION = OpenCvCameraRotation.UPRIGHT;
-    public static ArrayBlockingQueue<Integer> visionVals = new ArrayBlockingQueue<>(1);
+    private final ArrayBlockingQueue<Integer> visionVals = new ArrayBlockingQueue<>(1);
     public ConeDetector(HardwareMap hMap, String webcamName, boolean debug, boolean isRed, Telemetry telemetry) {
         this.isRed = isRed;
         this.debug = debug;
@@ -55,7 +55,7 @@ public class ConeDetector {
      * @return integer 1 - 3, corresponds to cyan magenta or yellow
      */
     public int run() throws InterruptedException {
-        final ConePipeline pipeline = new ConePipeline(isRed, telemetry, debug);
+        final ConePipeline pipeline = new ConePipeline(isRed, telemetry, debug, visionVals);
         camera.setPipeline(pipeline);
         pipeline.startPipeline();
         return visionVals.take();

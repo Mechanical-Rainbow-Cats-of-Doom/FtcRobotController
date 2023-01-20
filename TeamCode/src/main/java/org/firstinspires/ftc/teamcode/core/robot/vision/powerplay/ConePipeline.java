@@ -13,6 +13,8 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.util.concurrent.ArrayBlockingQueue;
+
 import androidx.annotation.NonNull;
 
 import static org.firstinspires.ftc.teamcode.core.robot.vision.old.TsePipeline.yellow;
@@ -36,16 +38,14 @@ top width = 0.08
  */
 @Config
 public class ConePipeline extends OpenCvPipeline {
-    public ConePipeline(boolean isRed, Telemetry telemetry, boolean debug) {
-        if (isRed) {
-            topRectHeightPercentage = 0.35D;
-            topRectWidthPercentage = 0.2D;
-        } else {
-            topRectHeightPercentage = 0.2D;
-            topRectWidthPercentage = 0.05D;
+    public ConePipeline(boolean isRed, Telemetry telemetry, boolean debug, ArrayBlockingQueue<Integer> queue) {
+        if (!debug && isRed) {
+            topRectWidthPercentage = redWidthPercent;
+            topRectHeightPercentage = redHeightPercent;
         }
         this.telemetry = telemetry;
         this.debug = debug;
+        this.queue = queue;
     }
     public void reset() {
         running = true;
@@ -55,9 +55,11 @@ public class ConePipeline extends OpenCvPipeline {
         greatestConfidence = new Pair<>(-1, 0);
     }
 
-    //The position related to the screen
+    //These are red
     public static double topRectWidthPercentage = 0.25;
     public static double topRectHeightPercentage = 0.50;
+    public static double redWidthPercent = 0.25;
+    public static double redHeightPercent = 0.5;
     //The points needed for the rectangles are calculated here
     public static int rectangleHeight = 10;
     //The width and height of the rectangles in terms of pixels
@@ -66,6 +68,7 @@ public class ConePipeline extends OpenCvPipeline {
     private final Telemetry telemetry;
     private int finalPos = -1; // 0 = pos1 (cyan), 1 = pos2(magneta), 2 = pos3(yellow)
     private Pair<Integer, Integer> curRun = new Pair<>(-1 ,0), greatestConfidence = new Pair<>(-1, 0);
+    private final ArrayBlockingQueue<Integer> queue;
     private int totalTimesRan = 0;
     private final boolean debug;
     public void startPipeline() {
@@ -115,7 +118,7 @@ public class ConePipeline extends OpenCvPipeline {
             }
             totalTimesRan++;
             if (greatestConfidence.second >= 3 || totalTimesRan >= 6) {
-                ConeDetector.visionVals.offer(greatestConfidence.first);
+                queue.offer(greatestConfidence.first);
                 running = false;
             }
         }
