@@ -115,9 +115,9 @@ public class ConePipeline extends OpenCvPipeline {
             final double green = Core.mean(greenMat).val[0];
             final double blue = Core.mean(blueMat).val[0] * blueness;
             if (debug) {
-                ConeVisionTester.redMean = red;
-                ConeVisionTester.greenMean = green;
-                ConeVisionTester.blueMean = blue;
+                ConeVisionTester.setRedMean(red);
+                ConeVisionTester.setGreenMean(green);
+                ConeVisionTester.setBlueMean(blue);
             }
             final int pos = getIndexOfMaxOf3Params(red, green, blue);
             curRun = new Pair<>(pos, pos == curRun.first ? curRun.second + 1 : 0);
