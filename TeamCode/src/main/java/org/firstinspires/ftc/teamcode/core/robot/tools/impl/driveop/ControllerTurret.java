@@ -24,7 +24,7 @@ public class ControllerTurret extends AutoTurret {
     }
 
     public void update() {
-        motor.setPower(gamepad.getLeftX());
+        motor.setPower(gamepad.getRightX());
     }
 
 }
