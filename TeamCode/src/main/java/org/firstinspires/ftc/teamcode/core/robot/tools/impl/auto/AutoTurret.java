@@ -4,11 +4,13 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
+@Config
 public class AutoTurret {
     public enum Units {
         DEGREES,
@@ -37,7 +39,7 @@ public class AutoTurret {
     // well i assume it was you but you were on logans computer or something
     public static final double tpr = (((1+(46D/17))) * (1+(46D/11))) * 28 * 5; // 5 for gear
     public static final double ticksperdeg = tpr / 360;
-
+    public static double offset = -45; // starting left corner
     protected void initMotors() {
         ZeroMotorEncoder.zero(motor);
     }
@@ -78,7 +80,7 @@ public class AutoTurret {
      * @return current pos in degrees
      */
     public double getPos(@NonNull Units unit) {
-        double output = motor.getCurrentPosition();
+        double output = motor.getCurrentPosition() + offset;
         if (unit == Units.MOTOR_TICKS) return output;
         else output /= ticksperdeg;
         if (unit == Units.RADIANS) output = Math.toRadians(output);
