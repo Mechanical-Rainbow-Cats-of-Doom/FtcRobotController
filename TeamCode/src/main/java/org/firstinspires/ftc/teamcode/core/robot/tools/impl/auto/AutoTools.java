@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 
 public class AutoTools {
     protected final DcMotor liftMotor, armMotor;
-    protected final AutoTurret rotation;
+    protected final AutoTurret turret;
     protected final CRServo intake;
     protected final Timer timer;
     public enum Action {
@@ -60,11 +60,11 @@ public class AutoTools {
     protected boolean waiting = true;
     protected boolean doingstuff = false;
     protected boolean isAuto = true;
-    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret rotation) {
+    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
         this.intake = hardwareMap.get(CRServo.class, "intake");
-        this.rotation = rotation;
+        this.turret = turret;
         this.timer = timer;
         initMotors();
     }
@@ -191,5 +191,6 @@ public class AutoTools {
         liftMotor.setPower(0);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turret.cleanup();
     }
 }

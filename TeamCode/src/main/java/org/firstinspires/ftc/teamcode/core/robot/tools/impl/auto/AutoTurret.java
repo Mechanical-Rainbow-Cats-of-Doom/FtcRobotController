@@ -86,4 +86,8 @@ public class AutoTurret {
         if (unit == Units.RADIANS) output = Math.toRadians(output);
         return output;
     }
+
+    public void cleanup() {
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 }

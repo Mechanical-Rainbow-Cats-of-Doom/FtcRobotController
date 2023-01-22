@@ -4,7 +4,6 @@ import android.util.Pair;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.opmodes.tests.ConeVisionTester;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;

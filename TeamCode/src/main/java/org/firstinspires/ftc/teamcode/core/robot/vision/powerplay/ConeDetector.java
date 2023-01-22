@@ -9,6 +9,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class ConeDetector {
@@ -51,12 +52,17 @@ public class ConeDetector {
      * Resets pipeline on call
      * Stalls code until pipeline is done with figuring out (max time of around 0.33 seconds)
      *
-     * @return integer 1 - 3, corresponds to cyan magenta or yellow
+     * @return integer 0 - 2, corresponds to cyan magenta or yellow
      */
     public int run() throws InterruptedException {
         final ConePipeline pipeline = new ConePipeline(isRed, debug, visionVals);
         camera.setPipeline(pipeline);
         pipeline.startPipeline();
-        return visionVals.take();
+        final int output = visionVals.take();
+        if (output == -1) {
+            System.out.println("something fucked up real bad, vision didn't return val");
+            return new Random().nextInt(3);
+        }
+        else return output;
     }
 }
