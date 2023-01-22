@@ -39,7 +39,7 @@ public class AutoTurret {
     // well i assume it was you but you were on logans computer or something
     public static final double tpr = (((1+(46D/17))) * (1+(46D/11))) * 28 * 5; // 5 for gear
     public static final double ticksperdeg = tpr / 360;
-    public static double offset = -45; // starting left corner
+    public static double offset = 0; // starting left corner
     protected void initMotors() {
         ZeroMotorEncoder.zero(motor);
     }
@@ -88,6 +88,7 @@ public class AutoTurret {
     }
 
     public void cleanup() {
+        motor.setPower(0);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 }
