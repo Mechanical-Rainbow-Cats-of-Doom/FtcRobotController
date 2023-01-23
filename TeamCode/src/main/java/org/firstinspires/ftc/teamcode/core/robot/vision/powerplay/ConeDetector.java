@@ -54,7 +54,7 @@ public class ConeDetector {
      *
      * @return integer 0 - 2, corresponds to cyan magenta or yellow
      */
-    public int run() throws InterruptedException {
+    public synchronized int run() throws InterruptedException {
         final ConePipeline pipeline = new ConePipeline(isRed, debug, visionVals);
         camera.setPipeline(pipeline);
         pipeline.startPipeline();

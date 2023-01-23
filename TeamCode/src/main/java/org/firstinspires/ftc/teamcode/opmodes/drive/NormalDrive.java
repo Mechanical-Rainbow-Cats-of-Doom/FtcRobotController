@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.core.robot.drive.ControllerMovement;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTurret;
 
@@ -22,10 +23,12 @@ public class NormalDrive extends LinearOpMode {
     public void runOpMode() {
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
+        final AutoTurret turret = new AutoTurret(hardwareMap);
         final ControllerMovement drive = createDrive(moveGamepad);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         final ControllerTools tools = new ControllerTools(hardwareMap, new Timer(), new ControllerTurret(hardwareMap, toolGamepad), toolGamepad, telemetry, this);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry.addData("Turret Rotation", turret.getPos(AutoTurret.Units.DEGREES));
         waitForStart();
         tools.initIntake();
         while (opModeIsActive()) {

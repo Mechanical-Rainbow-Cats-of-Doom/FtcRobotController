@@ -63,13 +63,13 @@ public class BlueAutoClose extends LinearOpMode {
          *|  |  |  |  |  |  |
          *|  |  |  |  |  |  |
          *|  |  |  |  |  |  |
-         *|——|——|—∆|  |  |  |
+         *|——|——|—∆|- |  |  |
          *|  |  |  |  |  |  |
          *|—————————————————|
         */
         TrajectorySequence trajectoryStart = drive.trajectorySequenceBuilder(startPose)
+                .lineToLinearHeading(new Pose2d(-35, 5, Math.toRadians(90)))
                 .lineToLinearHeading(new Pose2d(-35, 13, Math.toRadians(90)))
-                .lineToLinearHeading(new Pose2d(-22, 13, Math.toRadians(90)))
                 .build();
 
         /** Trajectory: Refill
@@ -124,7 +124,9 @@ public class BlueAutoClose extends LinearOpMode {
         timer.reset();
         DelayStorage.waitForDelay(timer);
 
-        tools.setPosition(AutoTools.Position.NEUTRAL);
+        tools.setPosition(AutoTools.Position.INTAKE_NO_INTAKE);
+        turret.setPos(-45,AutoTurret.Units.DEGREES);
+        tools.setIntake(AutoTools.Action.INTAKE);
 
 
         //set to follow the sequence
@@ -139,16 +141,20 @@ public class BlueAutoClose extends LinearOpMode {
             telemetry.addData("pose estimate", drive.getPoseEstimate());
             telemetry.update();
         }
-        drive.followTrajectorySequence(trajectoryPlace);
-        while(!isStopRequested() && drive.isBusy()) {
-            // update the position
-            drive.update();
-            // keep the current position updated in
-            PoseStorage.currentPose = drive.getPoseEstimate();
-
-            telemetry.addData("pose estimate", drive.getPoseEstimate());
-            telemetry.update();
-        }
+        tools.setPosition(AutoTools.Position.HIGH_TARGET_NODUMP);
+        tools.wait();
+        tools.setIntake(AutoTools.Action.DUMP);
+//        tools.setIntake(AutoTools.Action.NOTHING);
+//        drive.followTrajectorySequence(trajectoryPlace);
+//        while(!isStopRequested() && drive.isBusy()) {
+//            // update the position
+//            drive.update();
+//            // keep the current position updated in
+//            PoseStorage.currentPose = drive.getPoseEstimate();
+//
+//            telemetry.addData("pose estimate", drive.getPoseEstimate());
+//            telemetry.update();
+//        }
 //        WaitForDrive(drive);
 
 

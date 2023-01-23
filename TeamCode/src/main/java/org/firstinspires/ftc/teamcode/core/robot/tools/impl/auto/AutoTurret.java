@@ -28,9 +28,9 @@ public class AutoTurret {
         LEFT(270),
         FRONTLEFT(315);
 
-        final double motorPos;
-        Rotation(double motorPos) {
-            this.motorPos = motorPos * ticksperdeg;
+        final double val;
+        Rotation(double val) {
+            this.val = val * ticksperdeg;
         }
     }
 
