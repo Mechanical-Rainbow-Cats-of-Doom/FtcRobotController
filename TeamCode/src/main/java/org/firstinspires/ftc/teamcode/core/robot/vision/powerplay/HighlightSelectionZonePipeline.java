@@ -7,7 +7,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 public class HighlightSelectionZonePipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
-        ConePipeline.drawRectOnToMat(input, ConePipeline.getRect(), TsePipeline.yellow);
+        ConePipeline.drawRectOnToMat(input, ConePipeline.getRect(), TsePipeline.red);
         return input;
     }
 }

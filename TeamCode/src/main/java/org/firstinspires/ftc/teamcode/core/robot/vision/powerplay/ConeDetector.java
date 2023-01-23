@@ -60,7 +60,7 @@ public class ConeDetector {
         pipeline.startPipeline();
         final int output = visionVals.take();
         if (output == -1) {
-            System.out.println("something fucked up real bad, vision didn't return val");
+            System.out.println("something fucked up real bad, vision didn't return val 🐶🐱");
             return new Random().nextInt(3);
         }
         else return output;
