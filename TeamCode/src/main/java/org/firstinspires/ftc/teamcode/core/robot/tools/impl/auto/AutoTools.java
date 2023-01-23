@@ -30,7 +30,7 @@ public class AutoTools {
         LOW_TARGET(0, 752, Action.DUMP),
         MEDIUM_TARGET(1251, 671, Action.DUMP),
         MAX(2523, 1000, Action.NOTHING), //armpos max is verified
-        HIGH_TARGET(MAX.liftPos, 603, Action.DUMP),
+        HIGH_TARGET(MAX.liftPos, 725, Action.DUMP),
         GROUND_TARGET_NODUMP(GROUND_TARGET.liftPos, GROUND_TARGET.armPos, Action.NOTHING),
         LOW_TARGET_NODUMP(LOW_TARGET.liftPos, LOW_TARGET.armPos, Action.NOTHING),
         MEDIUM_TARGET_NODUMP(MEDIUM_TARGET.liftPos, MEDIUM_TARGET.armPos, Action.NOTHING),
@@ -182,8 +182,8 @@ public class AutoTools {
                 break;
         }
     }
-    public void setIntake(boolean state) {
-        intake.setPower(state ? 1 : -1);
+    public void setIntake(Action action) {
+        intake.setPower(action == Action.INTAKE ? 1 : action == Action.DUMP ? -1 : 0);
     }
 
     public void cleanup() {
