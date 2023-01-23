@@ -2,16 +2,17 @@ package org.firstinspires.ftc.teamcode.core.robot.util;
 
 public class AutoStorage {
     // stored variables
-    public static double delay = 0;
-    public static Side side = Side.RED;
+    private static double delay = 0;
+    private static Side side = Side.RED;
 
+    private static int cones = 3;
 
     // Side methods
     public enum Side {
         RED(true),
         BLUE(false);
 
-        private boolean value;
+        private final boolean value;
 
         Side(boolean value) {
             this.value = value;
@@ -20,22 +21,10 @@ public class AutoStorage {
         public boolean getSide() {
             return value;
         }
-
-        public void changeSide(){
-            this.value = !this.value;
-        }
-
-        public void setSide(boolean side){
-            this.value = side;
-        }
     }
 
     public static void changeSide() {
-        AutoStorage.side.changeSide();
-    }
-
-    public static void setSide(boolean side){
-        AutoStorage.side.setSide(side);
+        side = side == Side.RED ? Side.BLUE : Side.RED;
     }
 
     public static boolean getSide() {
@@ -55,5 +44,7 @@ public class AutoStorage {
         AutoStorage.delay = Math.max(AutoStorage.delay - seconds, 0);
     }
 
-
+    public static double getDelay() {
+        return delay;
+    }
 }
