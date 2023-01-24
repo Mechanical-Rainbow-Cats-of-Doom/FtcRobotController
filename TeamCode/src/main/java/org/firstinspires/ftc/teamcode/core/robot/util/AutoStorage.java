@@ -21,8 +21,8 @@ public class AutoStorage {
         public boolean getSide() {
             return value;
         }
-    }
 
+    }
     public static void changeSide() {
         side = side == Side.RED ? Side.BLUE : Side.RED;
     }
@@ -32,10 +32,10 @@ public class AutoStorage {
     }
 
     // Delay methods
+
     public static void setDelay(double seconds) {
         AutoStorage.delay = seconds;
     }
-
     public static void addDelay(double seconds) {
         AutoStorage.delay += seconds;
     }
@@ -46,5 +46,19 @@ public class AutoStorage {
 
     public static double getDelay() {
         return delay;
+    }
+
+    public static void incrementCones() {
+        cones++;
+    }
+
+    public static void decrementCones() {
+        if(cones > 0) {
+            cones--;
+        }
+    }
+
+    public static int getCones() {
+        return cones;
     }
 }
