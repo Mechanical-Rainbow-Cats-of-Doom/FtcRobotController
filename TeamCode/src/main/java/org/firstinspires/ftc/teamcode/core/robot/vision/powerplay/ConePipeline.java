@@ -52,10 +52,10 @@ public class ConePipeline extends OpenCvPipeline {
     }
 
     //These are red
-    public static double topRectWidthPercentage = 0.45;
-    public static double topRectHeightPercentage = 0.40;
-    public static double redWidthPercent = 0.25;
-    public static double redHeightPercent = 0.5;
+    public static double topRectWidthPercentage = 0.50;
+    public static double topRectHeightPercentage = 0.35;
+    public static double redWidthPercent = topRectWidthPercentage;
+    public static double redHeightPercent = topRectHeightPercentage;
     public static double blueness = 2.1;
     //The points needed for the rectangles are calculated here
     public static int rectangleHeight = 10;
@@ -102,9 +102,7 @@ public class ConePipeline extends OpenCvPipeline {
                     rectangleHeight
             );
             Mat rgbMat = input.submat(rect);
-            if (debug) {
-                drawRectOnToMat(input, rect, yellow);
-            }
+            drawRectOnToMat(input, rect, yellow);
             Mat redMat = new Mat(), greenMat = new Mat(), blueMat = new Mat();
             Core.extractChannel(rgbMat, redMat, 0);
             Core.extractChannel(rgbMat, greenMat, 1);

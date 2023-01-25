@@ -47,7 +47,7 @@ public class ControllerTurret extends AutoTurret {
             } else {
                 final double neg = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
                 final double pos = gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
-                motor.setPower(Math.max(neg, pos) == neg ? -neg : pos);
+                motor.setPower(Math.max(neg, pos) == neg ? -neg*ampltiude : pos*ampltiude);
             }
         } else {
             if (!isMoving()) {

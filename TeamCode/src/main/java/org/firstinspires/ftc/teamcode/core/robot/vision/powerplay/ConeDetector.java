@@ -22,16 +22,12 @@ public class ConeDetector {
         this.isRed = isRed;
         this.debug = debug;
         OpenCvCameraFactory cameraFactory = OpenCvCameraFactory.getInstance();
-        if (debug) {
-            int cameraMonitorViewId = hMap
-                    .appContext.getResources()
-                    .getIdentifier("cameraMonitorViewId", "id", hMap.appContext.getPackageName());
+        int cameraMonitorViewId = hMap
+                .appContext.getResources()
+                .getIdentifier("cameraMonitorViewId", "id", hMap.appContext.getPackageName());
 
-            camera = cameraFactory.createWebcam(hMap.get(WebcamName.class, webcamName), cameraMonitorViewId); //for configurating remove isred from here
-            camera.setPipeline(new HighlightSelectionZonePipeline());
-        } else {
-            camera = cameraFactory.createWebcam(hMap.get(WebcamName.class, webcamName));
-        }
+        camera = cameraFactory.createWebcam(hMap.get(WebcamName.class, webcamName), cameraMonitorViewId); //for configurating remove isred from here
+        camera.setPipeline(new HighlightSelectionZonePipeline());
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {

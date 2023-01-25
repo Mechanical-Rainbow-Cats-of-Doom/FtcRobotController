@@ -29,7 +29,6 @@ public class NormalDrive extends LinearOpMode {
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
         final ButtonReader xButton = new ButtonReader(moveGamepad, GamepadKeys.Button.X);
-        final AutoTurret turret = new AutoTurret(hardwareMap);
         final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
         int LEReset = leftEncoder.getCurrentPosition();
         final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
@@ -38,7 +37,8 @@ public class NormalDrive extends LinearOpMode {
         int FEReset = frontEncoder.getCurrentPosition();
         final ControllerMovement drive = createDrive(moveGamepad);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        final ControllerTools tools = new ControllerTools(hardwareMap, new Timer(), new ControllerTurret(hardwareMap, toolGamepad), toolGamepad, telemetry, this);
+        final ControllerTurret turret = new ControllerTurret(hardwareMap, toolGamepad);
+        final ControllerTools tools = new ControllerTools(hardwareMap, new Timer(), turret, toolGamepad, telemetry, this);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
         tools.initIntake();

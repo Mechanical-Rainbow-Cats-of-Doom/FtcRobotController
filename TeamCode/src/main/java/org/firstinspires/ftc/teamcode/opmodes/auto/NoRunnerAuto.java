@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 
 @Autonomous
 public class NoRunnerAuto extends LinearOpMode {
-    public int forwardDistance = 35000;
+    public int forwardDistance = 33500;
     public int leftDistance = 19857;
     public int rightDistance = -22157;
     public static boolean isRed;
@@ -36,9 +36,8 @@ public class NoRunnerAuto extends LinearOpMode {
         final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
         int FEReset;
         final ConeDetector detector = new ConeDetector(hardwareMap, "webcam", true, isRed);
-        int color = detector.run();
-        telemetry.addData("color", color);
         waitForStart();
+        int color = detector.run();
         timer.reset();
         telemetry.addData("is it running delay", Math.random());
         telemetry.update();
