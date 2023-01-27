@@ -55,8 +55,8 @@ public class ConePipeline extends OpenCvPipeline {
     }
 
     //These are red
-    public static double topRectWidthPercentage = 0.50;
-    public static double topRectHeightPercentage = 0.35;
+    public static double topRectWidthPercentage = 0.4;
+    public static double topRectHeightPercentage = 0.54;
     public static double redWidthPercent = topRectWidthPercentage;
     public static double redHeightPercent = topRectHeightPercentage;
     public static double blueness = 2.1;
