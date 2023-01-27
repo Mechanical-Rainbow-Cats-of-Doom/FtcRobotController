@@ -176,8 +176,10 @@ public class AutoTools {
                     liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 stage = 0;
-                synchronized (this) {
-                    notifyAll();
+                if(isAuto) {
+                    synchronized (this) {
+                        notifyAll();
+                    }
                 }
                 break;
         }
