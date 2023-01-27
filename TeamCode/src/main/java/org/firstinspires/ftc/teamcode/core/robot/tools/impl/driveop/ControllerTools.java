@@ -72,6 +72,7 @@ public class ControllerTools extends AutoTools {
                 }
             }
         });
+        thread.setPriority(Thread.MAX_PRIORITY-2);
         thread.start();
     }
 
@@ -83,33 +84,46 @@ public class ControllerTools extends AutoTools {
     }
 
     private boolean wasDoingStuff = false;
-
+    private void cleanupOpMode() {
+        doingstuff = false;
+        armMotor.setPower(0);
+        liftMotor.setPower(0);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
     @Override
     public void update() {
+        final double right = gamepad.getRightY();
+        final double left = gamepad.getLeftY();
         if (doingstuff) {
-            super.update();
-        } else {
-            if (wasDoingStuff != doingstuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            wasDoingStuff = doingstuff;
-            runBoundedTool(liftMotor, Position.MAX.liftPos, gamepad.getLeftY(), false, liftZeroPower);
-            runBoundedTool(armMotor, Position.MAX.armPos, -gamepad.getRightY(), false, armZeroPower);
-            telemetry.addData("liftpos", liftMotor.getCurrentPosition());
-            telemetry.addData("liftMotorPower", liftMotor.getPower());
-            telemetry.addData("armpos", armMotor.getCurrentPosition());
-            this.rotation.update();
-            bReader.readValue();
-            if (bReader.wasJustReleased() && !doingstuff) {
-                dump();
+            if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
+                cleanupOpMode();
+            } else {
+                super.update();
+                return;
             }
-            readLiftButtons();
-            for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
-                if (entry.getValue() && !doingstuff) {
-                    setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
-                    doingstuff = true;
-                }
+        }
+        if (wasDoingStuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wasDoingStuff = doingstuff;
+        runBoundedTool(liftMotor, Position.MAX.liftPos, left, false, liftZeroPower);
+        runBoundedTool(armMotor, Position.MAX.armPos, -right, false, armZeroPower);
+        telemetry.addData("liftpos", liftMotor.getCurrentPosition());
+        telemetry.addData("liftMotorPower", liftMotor.getPower());
+        telemetry.addData("armpos", armMotor.getCurrentPosition());
+        this.rotation.update();
+        bReader.readValue();
+        if (bReader.wasJustReleased() && !doingstuff) {
+            dump();
+        }
+        readLiftButtons();
+        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
+            if (entry.getValue() && !doingstuff) {
+                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
+                doingstuff = true;
             }
         }
     }
+
 
     public static void runBoundedTool(@NonNull DcMotor motor, int minBound, int maxBound, double power, boolean negative, double zeroPower) {
         int motorPos = motor.getCurrentPosition() * (negative ? -1 : 1);

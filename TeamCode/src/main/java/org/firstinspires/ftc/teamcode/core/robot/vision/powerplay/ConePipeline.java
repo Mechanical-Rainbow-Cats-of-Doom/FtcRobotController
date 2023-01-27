@@ -5,6 +5,7 @@ import android.util.Pair;
 import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.teamcode.opmodes.tests.ConeVisionTester;
+import org.jetbrains.annotations.Contract;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -13,6 +14,8 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.concurrent.ArrayBlockingQueue;
+
+import androidx.annotation.NonNull;
 
 import static org.firstinspires.ftc.teamcode.core.robot.vision.old.TsePipeline.yellow;
 
@@ -66,12 +69,6 @@ public class ConePipeline extends OpenCvPipeline {
     private final ArrayBlockingQueue<Integer> queue;
     private int totalTimesRan = 0;
     private final boolean debug;
-    private static Rect rect = new Rect(
-            (int) (ConeDetector.CAMERA_WIDTH * topRectWidthPercentage),
-            (int) (ConeDetector.CAMERA_HEIGHT* topRectHeightPercentage),
-            rectangleWidth,
-            rectangleHeight
-    );
 
     public void startPipeline() {
         running = true;
@@ -85,8 +82,15 @@ public class ConePipeline extends OpenCvPipeline {
         return running;
     }
 
+    @NonNull
+    @Contract(value = " -> new", pure = true)
     public static Rect getRect() {
-        return rect;
+        return new Rect(
+                (int) (ConeDetector.CAMERA_WIDTH * topRectWidthPercentage),
+                (int) (ConeDetector.CAMERA_HEIGHT* topRectHeightPercentage),
+                rectangleWidth,
+                rectangleHeight
+        );
     }
 
     /**
@@ -95,12 +99,7 @@ public class ConePipeline extends OpenCvPipeline {
     @Override
     public synchronized Mat processFrame(Mat input) {
         if (running) {
-            rect = new Rect(
-                    (int) (ConeDetector.CAMERA_WIDTH * topRectWidthPercentage),
-                    (int) (ConeDetector.CAMERA_HEIGHT* topRectHeightPercentage),
-                    rectangleWidth,
-                    rectangleHeight
-            );
+            final Rect rect = getRect();
             Mat rgbMat = input.submat(rect);
             drawRectOnToMat(input, rect, yellow);
             Mat redMat = new Mat(), greenMat = new Mat(), blueMat = new Mat();

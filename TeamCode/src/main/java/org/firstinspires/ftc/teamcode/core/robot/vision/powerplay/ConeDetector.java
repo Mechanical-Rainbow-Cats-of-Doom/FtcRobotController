@@ -58,7 +58,6 @@ public class ConeDetector {
         if (output == -1) {
             System.out.println("something fucked up real bad, vision didn't return val 🐶🐱");
             return new Random().nextInt(3);
-        }
-        else return output;
+        } else return output;
     }
 }

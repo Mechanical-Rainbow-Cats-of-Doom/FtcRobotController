@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.opmodes.auto;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.arcrobotics.ftclib.gamepad.ButtonReader;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -11,6 +14,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.core.robot.util.DelayStorage;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 import org.firstinspires.ftc.teamcode.core.robot.vision.powerplay.ConeDetector;
+import org.firstinspires.ftc.teamcode.core.robot.vision.powerplay.ConePipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 
@@ -36,7 +40,26 @@ public class NoRunnerAuto extends LinearOpMode {
         final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
         int FEReset;
         final ConeDetector detector = new ConeDetector(hardwareMap, "webcam", true, isRed);
+        final Thread thread = new Thread(() -> {
+            final GamepadEx moveGamepad = new GamepadEx(gamepad1);
+            final ButtonReader up = new ButtonReader(moveGamepad, GamepadKeys.Button.DPAD_UP);
+            final ButtonReader left = new ButtonReader(moveGamepad, GamepadKeys.Button.DPAD_LEFT);
+            final ButtonReader down = new ButtonReader(moveGamepad, GamepadKeys.Button.DPAD_DOWN);
+            final ButtonReader right = new ButtonReader(moveGamepad, GamepadKeys.Button.DPAD_RIGHT);
+            while (!isStarted()) {
+                up.readValue();
+                left.readValue();
+                down.readValue();
+                right.readValue();
+                if (up.wasJustReleased()) ConePipeline.topRectHeightPercentage -= 0.01;
+                if (down.wasJustReleased()) ConePipeline.topRectHeightPercentage += 0.01;
+                if (left.wasJustReleased()) ConePipeline.topRectWidthPercentage -= 0.01;
+                if (right.wasJustReleased()) ConePipeline.topRectWidthPercentage += 0.01;
+            }
+        });
+        thread.start();
         waitForStart();
+        thread.interrupt();
         int color = detector.run();
         timer.reset();
         telemetry.addData("is it running delay", Math.random());
