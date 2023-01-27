@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.core.robot.util.AutoStorage;
 import org.firstinspires.ftc.teamcode.core.robot.util.DelayStorage;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 import org.firstinspires.ftc.teamcode.core.robot.vision.powerplay.ConeDetector;
@@ -64,7 +65,7 @@ public class NoRunnerAuto extends LinearOpMode {
         timer.reset();
         telemetry.addData("is it running delay", Math.random());
         telemetry.update();
-        DelayStorage.waitForDelay(timer);
+        AutoStorage.waitForDelay(timer);
         FEReset = frontEncoder.getCurrentPosition();
         switch (color){
             case 0:
