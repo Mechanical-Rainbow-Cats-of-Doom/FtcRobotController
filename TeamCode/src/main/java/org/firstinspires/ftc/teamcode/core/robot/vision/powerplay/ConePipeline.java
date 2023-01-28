@@ -55,11 +55,11 @@ public class ConePipeline extends OpenCvPipeline {
     }
 
     //These are red
-    public static double topRectWidthPercentage = 0.50;
-    public static double topRectHeightPercentage = 0.35;
+    public static double topRectWidthPercentage = 0.4;
+    public static double topRectHeightPercentage = 0.54;
     public static double redWidthPercent = topRectWidthPercentage;
     public static double redHeightPercent = topRectHeightPercentage;
-    public static double blueness = 2.1;
+    public static double blueness = 2.75;
     //The points needed for the rectangles are calculated here
     public static int rectangleHeight = 10;
     //The width and height of the rectangles in terms of pixels

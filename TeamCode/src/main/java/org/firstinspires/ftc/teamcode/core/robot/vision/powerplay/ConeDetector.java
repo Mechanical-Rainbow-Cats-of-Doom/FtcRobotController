@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.robot.vision.powerplay;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -18,7 +20,7 @@ public class ConeDetector {
     public static int CAMERA_WIDTH = 320, CAMERA_HEIGHT = 240;
     public static OpenCvCameraRotation ORIENTATION = OpenCvCameraRotation.UPRIGHT;
     private final ArrayBlockingQueue<Integer> visionVals = new ArrayBlockingQueue<>(1);
-    public ConeDetector(HardwareMap hMap, String webcamName, boolean debug, boolean isRed) {
+    public ConeDetector(@NonNull HardwareMap hMap, String webcamName, boolean debug, boolean isRed) {
         this.isRed = isRed;
         this.debug = debug;
         OpenCvCameraFactory cameraFactory = OpenCvCameraFactory.getInstance();

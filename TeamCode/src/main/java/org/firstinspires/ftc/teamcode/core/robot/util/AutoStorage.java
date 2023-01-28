@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.core.robot.util;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import androidx.annotation.NonNull;
+
 public class AutoStorage {
     // stored variables
     private static double delay = 0;
@@ -47,6 +51,14 @@ public class AutoStorage {
     public static double getDelay() {
         return delay;
     }
+
+    public static void waitForDelay(@NonNull ElapsedTime timer) {
+        while (timer.seconds() < delay) {
+            // waiting...
+        }
+    }
+
+    // Cone methods
 
     public static void incrementCones() {
         cones++;

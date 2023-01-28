@@ -20,27 +20,32 @@ public class AutoSetup extends LinearOpMode {
             reader.readValue();
         }
     }
-    final GamepadEx configureGamepad = new GamepadEx(gamepad1);
+    GamepadEx configureGamepad;
     final MultipleTelemetry goodTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-    private final ButtonReader yButton = new ButtonReader(configureGamepad, GamepadKeys.Button.Y);
-    private final ButtonReader xButton = new ButtonReader(configureGamepad, GamepadKeys.Button.X);
-    private final ButtonReader bButton = new ButtonReader(configureGamepad, GamepadKeys.Button.B);
-    private final ButtonReader aButton = new ButtonReader(configureGamepad, GamepadKeys.Button.A);
+    private ButtonReader bButton;
+    private ButtonReader aButton;
     // for navigating forwards and backwards
-    private final ButtonReader next = new ButtonReader(configureGamepad, GamepadKeys.Button.RIGHT_BUMPER);
-    private final ButtonReader back = new ButtonReader(configureGamepad, GamepadKeys.Button.LEFT_BUMPER);
-    private final ButtonReader[] buttonReaders = {yButton, xButton, bButton, aButton, next, back};
+    private ButtonReader next;
+    private ButtonReader back;
+    private ButtonReader[] buttonReaders;
     enum Setup {
         DELAY, SIDE, CONES
     }
 
     private static final double deadzone = 0.5;
-    private static final double timeBetweenContinuous = 100;
+    private static final double timeBetweenContinuous = 500;
     private final ElapsedTime controlTimer = new ElapsedTime();
     private final ElapsedTime nextLastTimer = new ElapsedTime();
     private String lastPressed = "none";
     @Override
     public void runOpMode() throws InterruptedException {
+        configureGamepad = new GamepadEx(gamepad1);
+        bButton = new ButtonReader(configureGamepad, GamepadKeys.Button.B);
+        aButton = new ButtonReader(configureGamepad, GamepadKeys.Button.A);
+        next = new ButtonReader(configureGamepad, GamepadKeys.Button.RIGHT_BUMPER);
+        back = new ButtonReader(configureGamepad, GamepadKeys.Button.LEFT_BUMPER);
+        buttonReaders = new ButtonReader[]{bButton, aButton, next, back};
+        waitForStart();
         Setup window = Setup.DELAY;
         while (opModeIsActive()) {
             readButtons(buttonReaders);
@@ -58,7 +63,7 @@ public class AutoSetup extends LinearOpMode {
                             controlTimer.reset();
                             lastPressed = "right";
                         }
-                    } else if (configureGamepad.getLeftX() < deadzone){
+                    } else if (configureGamepad.getLeftX() < -deadzone){
                         if(controlTimer.milliseconds() > timeBetweenContinuous || !lastPressed.equals("left")) {
                             if (AutoStorage.getDelay() >= .1) {
                                 AutoStorage.subtractDelay(.1);
@@ -76,7 +81,7 @@ public class AutoSetup extends LinearOpMode {
                             controlTimer.reset();
                             lastPressed = "up";
                         }
-                    } else if (configureGamepad.getLeftY() < deadzone){
+                    } else if (configureGamepad.getLeftY() < -deadzone){
                         if(controlTimer.milliseconds() > timeBetweenContinuous || !lastPressed.equals("down")) {
                             if (AutoStorage.getDelay() >= 1) {
                                 AutoStorage.subtractDelay(1);
@@ -88,10 +93,10 @@ public class AutoSetup extends LinearOpMode {
                         }
                     }
 
-                    if (next.isDown() && nextLastTimer.milliseconds() < timeBetweenContinuous) {
+                    if (next.isDown() && nextLastTimer.milliseconds() > timeBetweenContinuous) {
                         window = Setup.SIDE;
                     }
-                    if (back.isDown() && nextLastTimer.milliseconds() < timeBetweenContinuous) {
+                    if (back.isDown() && nextLastTimer.milliseconds() > timeBetweenContinuous) {
                         window = Setup.CONES;
                     }
                     break;
@@ -106,10 +111,10 @@ public class AutoSetup extends LinearOpMode {
                         lastPressed = "A";
                     }
 
-                    if (next.isDown() && nextLastTimer.milliseconds() < timeBetweenContinuous) {
+                    if (next.isDown() && nextLastTimer.milliseconds() > timeBetweenContinuous) {
                         window = Setup.CONES;
                     }
-                    if (back.isDown() && nextLastTimer.milliseconds() < timeBetweenContinuous) {
+                    if (back.isDown() && nextLastTimer.milliseconds() > timeBetweenContinuous) {
                         window = Setup.DELAY;
                     }
                     break;
@@ -127,10 +132,10 @@ public class AutoSetup extends LinearOpMode {
                         lastPressed = "B";
                     }
 
-                    if (next.isDown() && nextLastTimer.milliseconds() < timeBetweenContinuous) {
+                    if (next.isDown() && nextLastTimer.milliseconds() > timeBetweenContinuous) {
                         window = Setup.DELAY;
                     }
-                    if (back.isDown() && nextLastTimer.milliseconds() < timeBetweenContinuous) {
+                    if (back.isDown() && nextLastTimer.milliseconds() > timeBetweenContinuous) {
                         window = Setup.SIDE;
                     }
                     break;
