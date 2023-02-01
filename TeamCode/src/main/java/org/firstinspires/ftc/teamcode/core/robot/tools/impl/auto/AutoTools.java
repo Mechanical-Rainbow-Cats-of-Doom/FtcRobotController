@@ -23,8 +23,7 @@ public class AutoTools {
         DUMP,
         NOTHING
     }
-    public static short highTargetMaxOffset = 0;
-    public static int highTargetArmPos = 725;
+
     //armpos on dump is above
     public enum Position { // THESE VALUES ARE JUST GUESSES
         NEUTRAL(0, 80, Action.NOTHING),
@@ -34,7 +33,7 @@ public class AutoTools {
         LOW_TARGET(0, 752, Action.DUMP),
         MEDIUM_TARGET(1251, 671, Action.DUMP),
         MAX(2523, 1000, Action.NOTHING), //armpos max is verified
-        HIGH_TARGET(MAX.liftPos - highTargetMaxOffset, highTargetArmPos, Action.DUMP),
+        HIGH_TARGET(2090, MAX.armPos, Action.DUMP),
         GROUND_TARGET_NODUMP(GROUND_TARGET.liftPos, GROUND_TARGET.armPos, Action.NOTHING),
         LOW_TARGET_NODUMP(LOW_TARGET.liftPos, LOW_TARGET.armPos, Action.NOTHING),
         MEDIUM_TARGET_NODUMP(MEDIUM_TARGET.liftPos, MEDIUM_TARGET.armPos, Action.NOTHING),

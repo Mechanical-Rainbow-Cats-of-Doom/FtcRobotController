@@ -1,33 +1,32 @@
 // https://tenor.com/view/we-do-a-medium-amount-of-trolling-we-do-a-lot-of-trolling-troll-trolling-we-do-a-little-trolling-gif-20600937
 package org.firstinspires.ftc.teamcode.core.robot.util;
-import android.os.DropBoxManager;
 import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Blinker;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
+
 import java.lang.Math;
-@TeleOp
+
 public class SewerOodoo {
+    HardwareMap hardwareMap;
+
+    public SewerOodoo(HardwareMap hardwareMap){
+        this.hardwareMap = hardwareMap;
+    }
 
     ElapsedTime movementTimer = new ElapsedTime();
-    public DcMotor back_right_wheel;
-    public DcMotor front_right_wheel;
-    public DcMotor back_left_wheel;
-    public DcMotor front_left_wheel;
-    public BNO055IMU imu;
+    final Encoder leftEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
+    final Encoder rightEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
+    final Encoder frontEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
+    public DcMotor rightRear;
+    public DcMotor rightFront;
+    public DcMotor leftRear;
+    public DcMotor leftFront;
+
     private DigitalChannel switch_;
 
     double frontLeft;
@@ -57,7 +56,7 @@ public class SewerOodoo {
     double oldZAngel = 0;
     double newZAngle = 0;
     double rotations = 0;
-    double zAngle = 0;
+    public double zAngle = 0;
     double presetX = 0;
     double presetY = 0;
     double trueX = 0;
@@ -152,10 +151,10 @@ public class SewerOodoo {
             isDrive = 0;
             isRotate = 0;
             isStrafe = 0;
-            front_left_wheel.setPower(-0.01);
-            front_right_wheel.setPower(-0.01);
-            back_right_wheel.setPower(-0.01);
-            back_left_wheel.setPower(-0.01);
+            leftFront.setPower(-0.01);
+            rightFront.setPower(-0.01);
+            rightRear.setPower(-0.01);
+            leftRear.setPower(-0.01);
             isDone = true;
         } else {
             isDrive = 0;
@@ -181,9 +180,9 @@ public class SewerOodoo {
 
 
     public void SetAxisMovement() {
-        rightEncoder = back_right_wheel.getCurrentPosition() / 360 * 1.173150521 - clearRight;
-        leftEncoder = -front_right_wheel.getCurrentPosition() / 360 * 1.178221633 - clearLeft;
-        backEncoder = front_left_wheel.getCurrentPosition() / 360 * 1.17584979 - clearBack;
+        rightEncoder = rightRear.getCurrentPosition() / 360 * 1.173150521 - clearRight;
+        leftEncoder = -rightFront.getCurrentPosition() / 360 * 1.178221633 - clearLeft;
+        backEncoder = leftFront.getCurrentPosition() / 360 * 1.17584979 - clearBack;
         trueDrive = ((rightEncoder + leftEncoder) / 2) - clearDrive;
         trueStrafe = (backEncoder - (rightEncoder - leftEncoder) / 2) - clearStrafe;
         trueRotate = (((rightEncoder - leftEncoder) / 2) * 0.12877427457 /* <---- see comment below*/) - clearRotate;
@@ -209,10 +208,10 @@ public class SewerOodoo {
     }
 
     public void ForwardAndBackward(double drivePreset) {
-        front_right_wheel.setPower(frontRightMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
-        front_left_wheel.setPower(frontLeftMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
-        back_left_wheel.setPower(-1 * backLeftMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
-        back_right_wheel.setPower(backRightMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
+        rightFront.setPower(frontRightMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
+        leftFront.setPower(frontLeftMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
+        leftRear.setPower(-1 * backLeftMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
+        rightRear.setPower(backRightMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
 
     }
 
@@ -226,18 +225,18 @@ public class SewerOodoo {
     }
 
     public void LeftAndRight(double drivePreset) {
-        front_right_wheel.setPower(-1 * frontRightMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
-        front_left_wheel.setPower(frontLeftMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
-        back_left_wheel.setPower(backLeftMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
-        back_right_wheel.setPower(backRightMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
+        rightFront.setPower(-1 * frontRightMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
+        leftFront.setPower(frontLeftMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
+        leftRear.setPower(backLeftMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
+        rightRear.setPower(backRightMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
 
     }
 
 
     public void ZeroEncoders() {
-        clearRight = back_right_wheel.getCurrentPosition() / 360 * 1.173150521;
-        clearLeft = -front_right_wheel.getCurrentPosition() / 360 * 1.178221633;
-        clearBack = front_left_wheel.getCurrentPosition() / 360 * 1.17584979;
+        clearRight = rightRear.getCurrentPosition() / 360 * 1.173150521;
+        clearLeft = -rightFront.getCurrentPosition() / 360 * 1.178221633;
+        clearBack = leftFront.getCurrentPosition() / 360 * 1.17584979;
     }
 
     public void Encoders() {
@@ -276,9 +275,9 @@ public class SewerOodoo {
 
 
     public void Drive() {
-        front_right_wheel.setPower(this.frontRight * (1 / 1));
-        front_left_wheel.setPower(this.frontLeft * (1 / 1));
-        back_left_wheel.setPower(this.backLeft * (1 / 1));
-        back_right_wheel.setPower(this.backRight * (1 / 1));
+        rightFront.setPower(this.frontRight * (1 / 1));
+        leftFront.setPower(this.frontLeft * (1 / 1));
+        leftRear.setPower(this.backLeft * (1 / 1));
+        rightRear.setPower(this.backRight * (1 / 1));
     }
 }
