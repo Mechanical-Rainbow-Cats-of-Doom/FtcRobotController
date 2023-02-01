@@ -35,8 +35,6 @@ public class AutoTurret {
     }
 
     protected final DcMotor motor;
-    // thanks ethan for the unlabeled magic numbers!
-    // well i assume it was you but you were on logans computer or something
     public static final double tpr = (((1+(46D/17))) * (1+(46D/11))) * 28 * 5; // 5 for gear
     public static final double ticksperdeg = tpr / 360;
     public static double offset = 0; // starting left corner
