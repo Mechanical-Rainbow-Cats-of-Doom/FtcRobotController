@@ -13,17 +13,19 @@ import java.util.Timer;
 
 @Config
 @TeleOp
-public class SetTurretPosition extends LinearOpMode {
+public class ToolTester extends LinearOpMode {
     public static double turretPos = 0;
     public static AutoTurret.Units unit = AutoTurret.Units.DEGREES;
+    public static AutoTools.Position position = AutoTools.Position.GROUND_TARGET_NODUMP;
     @Override
     public void runOpMode() throws InterruptedException {
         final MultipleTelemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), super.telemetry);
         final AutoTurret turret = new AutoTurret(hardwareMap);
         final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret);
-        tools.setPosition(AutoTools.Position.GROUND_TARGET_NODUMP);
         waitForStart();
         while (opModeIsActive()) {
+            tools.setPosition(position);
+            tools.update();
             turret.setPos(turretPos, unit);
             telemetry.addData("turret pos", turret.getPos(unit));
             telemetry.update();
