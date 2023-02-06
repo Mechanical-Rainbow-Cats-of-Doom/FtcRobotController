@@ -95,9 +95,21 @@ public class ControllerTools extends AutoTools {
     public void update() {
         final double right = gamepad.getRightY();
         final double left = gamepad.getLeftY();
+
+        readLiftButtons();
+        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
+            if (entry.getValue() && !doingstuff) {
+                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
+                doingstuff = true;
+            }
+        }
+
         if (doingstuff) {
             if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
                 cleanupOpMode();
+            } else if(bReader.wasJustReleased() && !doingstuff) {
+                cleanupOpMode();
+                dump();
             } else {
                 super.update();
                 return;
@@ -112,16 +124,6 @@ public class ControllerTools extends AutoTools {
         telemetry.addData("armpos", armMotor.getCurrentPosition());
         this.rotation.update();
         bReader.readValue();
-        if (bReader.wasJustReleased() && !doingstuff) {
-            dump();
-        }
-        readLiftButtons();
-        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
-            if (entry.getValue() && !doingstuff) {
-                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
-                doingstuff = true;
-            }
-        }
     }
 
 
