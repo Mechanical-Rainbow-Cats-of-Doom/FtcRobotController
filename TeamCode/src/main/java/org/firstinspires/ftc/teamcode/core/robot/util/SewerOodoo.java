@@ -1,5 +1,6 @@
 // https://tenor.com/view/we-do-a-medium-amount-of-trolling-we-do-a-lot-of-trolling-troll-trolling-we-do-a-little-trolling-gif-20600937
 package org.firstinspires.ftc.teamcode.core.robot.util;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -7,25 +8,34 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 
 import java.lang.Math;
 
 public class SewerOodoo {
-    HardwareMap hardwareMap;
-
-    public SewerOodoo(HardwareMap hardwareMap){
-        this.hardwareMap = hardwareMap;
+    Encoder leftEncoder2, rightEncoder2, frontEncoder2;
+//    HardwareMap hardwareMap;
+    Telemetry telemetry;
+    private DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    public SewerOodoo(HardwareMap hardwareMap, Telemetry telemetry){
+//        this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
+        leftEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
+        rightEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
+        frontEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
     }
+//
+//    ElapsedTime movementTimer = new ElapsedTime();
+//    final Encoder leftEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
+//    final Encoder rightEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
+//    final Encoder frontEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
 
-    ElapsedTime movementTimer = new ElapsedTime();
-    final Encoder leftEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
-    final Encoder rightEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
-    final Encoder frontEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
-    public DcMotor rightRear;
-    public DcMotor rightFront;
-    public DcMotor leftRear;
-    public DcMotor leftFront;
 
     private DigitalChannel switch_;
 
@@ -44,7 +54,7 @@ public class SewerOodoo {
     double robotLength = 17.25;
     double robotWidth = 17.375;
     double countsPerRotation = 360;
-    double trueDrive;
+    public double trueDrive;
 
     double trueStrafe;
     double slowIntensity = 10;
@@ -80,11 +90,69 @@ public class SewerOodoo {
     double rotation;
     int isRotate = 0;
 
-    double drivePreset = 0;
+    public double drivePreset = 0;
     double strafePreset = 0;
     double rotationPreset = 0;
 
     boolean isDone = false;
+
+    public void TryTelemetry(){
+//        try {
+//            telemetry.addData("right encoder", hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
+//        } catch (Exception e){
+//            telemetry.addLine("Problem with right encoder");
+//        }
+//        try {
+//            telemetry.addData( "left encoder",hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
+//        } catch (Exception e){
+//            telemetry.addLine("Problem with left encoder");
+//        }
+//        try {
+//            telemetry.addData( "front encoder",hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
+//        } catch (Exception e){
+//            telemetry.addLine("Problem with front encoder");
+//        }
+//        try{
+//            telemetry.addData("encoder f ", new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder)));
+//        } catch (Exception e){
+//            telemetry.addLine("oops");
+//        }
+//        try{
+//            telemetry.addData("encoder l ", new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder)));
+//        } catch (Exception e){
+//            telemetry.addLine("oops");
+//        }
+//        try{
+//            telemetry.addData("encoder r ", new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder)));
+//        } catch (Exception e){
+//            telemetry.addLine("oops");
+//        }
+//        new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
+//        final Encoder leftEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
+//        final Encoder rightEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
+//        final Encoder frontEncoder2 = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
+        while(true){
+            try {
+                telemetry.addData("re", this.rightEncoder2.getCurrentPosition());
+            } catch (Exception e){
+                telemetry.addLine("re prob");
+            }
+            try {
+                telemetry.addData("le", this.leftEncoder2.getCurrentPosition());
+            } catch (Exception e){
+                telemetry.addLine("le prob");
+            }
+            try {
+                telemetry.addData("fe", this.frontEncoder2.getCurrentPosition());
+            } catch (Exception e){
+                telemetry.addLine("fe prob");
+            }
+            telemetry.update();
+        }
+
+
+
+    }
 
     public void SetPresetMovement(double Preset_Drive, double Drive_Speed_Multiplier, double Preset_Strafe, double Strafe_Speed_Multiplier, double Preset_Rotation) {
         drivePreset = trueDrive + Preset_Drive;
@@ -123,6 +191,8 @@ public class SewerOodoo {
             strafePreset = 0.0000000000000000000000001;
         }
 
+//        telemetry.addLine("works d ");
+        telemetry.update();
         if (Math.abs(drivePreset - trueDrive) >= 2) {
             drive = Math.signum(drivePreset - trueDrive) * Math.max(0.2, driveSpeedMultiplier * Math.abs((drivePreset - trueDrive) / drivePreset));
         } else {
@@ -130,6 +200,8 @@ public class SewerOodoo {
             drive = 0;
         }
 
+//        telemetry.addLine("works s");
+        telemetry.update();
         if (Math.abs(strafePreset - trueStrafe) >= 1) {
             strafe = Math.signum(strafePreset - trueStrafe) * Math.max(0.2, strafeSpeedMultiplier * Math.abs((strafePreset - trueStrafe) / strafePreset));
         } else {
@@ -137,6 +209,8 @@ public class SewerOodoo {
             strafe = 0;
         }
 
+//        telemetry.addLine("works r");
+        telemetry.update();
         if ((Math.abs(zAngle - rotationPreset) >= 2)) {
             rotation = Math.signum(rotationPreset - zAngle) * (Math.max(0.2, Math.abs((rotationPreset - zAngle) / 180)));
         } else {
@@ -144,8 +218,13 @@ public class SewerOodoo {
             rotation = 0;
         }
 
+
         this.SetMotors(drive, strafe, rotation);
-        this.Drive();
+//        telemetry.addLine("works 1");
+//        telemetry.update();
+//        this.Drive();
+//        telemetry.addLine("works 2");
+//        telemetry.update();
 
         if ((isDrive == 1) & (isRotate == 1) & (isStrafe == 1)) {
             isDrive = 0;
@@ -163,6 +242,8 @@ public class SewerOodoo {
             isDone = false;
         }
 
+//        telemetry.addLine("works 3");
+//        telemetry.update();
         return (isDone);
     }
 
@@ -180,9 +261,9 @@ public class SewerOodoo {
 
 
     public void SetAxisMovement() {
-        rightEncoder = rightRear.getCurrentPosition() / 360 * 1.173150521 - clearRight;
-        leftEncoder = -rightFront.getCurrentPosition() / 360 * 1.178221633 - clearLeft;
-        backEncoder = leftFront.getCurrentPosition() / 360 * 1.17584979 - clearBack;
+        rightEncoder = rightEncoder2.getCurrentPosition() / 360 * 1.173150521 - clearRight;
+        leftEncoder = rightEncoder2.getCurrentPosition() / 360 * 1.178221633 - clearLeft;
+        backEncoder = frontEncoder2.getCurrentPosition() / 360 * 1.17584979 - clearBack;
         trueDrive = ((rightEncoder + leftEncoder) / 2) - clearDrive;
         trueStrafe = (backEncoder - (rightEncoder - leftEncoder) / 2) - clearStrafe;
         trueRotate = (((rightEncoder - leftEncoder) / 2) * 0.12877427457 /* <---- see comment below*/) - clearRotate;
@@ -211,7 +292,7 @@ public class SewerOodoo {
         rightFront.setPower(frontRightMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
         leftFront.setPower(frontLeftMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
         leftRear.setPower(-1 * backLeftMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
-        rightRear.setPower(backRightMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
+        rightRear.setPower(-1*backRightMultiplier * Math.signum(drivePreset - trueDrive) * Math.max(0.15, Math.abs((drivePreset - trueDrive) / drivePreset)));
 
     }
 
@@ -228,15 +309,15 @@ public class SewerOodoo {
         rightFront.setPower(-1 * frontRightMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
         leftFront.setPower(frontLeftMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
         leftRear.setPower(backLeftMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
-        rightRear.setPower(backRightMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
+        rightRear.setPower(-1*backRightMultiplier * Math.signum(drivePreset - trueStrafe) * Math.max(0.15, Math.abs((drivePreset - trueStrafe) / drivePreset)));
 
     }
 
 
     public void ZeroEncoders() {
-        clearRight = rightRear.getCurrentPosition() / 360 * 1.173150521;
-        clearLeft = -rightFront.getCurrentPosition() / 360 * 1.178221633;
-        clearBack = leftFront.getCurrentPosition() / 360 * 1.17584979;
+        clearRight = rightEncoder2.getCurrentPosition() / 360 * 1.173150521;
+        clearLeft = -leftEncoder2.getCurrentPosition() / 360 * 1.178221633;
+        clearBack = frontEncoder2.getCurrentPosition() / 360 * 1.17584979;
     }
 
     public void Encoders() {
@@ -275,9 +356,16 @@ public class SewerOodoo {
 
 
     public void Drive() {
-        rightFront.setPower(this.frontRight * (1 / 1));
-        leftFront.setPower(this.frontLeft * (1 / 1));
-        leftRear.setPower(this.backLeft * (1 / 1));
-        rightRear.setPower(this.backRight * (1 / 1));
+        rightFront.setPower(this.frontRight);
+        leftFront.setPower(this.frontLeft);
+        leftRear.setPower(this.backLeft);
+        rightRear.setPower(-this.backRight);
+    }
+
+    public void testDrive(){
+        rightFront.setPower(0.3);
+        leftFront.setPower(0.3);
+        leftRear.setPower(0.3);
+        rightRear.setPower(0.3);
     }
 }
