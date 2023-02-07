@@ -57,6 +57,7 @@ public class FunnyControllerMovement extends ControllerMovement {
         Vector2d avg = calcAvg();
         if (avg.getY() >= y + 0.2 || avg.getX() >= x + 0.2) {
             Arrays.fill(vals, (loopCount - AVG_COUNT_DECELERATING) % vals.length, loopCount % vals.length, avg);
+            avg = calcAvg();
         }
         Vector2d input = new Vector2d(avg.getY(), avg.getX()).rotated(imu.getAngularOrientation().firstAngle - PI / 2);
         drive.setWeightedDrivePower(new Pose2d(
