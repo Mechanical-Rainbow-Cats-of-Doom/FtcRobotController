@@ -19,10 +19,13 @@ public class ToggleableToggleButtonReader extends ButtonReader {
      * @param gamepad the gamepad object that contains the buttonn
      * @param button  the button on the oject
      */
-    public ToggleableToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button) {
+    public ToggleableToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button, boolean currToggleState) {
         super(gamepad, button);
 
-        currToggleState = false;
+        this.currToggleState = currToggleState;
+    }
+    public ToggleableToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button) {
+        this(gamepad, button, false);
     }
 
     /**

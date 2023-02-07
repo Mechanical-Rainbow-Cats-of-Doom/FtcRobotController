@@ -28,13 +28,6 @@ public class NormalDrive extends LinearOpMode {
     public void runOpMode() {
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
-        final ButtonReader xButton = new ButtonReader(moveGamepad, GamepadKeys.Button.X);
-        final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
-        int LEReset = leftEncoder.getCurrentPosition();
-        final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
-        int REReset = rightEncoder.getCurrentPosition();
-        final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
-        int FEReset = frontEncoder.getCurrentPosition();
         final ControllerMovement drive = createDrive(moveGamepad);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         final ControllerTurret turret = new ControllerTurret(hardwareMap, toolGamepad);
@@ -43,17 +36,9 @@ public class NormalDrive extends LinearOpMode {
         waitForStart();
         tools.initIntake();
         while (opModeIsActive()) {
-            if(xButton.isDown()){
-                LEReset = leftEncoder.getCurrentPosition();
-                REReset = rightEncoder.getCurrentPosition();
-                FEReset = frontEncoder.getCurrentPosition();
-            }
             drive.update();
             tools.update();
             telemetry.addData("Turret Rotation", turret.getPos(AutoTurret.Units.DEGREES));
-            telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition()-LEReset);
-            telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition()-REReset);
-            telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition()-FEReset);
             telemetry.addData("forward/backward: ", moveGamepad.getLeftY());
             telemetry.addData("left/right: ", -moveGamepad.getLeftX());
             telemetry.update();

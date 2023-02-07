@@ -123,8 +123,9 @@ public class AutoTools {
         }, 60);
     }
     public void update() {
-        if (isAuto) doingstuff = true;
-        else {
+        if (isAuto) {
+            doingstuff = true;
+        } else {
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
