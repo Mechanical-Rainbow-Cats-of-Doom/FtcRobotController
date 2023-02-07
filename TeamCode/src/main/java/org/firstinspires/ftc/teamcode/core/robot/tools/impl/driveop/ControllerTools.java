@@ -35,6 +35,12 @@ public class ControllerTools extends AutoTools {
     private final LinkedHashMap<ButtonReader, Position> liftButtons;
     private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>();
 
+    private final BoxedBoolean[] wasOn = new BoxedBoolean[2];
+
+    static class BoxedBoolean {
+        boolean value = false;
+    }
+
     @Override
     protected void initMotors() {
         ZeroMotorEncoder.zero(liftMotor, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -61,14 +67,24 @@ public class ControllerTools extends AutoTools {
 
     public void initIntake() {
         final Thread thread = new Thread(() -> {
+            boolean yOldActive = false;
+            boolean xOldActive = false;
             while (!opMode.isStopRequested()) {
                 yReader.readValue();
                 if (yReader.getState()) {
-                    intake.setPower(-1);
-                    xReader.forceVal(false);
+                    if(!yOldActive) {
+                        intake.setPower(-1);
+                        xReader.forceVal(false);
+                        yOldActive = true;
+                    }
                 } else {
                     xReader.readValue();
-                    intake.setPower(xReader.getState() ? 1 : 0);
+                    boolean xState = xReader.getState();
+                    if (xOldActive != xState) {
+                        intake.setPower(xReader.getState() ? 1 : 0);
+                        xOldActive = xState;
+                    }
+                    yOldActive = false;
                 }
             }
         });
@@ -117,8 +133,8 @@ public class ControllerTools extends AutoTools {
         }
         if (wasDoingStuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         wasDoingStuff = doingstuff;
-        runBoundedTool(liftMotor, Position.MAX.liftPos, left, false, liftZeroPower);
-        runBoundedTool(armMotor, Position.MAX.armPos, -right, false, armZeroPower);
+        runBoundedTool(liftMotor, wasOn[0], Position.MAX.liftPos, left, false, liftZeroPower);
+        runBoundedTool(armMotor, wasOn[1], Position.MAX.armPos, -right, false, armZeroPower);
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
@@ -127,23 +143,28 @@ public class ControllerTools extends AutoTools {
     }
 
 
-    public static void runBoundedTool(@NonNull DcMotor motor, int minBound, int maxBound, double power, boolean negative, double zeroPower) {
+    public static void runBoundedTool(@NonNull DcMotor motor, BoxedBoolean previouslyOn, int minBound, int maxBound, double power, boolean negative, double zeroPower) {
         int motorPos = motor.getCurrentPosition() * (negative ? -1 : 1);
+
         if (((power < 0) && (motorPos > minBound + 4)) || ((power > 0) && (motorPos < maxBound - 4))) {
             motor.setPower(power);
+            previouslyOn.value = true;
         } else {
-            motor.setPower(zeroPower);
+            if(previouslyOn.value) {
+                motor.setPower(zeroPower);
+                previouslyOn.value = false;
+            }
         }
     }
 
-    public static void runBoundedTool(@NonNull DcMotor motor, int minBound, int maxBound, double power, boolean negative) {
-        runBoundedTool(motor, minBound, maxBound, power, negative, 0);
+    public static void runBoundedTool(@NonNull DcMotor motor, BoxedBoolean previouslyOn, int minBound, int maxBound, double power, boolean negative) {
+        runBoundedTool(motor, previouslyOn, minBound, maxBound, power, negative, 0);
     }
 
-    public static void runBoundedTool(DcMotor motor, int maxBound, double power, boolean negative, double zeroPower) {
-        runBoundedTool(motor, 0, maxBound, power, negative, zeroPower);
+    public static void runBoundedTool(DcMotor motor, BoxedBoolean previouslyOn, int maxBound, double power, boolean negative, double zeroPower) {
+        runBoundedTool(motor, previouslyOn, 0, maxBound, power, negative, zeroPower);
     }
-    public static void runBoundedTool(DcMotor motor, int maxBound, double power, boolean negative) {
-        runBoundedTool(motor, maxBound, power, negative, 0);
+    public static void runBoundedTool(DcMotor motor, BoxedBoolean previouslyOn, int maxBound, double power, boolean negative) {
+        runBoundedTool(motor, previouslyOn, maxBound, power, negative, 0);
     }
 }
