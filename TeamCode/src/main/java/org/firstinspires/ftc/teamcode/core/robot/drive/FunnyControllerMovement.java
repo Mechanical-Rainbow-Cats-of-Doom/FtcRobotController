@@ -21,7 +21,7 @@ import static java.lang.Math.PI;
 @Config
 public class FunnyControllerMovement extends ControllerMovement {
     private boolean firstrun = true;
-    public final static int AVG_COUNT_ACCELERATING = 10, AVG_COUNT_DECELERATING = 5;
+    public static int AVG_COUNT_ACCELERATING = 10, AVG_COUNT_DECELERATING = 5;
     private final BNO055IMU imu;
     private final Vector2d[] vals = new Vector2d[AVG_COUNT_ACCELERATING];
     private final ToggleButtonReader bReader;
