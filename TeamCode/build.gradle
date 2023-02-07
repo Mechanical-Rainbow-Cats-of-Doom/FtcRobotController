@@ -34,7 +34,4 @@ dependencies {
     implementation 'com.acmerobotics.roadrunner:core:0.5.6'
     implementation 'org.openftc:easyopencv:1.5.3'
     implementation 'org.ftclib.ftclib:core:2.0.1' // core for ftclib
-    implementation('org.boofcv:boofcv-core:0.39') {
-        exclude group: 'org.deepboof'
-    }
 }
