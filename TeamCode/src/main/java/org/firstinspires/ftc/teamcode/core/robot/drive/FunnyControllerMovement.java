@@ -5,11 +5,11 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.gamepad.ToggleButtonReader;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.PoseStorage;
+import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.jetbrains.annotations.Contract;
 
 import java.util.Arrays;
@@ -24,11 +24,11 @@ public class FunnyControllerMovement extends ControllerMovement {
     public static int AVG_COUNT_ACCELERATING = 10, AVG_COUNT_DECELERATING = 5;
     private final BNO055IMU imu;
     private final Vector2d[] vals = new Vector2d[AVG_COUNT_ACCELERATING];
-    private final ToggleButtonReader bReader;
+    private final ToggleableToggleButtonReader bReader;
     private int loopCount = 0;
     public FunnyControllerMovement(@NonNull HardwareMap map, GamepadEx gamepad) {
         super(map, gamepad);
-        bReader = new ToggleButtonReader(gamepad, GamepadKeys.Button.B);
+        bReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.B, true);
         drive.setPoseEstimate(PoseStorage.currentPose);
         imu = map.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters() {{
