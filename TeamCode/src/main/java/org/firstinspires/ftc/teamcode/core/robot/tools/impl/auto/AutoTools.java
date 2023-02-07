@@ -38,7 +38,10 @@ public class AutoTools {
         LOW_TARGET_NODUMP(LOW_TARGET.liftPos, LOW_TARGET.armPos, Action.NOTHING),
         MEDIUM_TARGET_NODUMP(MEDIUM_TARGET.liftPos, MEDIUM_TARGET.armPos, Action.NOTHING),
         HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING),
-        HIGH_ARM(0, MAX.armPos, Action.NOTHING);
+        HIGH_ARM(0, MAX.armPos, Action.NOTHING),
+        HOVER_5(260,500,Action.NOTHING),
+        INTAKE_5(260,250,Action.NOTHING),
+        EXIT_5(260,600,Action.NOTHING);
 
         public final int liftPos;
         public final int armPos;
@@ -182,7 +185,7 @@ public class AutoTools {
                 stage = 0;
                 if(isAuto) {
                     synchronized (this) {
-                        notifyAll();
+                        notify();
                     }
                 }
                 break;
@@ -190,6 +193,10 @@ public class AutoTools {
     }
     public void setIntake(Action action) {
         intake.setPower(action == Action.INTAKE ? 1 : action == Action.DUMP ? -1 : 0);
+    }
+
+    public void setIntake(int power){
+        intake.setPower(power);
     }
 
     public void cleanup() {
