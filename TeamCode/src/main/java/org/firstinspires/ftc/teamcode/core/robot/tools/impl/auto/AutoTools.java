@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 
 @Config
 public class AutoTools {
+    public static double armZeroPower = 0.075, liftZeroPower = 0.001;
     protected final DcMotor liftMotor, armMotor;
     protected final AutoTurret turret;
     protected final CRServo intake;
@@ -82,6 +84,7 @@ public class AutoTools {
     }
 
     public void setPosition(@NonNull Position position) {
+        this.stage = 0;
         this.position = position;
     }
 
@@ -126,9 +129,14 @@ public class AutoTools {
         if (isAuto) {
             doingstuff = true;
         } else {
-            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            try {
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            } catch (TargetPositionNotSetException ignored) {
+                // who
+            }
         }
+
         if(lastPosition != position) {
             this.stage = 0;
             this.lastPosition = position;
@@ -178,10 +186,10 @@ public class AutoTools {
                 } else if ((isAuto && position.action != Action.NOTHING) || position == Position.INTAKE) position = Position.NEUTRAL;
                 if (!isAuto) {
                     doingstuff = false;
-                    armMotor.setPower(0);
-                    liftMotor.setPower(0);
                     armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    armMotor.setPower(armZeroPower);
+                    liftMotor.setPower(liftZeroPower);
                 }
                 stage = 0;
                 if(isAuto) {
@@ -201,8 +209,8 @@ public class AutoTools {
     }
 
     public void cleanup() {
-        armMotor.setPower(0);
-        liftMotor.setPower(0);
+        armMotor.setPower(armZeroPower);
+        liftMotor.setPower(liftZeroPower);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turret.cleanup();

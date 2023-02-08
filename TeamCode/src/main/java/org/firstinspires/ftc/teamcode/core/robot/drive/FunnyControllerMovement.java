@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.PoseStorage;
@@ -55,10 +56,19 @@ public class FunnyControllerMovement extends ControllerMovement {
         if (firstrun) {
             Arrays.fill(vals, raw);
             firstrun = false;
-        } else vals[loopCount % vals.length] = raw;
-        Vector2d avg = calcAvg();
+        } else vals[Math.floorMod(loopCount, vals.length)] = raw;
+            Vector2d avg = calcAvg();
         if (avg.getY() >= y + 0.2 || avg.getX() >= x + 0.2) {
-            Arrays.fill(vals, (loopCount - AVG_COUNT_DECELERATING) % vals.length, loopCount % vals.length, avg);
+            final int upper = Math.floorMod(loopCount, vals.length);
+            final int lower = Math.floorMod((loopCount - AVG_COUNT_DECELERATING), vals.length);
+            //try {
+                if (lower < upper) Arrays.fill(vals, lower, upper, avg);
+                else if (upper != 0) Arrays.fill(vals, upper - 1, lower - 1, avg);
+                else Arrays.fill(vals, upper, vals.length, avg);
+            //} catch (Exception e) {
+             //   e.printStackTrace();
+            //    Arrays.fill(vals, avg);
+           // }
             avg = calcAvg();
         }
         bReader.readValue();
@@ -71,6 +81,6 @@ public class FunnyControllerMovement extends ControllerMovement {
             ));
             drive.updatePoseEstimate();
         } else super.update();
-        if (++loopCount % 10 == 0) loopCount = 0;
+        if (Math.floorMod(++loopCount, 10) == 0) loopCount = 0;
     }
 }
