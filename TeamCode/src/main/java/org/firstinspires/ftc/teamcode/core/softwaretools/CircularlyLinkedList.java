@@ -11,7 +11,11 @@ public class CircularlyLinkedList<T> {
         public Node<T> getNextNode() {
             return nextNode;
         }
-
+        
+        public void setNextNode(Node<T> nextNode) {
+            this.nextNode = nextNode;
+        }
+        
         public T getVal() {
             return val;
         }
@@ -27,7 +31,7 @@ public class CircularlyLinkedList<T> {
     public CircularlyLinkedList(int capacity, T initVal) {
         this.capacity = capacity;
         this.head = new Node<>(initVal);
-        head.nextNode = head;
+        head.setNextNode(head);
         this.curNode = head;
         this.tail = head;
     }
@@ -51,12 +55,12 @@ public class CircularlyLinkedList<T> {
     public void add(T val) {
         if (size++ < capacity) {
             Node<T> newNode = new Node<>(val);
-            tail.nextNode = newNode;
+            tail.setNextNode(newNode);
             tail = newNode;
-            tail.nextNode = head;
+            tail.setNextNode(head);
         } else {
             curNode.setVal(val);
-            curNode = curNode.nextNode;
+            curNode = curNode.getNextNode();
         }
     }
 
