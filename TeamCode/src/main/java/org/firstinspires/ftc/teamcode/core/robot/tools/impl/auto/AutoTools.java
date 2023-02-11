@@ -42,9 +42,26 @@ public class AutoTools {
         MEDIUM_TARGET_NODUMP(MEDIUM_TARGET.liftPos, MEDIUM_TARGET.armPos, Action.NOTHING),
         HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING),
         HIGH_ARM(0, MAX.armPos, Action.NOTHING),
-        HOVER_5(260,500,Action.NOTHING),
-        INTAKE_5(260,250,Action.NOTHING),
-        EXIT_5(260,600,Action.NOTHING);
+        //cone 5
+        HOVER_5(800,0,Action.NOTHING),
+        INTAKE_5(700,0,Action.NOTHING),
+        EXIT_5(1250,0,Action.NOTHING),
+        //cone 4
+        HOVER_4(650,0,Action.NOTHING),
+        INTAKE_4(550,0,Action.NOTHING),
+        EXIT_4(1050,0,Action.NOTHING),
+        //cone 3
+        HOVER_3(470,0,Action.NOTHING),
+        INTAKE_3(370,0,Action.NOTHING),
+        EXIT_3(900,0,Action.NOTHING),
+        //cone 2
+        HOVER_2(260,0,Action.NOTHING),
+        INTAKE_2(160,0,Action.NOTHING),
+        EXIT_2(700,0,Action.NOTHING),
+        //cone 1
+        HOVER_1(100,0,Action.NOTHING),
+        INTAKE_1(0,0,Action.NOTHING),
+        EXIT_1(500,0,Action.NOTHING);
 
         public final int liftPos;
         public final int armPos;

@@ -26,7 +26,7 @@ import java.util.Timer;
 public class NoRunnerAuto2 extends LinearOpMode {
     public int forwardDistance = 47000;
     public int leftDistance = 8000;
-    public int rightDistance = -28848;
+    public int rightDistance = -27848;
     public static boolean isRed;
 
 
@@ -89,7 +89,7 @@ public class NoRunnerAuto2 extends LinearOpMode {
         tools.setIntake(-1);
         Thread.sleep(2000);
         tools.setIntake(0);
-        turret.setPos(55, AutoTurret.Units.DEGREES);
+        turret.setPos(80, AutoTurret.Units.DEGREES);
         Thread.sleep(500);
         tools.setPosition(AutoTools.Position.HOVER_5);
         Thread.sleep(1000);
@@ -103,6 +103,9 @@ public class NoRunnerAuto2 extends LinearOpMode {
         }
         drive.setWeightedDrivePower(new Pose2d(0,0,0));
 
+        while(opModeIsActive()){
+            drive.setWeightedDrivePower(new Pose2d(0,0,0));
+        }
         tools.cleanup();
     }
 }
