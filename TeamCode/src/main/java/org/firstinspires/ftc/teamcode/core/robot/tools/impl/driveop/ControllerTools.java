@@ -119,6 +119,8 @@ public class ControllerTools extends AutoTools {
 
     @Override
     public void update() {
+        turret.update();
+
         final double right = gamepad.getRightY();
         final double left = gamepad.getLeftY();
 
@@ -149,7 +151,6 @@ public class ControllerTools extends AutoTools {
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
-        turret.update();
         bReader.readValue();
     }
 

@@ -38,6 +38,9 @@ public class ControllerTurret extends AutoTurret {
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT), Rotation.RIGHT);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_DOWN), Rotation.BACK);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_LEFT), Rotation.LEFT);
+            put(new ButtonReader(gamepad, GamepadKeys.Button.LEFT_BUMPER), Rotation.FRONTLEFT);
+            put(new ButtonReader(gamepad, GamepadKeys.Button.RIGHT_BUMPER), Rotation.FRONTRIGHT);
+
         }};
     }
 

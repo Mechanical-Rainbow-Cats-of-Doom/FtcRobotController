@@ -26,7 +26,7 @@ import static org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinked
 @Config
 public class FunnyControllerMovement extends ControllerMovement {
     public static int AVG_COUNT_ACCELERATING = 4, AVG_COUNT_DECELERATING = 2;
-    public static boolean inverseDrive = true, inverseStrafe = false, inverseRotate = true;
+    public static boolean inverseDrive = true, inverseStrafe = false, inverseRotate = false;
     private final BNO055IMU imu;
     private final CircularlyLinkedList<Vector2d> vals = new CircularlyLinkedList<>(AVG_COUNT_ACCELERATING, new Vector2d());
     private final ToggleableToggleButtonReader bReader;
