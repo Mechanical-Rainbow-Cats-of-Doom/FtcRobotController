@@ -41,7 +41,6 @@ public class NoRunnerAuto2 extends LinearOpMode {
         Thread thread = new Thread(() -> {
             while (opModeIsActive()) {
                 tools.update();
-
             }
         });
 
