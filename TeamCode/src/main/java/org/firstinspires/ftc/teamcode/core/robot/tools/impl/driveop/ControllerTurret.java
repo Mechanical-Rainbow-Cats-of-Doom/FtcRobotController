@@ -47,9 +47,9 @@ public class ControllerTurret extends AutoTurret {
             final double pos = gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
             motor.setPower(Math.max(neg, pos) == neg ? -neg*ampltiude : pos*ampltiude);
             doingstuff = ControllerTools.setPosFromButtonMap(turretButtonVals, turretButtons, (turPos) -> {
-                setPos(turPos);
                 motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 motor.setPower(1);
+                setPos(turPos);
             });
         } else {
             if (!isMoving()) {

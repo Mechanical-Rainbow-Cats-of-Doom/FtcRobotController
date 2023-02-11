@@ -93,5 +93,6 @@ public class AutoTurret {
     public void cleanup() {
         motor.setPower(0);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setPower(0);
     }
 }

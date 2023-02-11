@@ -72,6 +72,7 @@ public class ControllerTools extends AutoTools {
         final Thread thread = new Thread(() -> {
             while (!opMode.isStopRequested()) {
                 yReader.readValue();
+                xReader.readValue();
                 if (yReader.getState()) {
                     intake.setPower(-1);
                     xReader.forceVal(false);
@@ -90,7 +91,12 @@ public class ControllerTools extends AutoTools {
             buttonVals.put(button, button.wasJustReleased());
         }
     }
-
+    private void readLiftButtons() {
+        for (ButtonReader button : liftButtons.keySet()) {
+            button.readValue();
+            liftButtonVals.put(button, button.wasJustReleased());
+        }
+    }
     private boolean wasDoingStuff = false;
     private void cleanupOpMode() {
         doingstuff = false;
@@ -116,7 +122,13 @@ public class ControllerTools extends AutoTools {
         final double right = gamepad.getRightY();
         final double left = gamepad.getLeftY();
 
-        doingstuff = setPosFromButtonMap(liftButtonVals, liftButtons, this::setPosition);
+        readLiftButtons();
+        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
+            if (entry.getValue()) {
+                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
+                doingstuff = true;
+            }
+        }
 
         if (doingstuff) {
             if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
@@ -129,10 +141,11 @@ public class ControllerTools extends AutoTools {
                 return;
             }
         }
-        if (wasDoingStuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wasDoingStuff = doingstuff;
         runBoundedTool(liftMotor, wasOn[0], Position.MAX.liftPos, left, false, liftZeroPower);
         runBoundedTool(armMotor, wasOn[1], Position.MAX.armPos, -right, false, armZeroPower);
+        if (wasDoingStuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wasDoingStuff = doingstuff;
+
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
