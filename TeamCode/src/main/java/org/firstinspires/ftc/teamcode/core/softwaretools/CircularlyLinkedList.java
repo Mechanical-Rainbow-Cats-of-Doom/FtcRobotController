@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.core.softwaretools;
 
-public class CircularlyLinkedList<T> {
-    public static class Node<T> {
+import java.io.Serializable;
+import java.util.LinkedList;
+
+public class CircularlyLinkedList<T> implements Serializable {
+    public static class Node<T> implements Serializable {
         private T val;
         private Node<T> nextNode;
         public Node(T val) {
@@ -24,7 +27,8 @@ public class CircularlyLinkedList<T> {
             this.val = val;
         }
     }
-    private Node<T> head, curNode, tail;
+    private final Node<T> head;
+    private Node<T> curNode, tail;
     private final int capacity;
     private int size = 1;
 
@@ -52,6 +56,18 @@ public class CircularlyLinkedList<T> {
         return tail;
     }
 
+    public Node<T> get(int index) {
+        int iter = 0;
+        Node<T> node = getHead();
+        while (++iter < index) {
+            node = node.getNextNode();
+        }
+        return node;
+    }
+
+    public void set(int index, T val) {
+        get(index).setVal(val);
+    }
     public void add(T val) {
         if (size++ < capacity) {
             Node<T> newNode = new Node<>(val);

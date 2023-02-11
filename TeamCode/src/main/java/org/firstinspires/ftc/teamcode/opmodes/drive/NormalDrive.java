@@ -20,6 +20,7 @@ import java.util.Timer;
 
 @TeleOp
 public class NormalDrive extends LinearOpMode {
+    protected MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
     ControllerMovement createDrive(GamepadEx gamepad) {
         return new ControllerMovement(hardwareMap, gamepad);
     }
@@ -29,16 +30,14 @@ public class NormalDrive extends LinearOpMode {
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
         final ControllerMovement drive = createDrive(moveGamepad);
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        final ControllerTurret turret = new ControllerTurret(hardwareMap, toolGamepad);
-        final ControllerTools tools = new ControllerTools(hardwareMap, new Timer(), turret, toolGamepad, telemetry, this);
+        final ControllerTools tools = new ControllerTools(hardwareMap, new Timer(), toolGamepad, moveGamepad, telemetry, this);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
         tools.initIntake();
         while (opModeIsActive()) {
             drive.update();
             tools.update();
-            telemetry.addData("Turret Rotation", turret.getPos(AutoTurret.Units.DEGREES));
+            telemetry.addData("Turret Rotation", tools.getTurretPos(AutoTurret.Units.DEGREES));
             telemetry.addData("forward/backward: ", moveGamepad.getLeftY());
             telemetry.addData("left/right: ", -moveGamepad.getLeftX());
             telemetry.update();

@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
@@ -20,13 +21,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
+import java.util.function.Consumer;
 
 @Config
 public class ControllerTools extends AutoTools {
     // lift and arm zero power moved to auto tools
     public double test;
     private final GamepadEx gamepad;
-    private final ControllerTurret rotation;
+    private final ControllerTurret turret;
     private final Telemetry telemetry;
     private final ToggleableToggleButtonReader xReader, yReader;
     private final ButtonReader bReader;
@@ -47,11 +49,12 @@ public class ControllerTools extends AutoTools {
         ZeroMotorEncoder.zero(armMotor, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public ControllerTools(HardwareMap hardwareMap, Timer timer, ControllerTurret rotation, GamepadEx toolGamepad, Telemetry telemetry, LinearOpMode opMode) {
-        super(hardwareMap, timer, rotation);
+    public ControllerTools(HardwareMap hardwareMap, Timer timer, GamepadEx toolGamepad, GamepadEx driveGamepad, Telemetry telemetry, LinearOpMode opMode) {
+        super(hardwareMap, timer, null);
         isAuto = false;
-        this.rotation = rotation;
         gamepad = toolGamepad;
+        this.turret = new ControllerTurret(hardwareMap, driveGamepad);
+        super.turret = turret;
         this.telemetry = telemetry;
         this.opMode = opMode;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
@@ -88,10 +91,10 @@ public class ControllerTools extends AutoTools {
         thread.start();
     }
 
-    private void readLiftButtons() {
-        for (ButtonReader button : liftButtons.keySet()) {
+    public static void readLiftButtons(@NonNull HashMap<ButtonReader, Boolean> map) {
+        for (ButtonReader button : map.keySet()) {
             button.readValue();
-            liftButtonVals.put(button, button.wasJustReleased());
+            map.put(button, button.wasJustReleased());
         }
     }
 
@@ -103,18 +106,24 @@ public class ControllerTools extends AutoTools {
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+
+    public static <Pos> boolean setPosFromButtonMap(HashMap<ButtonReader, Boolean> buttonVals, HashMap<ButtonReader, Pos> buttonMap, Consumer<Pos> consumer) {
+        readLiftButtons(buttonVals);
+        for (Map.Entry<ButtonReader, Boolean> entry : buttonVals.entrySet()) {
+            if (entry.getValue()) {
+                consumer.accept(Objects.requireNonNull(buttonMap.get(entry.getKey())));
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void update() {
         final double right = gamepad.getRightY();
         final double left = gamepad.getLeftY();
 
-        readLiftButtons();
-        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
-            if (entry.getValue()) {
-                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
-                doingstuff = true;
-            }
-        }
+        doingstuff = setPosFromButtonMap(liftButtonVals, liftButtons, this::setPosition);
 
         if (doingstuff) {
             if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
@@ -134,7 +143,7 @@ public class ControllerTools extends AutoTools {
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
-        this.rotation.update();
+        turret.update();
         bReader.readValue();
     }
 

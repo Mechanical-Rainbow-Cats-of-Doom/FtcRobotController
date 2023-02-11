@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.robot.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinkedList;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static java.lang.Math.PI;
 import static org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinkedList.Node;
@@ -24,10 +26,12 @@ import static org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinked
 @Config
 public class FunnyControllerMovement extends ControllerMovement {
     public static int AVG_COUNT_ACCELERATING = 10, AVG_COUNT_DECELERATING = 5;
+    public static boolean inverseDrive = false, inverseStrafe = false, inverseRotate = false;
     private final BNO055IMU imu;
     private final CircularlyLinkedList<Vector2d> vals = new CircularlyLinkedList<>(AVG_COUNT_ACCELERATING, new Vector2d());
     private final ToggleableToggleButtonReader bReader;
-    public FunnyControllerMovement(@NonNull HardwareMap map, GamepadEx gamepad) {
+    private final Telemetry telemetry;
+    public FunnyControllerMovement(@NonNull HardwareMap map, GamepadEx gamepad, @Nullable Telemetry telemetry) {
         super(map, gamepad);
         bReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.B, true);
         drive.setPoseEstimate(PoseStorage.currentPose);
@@ -36,6 +40,11 @@ public class FunnyControllerMovement extends ControllerMovement {
             angleUnit = BNO055IMU.AngleUnit.RADIANS;
         }};
         imu.initialize(parameters);
+        this.telemetry = telemetry;
+    }
+
+    public FunnyControllerMovement(@NonNull HardwareMap map, GamepadEx gamepad) {
+        this(map, gamepad, null);
     }
 
     @NonNull
@@ -70,13 +79,21 @@ public class FunnyControllerMovement extends ControllerMovement {
         }
         bReader.readValue();
         if (bReader.getState()) {
-            Vector2d input = new Vector2d(avg.getY(), avg.getX()).rotated(imu.getAngularOrientation().firstAngle - PI / 2);
+            Vector2d input = new Vector2d(avg.getX(), avg.getY()).rotated(imu.getAngularOrientation().firstAngle - PI / 2);
+            final double drivePow = input.getX() * (inverseDrive ? -1 : 1);
+            final double strafePow = input.getY() * (inverseStrafe ? -1 : 1);
+            final double rotatePow = gamepad.getRightX() * (inverseRotate ? -1 : 1);
             drive.setWeightedDrivePower(new Pose2d(
-                    input.getX(),
-                    input.getY(),
-                    gamepad.getRightX()
+                    strafePow,
+                    drivePow,
+                    rotatePow
             ));
             drive.updatePoseEstimate();
+            if (telemetry != null) {
+                telemetry.addData("funnyDrive", drivePow);
+                telemetry.addData("funnyStrafe", strafePow);
+                telemetry.addData("funnyRotate", rotatePow);
+            }
         } else super.update();
     }
 }

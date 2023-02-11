@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.drive;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,6 +11,6 @@ import org.firstinspires.ftc.teamcode.core.robot.drive.FunnyControllerMovement;
 public class FunnyDrive extends NormalDrive {
     @Override
     FunnyControllerMovement createDrive(GamepadEx gamepad) {
-        return new FunnyControllerMovement(hardwareMap, gamepad);
+        return new FunnyControllerMovement(hardwareMap, gamepad, telemetry);
     }
 }

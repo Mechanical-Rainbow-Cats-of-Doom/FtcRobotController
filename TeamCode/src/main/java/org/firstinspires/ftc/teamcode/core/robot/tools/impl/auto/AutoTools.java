@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 public class AutoTools {
     public static double armZeroPower = 0.075, liftZeroPower = 0.001;
     protected final DcMotor liftMotor, armMotor;
-    protected final AutoTurret turret;
+    protected AutoTurret turret;
     protected final CRServo intake;
     protected final Timer timer;
     public enum Action {
@@ -239,5 +239,9 @@ public class AutoTools {
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turret.cleanup();
+    }
+
+    public double getTurretPos(AutoTurret.Units unit) {
+        return turret.getPos(unit);
     }
 }
