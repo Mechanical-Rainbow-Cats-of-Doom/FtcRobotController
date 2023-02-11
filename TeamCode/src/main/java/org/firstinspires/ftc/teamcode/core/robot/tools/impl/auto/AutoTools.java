@@ -143,6 +143,7 @@ public class AutoTools {
             }
         }, 60);
     }
+
     public void update() {
         if(!isAuto) {
             try {

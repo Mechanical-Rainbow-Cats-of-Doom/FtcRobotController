@@ -70,21 +70,13 @@ public class ControllerTools extends AutoTools {
 
     public void initIntake() {
         final Thread thread = new Thread(() -> {
-            int oldPower = 0;
             while (!opMode.isStopRequested()) {
                 yReader.readValue();
                 if (yReader.getState()) {
-                    if (oldPower != -1) {
-                        intake.setPower(-1);
-                        xReader.forceVal(false);
-                        oldPower = -1;
-                    }
+                    intake.setPower(-1);
+                    xReader.forceVal(false);
                 } else {
-                    int newPower = xReader.getState() ? 1 : 0;
-                    if (newPower != oldPower) {
-                        intake.setPower(newPower);
-                        oldPower = newPower;
-                    }
+                    intake.setPower(xReader.getState() ? 1 : 0);
                 }
             }
         });
