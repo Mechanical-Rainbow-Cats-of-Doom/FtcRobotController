@@ -83,6 +83,7 @@ public class ControllerTools extends AutoTools {
                     int newPower = xReader.getState() ? 1 : 0;
                     if (newPower != oldPower) {
                         intake.setPower(newPower);
+                        oldPower = newPower;
                     }
                 }
             }
@@ -91,10 +92,10 @@ public class ControllerTools extends AutoTools {
         thread.start();
     }
 
-    public static void readLiftButtons(@NonNull HashMap<ButtonReader, Boolean> map) {
-        for (ButtonReader button : map.keySet()) {
+    public static void readLiftButtons(@NonNull Map<ButtonReader, Boolean> buttonVals, @NonNull Map<ButtonReader, ?> buttons) {
+        for (ButtonReader button : buttons.keySet()) {
             button.readValue();
-            map.put(button, button.wasJustReleased());
+            buttonVals.put(button, button.wasJustReleased());
         }
     }
 
@@ -107,8 +108,8 @@ public class ControllerTools extends AutoTools {
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public static <Pos> boolean setPosFromButtonMap(HashMap<ButtonReader, Boolean> buttonVals, HashMap<ButtonReader, Pos> buttonMap, Consumer<Pos> consumer) {
-        readLiftButtons(buttonVals);
+    public static <Pos> boolean setPosFromButtonMap(Map<ButtonReader, Boolean> buttonVals, Map<ButtonReader, Pos> buttonMap, Consumer<Pos> consumer) {
+        readLiftButtons(buttonVals, buttonMap);
         for (Map.Entry<ButtonReader, Boolean> entry : buttonVals.entrySet()) {
             if (entry.getValue()) {
                 consumer.accept(Objects.requireNonNull(buttonMap.get(entry.getKey())));

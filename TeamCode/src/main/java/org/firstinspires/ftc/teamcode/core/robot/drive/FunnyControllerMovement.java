@@ -25,8 +25,8 @@ import static org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinked
 
 @Config
 public class FunnyControllerMovement extends ControllerMovement {
-    public static int AVG_COUNT_ACCELERATING = 10, AVG_COUNT_DECELERATING = 5;
-    public static boolean inverseDrive = false, inverseStrafe = false, inverseRotate = false;
+    public static int AVG_COUNT_ACCELERATING = 4, AVG_COUNT_DECELERATING = 2;
+    public static boolean inverseDrive = true, inverseStrafe = false, inverseRotate = true;
     private final BNO055IMU imu;
     private final CircularlyLinkedList<Vector2d> vals = new CircularlyLinkedList<>(AVG_COUNT_ACCELERATING, new Vector2d());
     private final ToggleableToggleButtonReader bReader;
@@ -79,9 +79,9 @@ public class FunnyControllerMovement extends ControllerMovement {
         }
         bReader.readValue();
         if (bReader.getState()) {
-            Vector2d input = new Vector2d(avg.getX(), avg.getY()).rotated(imu.getAngularOrientation().firstAngle - PI / 2);
-            final double drivePow = input.getX() * (inverseDrive ? -1 : 1);
-            final double strafePow = input.getY() * (inverseStrafe ? -1 : 1);
+            Vector2d input = new Vector2d(avg.getX() * (inverseStrafe ? -1 : 1), avg.getY() * (inverseDrive ? -1 : 1)).rotated(imu.getAngularOrientation().firstAngle - PI / 2);
+            final double drivePow = input.getX();
+            final double strafePow = input.getY();
             final double rotatePow = gamepad.getRightX() * (inverseRotate ? -1 : 1);
             drive.setWeightedDrivePower(new Pose2d(
                     strafePow,
