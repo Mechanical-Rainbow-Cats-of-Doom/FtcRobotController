@@ -10,22 +10,23 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.core.robot.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
+import org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinkedList;
 import org.jetbrains.annotations.Contract;
 
 import java.util.Arrays;
+import java.util.Vector;
 
 import androidx.annotation.NonNull;
 
 import static java.lang.Math.PI;
+import static org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinkedList.Node;
 
 @Config
 public class FunnyControllerMovement extends ControllerMovement {
-    private boolean firstrun = true;
     public static int AVG_COUNT_ACCELERATING = 10, AVG_COUNT_DECELERATING = 5;
     private final BNO055IMU imu;
-    private final Vector2d[] vals = new Vector2d[AVG_COUNT_ACCELERATING];
+    private final CircularlyLinkedList<Vector2d> vals = new CircularlyLinkedList<>(AVG_COUNT_ACCELERATING, new Vector2d());
     private final ToggleableToggleButtonReader bReader;
-    private int loopCount = 0;
     public FunnyControllerMovement(@NonNull HardwareMap map, GamepadEx gamepad) {
         super(map, gamepad);
         bReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.B, true);
@@ -36,29 +37,35 @@ public class FunnyControllerMovement extends ControllerMovement {
         }};
         imu.initialize(parameters);
     }
+
     @NonNull
     @Contract(" -> new")
     private Vector2d calcAvg() {
         double ytotal = 0, xtotal = 0;
-        for (Vector2d vec : vals) {
-            ytotal += vec.getY();
-            xtotal += vec.getX();
-        }
-        return new Vector2d(xtotal / vals.length,ytotal / vals.length);
+        Node<Vector2d> node = vals.getHead();
+        int itercount = 0;
+        do {
+            ytotal += node.getVal().getY();
+            xtotal += node.getVal().getX();
+            node = node.getNextNode();
+            ++itercount;
+        } while (node != vals.getHead());
+        return new Vector2d(xtotal / itercount,ytotal / itercount);
     }
+
     @SuppressWarnings("SuspiciousNameCombination")
     @Override
     public void update() {
         final double y = gamepad.getLeftY();
         final double x = -gamepad.getLeftX();
         final Vector2d raw = new Vector2d(y, x);
-        if (firstrun) {
-            Arrays.fill(vals, raw);
-            firstrun = false;
-        } else vals[loopCount % vals.length] = raw;
+        vals.add(raw);
         Vector2d avg = calcAvg();
         if (avg.getY() >= y + 0.2 || avg.getX() >= x + 0.2) {
-            Arrays.fill(vals, (loopCount - AVG_COUNT_DECELERATING) % vals.length, loopCount % vals.length, avg);
+            int itercount = 0;
+            while (itercount++ < AVG_COUNT_DECELERATING) {
+                vals.add(avg);
+            }
             avg = calcAvg();
         }
         bReader.readValue();
@@ -71,6 +78,5 @@ public class FunnyControllerMovement extends ControllerMovement {
             ));
             drive.updatePoseEstimate();
         } else super.update();
-        if (++loopCount % 10 == 0) loopCount = 0;
     }
 }
