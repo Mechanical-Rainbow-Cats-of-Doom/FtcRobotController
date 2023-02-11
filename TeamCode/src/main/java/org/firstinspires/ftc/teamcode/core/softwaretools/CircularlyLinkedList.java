@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.core.softwaretools;
 
-import androidx.annotation.Nullable;
-
 public class CircularlyLinkedList<T> {
     public static class Node<T> {
         private T val;
@@ -22,15 +20,16 @@ public class CircularlyLinkedList<T> {
             this.val = val;
         }
     }
-    private Node<T> head, curNode;
-    private Node<T> tail = null;
+    private Node<T> head, curNode, tail;
     private final int capacity;
     private int size = 1;
 
     public CircularlyLinkedList(int capacity, T initVal) {
         this.capacity = capacity;
         this.head = new Node<>(initVal);
+        head.nextNode = head;
         this.curNode = head;
+        this.tail = head;
     }
 
     public CircularlyLinkedList(T initVal) {
@@ -38,26 +37,21 @@ public class CircularlyLinkedList<T> {
     }
 
     public Node<T> getHead() {
-        return head == null ? null : head;
+        return head;
     }
 
     public Node<T> getCurNode() {
         return curNode;
     }
 
-    @Nullable
     public Node<T> getTail() {
-        return tail == null ? null : tail;
+        return tail;
     }
 
     public void add(T val) {
         if (size++ < capacity) {
             Node<T> newNode = new Node<>(val);
-            if (head == null) {
-                head = newNode;
-            } else {
-                tail.nextNode = newNode;
-            }
+            tail.nextNode = newNode;
             tail = newNode;
             tail.nextNode = head;
         } else {
