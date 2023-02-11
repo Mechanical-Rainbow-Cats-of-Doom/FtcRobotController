@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.BooleanSupplier;
 
 import androidx.annotation.NonNull;
 
@@ -126,9 +127,7 @@ public class AutoTools {
         }, 60);
     }
     public void update() {
-        if (isAuto) {
-            doingstuff = true;
-        } else {
+        if(!isAuto) {
             try {
                 armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -146,6 +145,7 @@ public class AutoTools {
             // initial position
             case 0:
                 if(!waiting) {
+                    doingstuff = true;
                     liftMotor.setTargetPosition(position.liftPos);
                     armMotor.setTargetPosition(position.armPos);
                     liftMotor.setPower(1);
@@ -193,13 +193,21 @@ public class AutoTools {
                 }
                 stage = 0;
                 if(isAuto) {
-                    synchronized (this) {
-                        notify();
-                    }
+                    doingstuff = false;
                 }
                 break;
         }
     }
+
+    public boolean isDoingStuff() {
+        return doingstuff;
+    }
+
+    public void waitUntilFinished(BooleanSupplier shouldStop) {
+        //noinspection StatementWithEmptyBody
+        while(doingstuff && !shouldStop.getAsBoolean());
+    }
+
     public void setIntake(Action action) {
         intake.setPower(action == Action.INTAKE ? 1 : action == Action.DUMP ? -1 : 0);
     }
