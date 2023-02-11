@@ -23,7 +23,7 @@ import java.util.Timer;
 
 @Config
 public class ControllerTools extends AutoTools {
-    public static double armZeroPower = 0.075, liftZeroPower = 0.001;
+    // lift and arm zero power moved to auto tools
     public double test;
     private final GamepadEx gamepad;
     private final ControllerTurret rotation;
@@ -35,7 +35,7 @@ public class ControllerTools extends AutoTools {
     private final LinkedHashMap<ButtonReader, Position> liftButtons;
     private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>();
 
-    private final BoxedBoolean[] wasOn = new BoxedBoolean[2];
+    private final BoxedBoolean[] wasOn = {new BoxedBoolean(), new BoxedBoolean()};
 
     static class BoxedBoolean {
         boolean value = false;
@@ -67,24 +67,20 @@ public class ControllerTools extends AutoTools {
 
     public void initIntake() {
         final Thread thread = new Thread(() -> {
-            boolean yOldActive = false;
-            boolean xOldActive = false;
+            int oldPower = 0;
             while (!opMode.isStopRequested()) {
                 yReader.readValue();
                 if (yReader.getState()) {
-                    if(!yOldActive) {
+                    if (oldPower != -1) {
                         intake.setPower(-1);
                         xReader.forceVal(false);
-                        yOldActive = true;
+                        oldPower = -1;
                     }
                 } else {
-                    xReader.readValue();
-                    boolean xState = xReader.getState();
-                    if (xOldActive != xState) {
-                        intake.setPower(xReader.getState() ? 1 : 0);
-                        xOldActive = xState;
+                    int newPower = xReader.getState() ? 1 : 0;
+                    if (newPower != oldPower) {
+                        intake.setPower(newPower);
                     }
-                    yOldActive = false;
                 }
             }
         });
@@ -114,7 +110,7 @@ public class ControllerTools extends AutoTools {
 
         readLiftButtons();
         for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
-            if (entry.getValue() && !doingstuff) {
+            if (entry.getValue()) {
                 setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
                 doingstuff = true;
             }
