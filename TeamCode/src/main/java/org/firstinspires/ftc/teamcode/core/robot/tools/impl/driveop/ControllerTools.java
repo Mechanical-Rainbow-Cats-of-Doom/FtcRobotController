@@ -12,7 +12,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
-import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
@@ -39,8 +38,14 @@ public class ControllerTools extends AutoTools {
 
     private final BoxedBoolean[] wasOn = {new BoxedBoolean(), new BoxedBoolean()};
 
-    static class BoxedBoolean {
-        boolean value = false;
+    public static class BoxedBoolean {
+        public boolean value;
+        public BoxedBoolean(boolean value) {
+            this.value = value;
+        }
+        public BoxedBoolean() {
+            this(false);
+        }
     }
 
     @Override
@@ -85,36 +90,30 @@ public class ControllerTools extends AutoTools {
         thread.start();
     }
 
-    public static void readLiftButtons(@NonNull Map<ButtonReader, Boolean> buttonVals, @NonNull Map<ButtonReader, ?> buttons) {
+    public static void readButtons(@NonNull Map<ButtonReader, Boolean> buttonVals, @NonNull Map<ButtonReader, ?> buttons) {
         for (ButtonReader button : buttons.keySet()) {
             button.readValue();
             buttonVals.put(button, button.wasJustReleased());
         }
     }
-    private void readLiftButtons() {
-        for (ButtonReader button : liftButtons.keySet()) {
-            button.readValue();
-            liftButtonVals.put(button, button.wasJustReleased());
-        }
-    }
     private boolean wasDoingStuff = false;
     private void cleanupOpMode() {
-        doingstuff = false;
+        doingstuff.value = false;
         armMotor.setPower(0);
         liftMotor.setPower(0);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public static <Pos> boolean setPosFromButtonMap(Map<ButtonReader, Boolean> buttonVals, Map<ButtonReader, Pos> buttonMap, Consumer<Pos> consumer) {
-        readLiftButtons(buttonVals, buttonMap);
+    public static <Pos> void setPosFromButtonMap(Map<ButtonReader, Boolean> buttonVals, Map<ButtonReader, Pos> buttonMap, Consumer<Pos> consumer, BoxedBoolean doingStuff) {
+        readButtons(buttonVals, buttonMap);
         for (Map.Entry<ButtonReader, Boolean> entry : buttonVals.entrySet()) {
             if (entry.getValue()) {
                 consumer.accept(Objects.requireNonNull(buttonMap.get(entry.getKey())));
-                return true;
+                doingStuff.value = true;
+                return;
             }
         }
-        return false;
     }
 
     @Override
@@ -124,18 +123,12 @@ public class ControllerTools extends AutoTools {
         final double right = gamepad.getRightY();
         final double left = gamepad.getLeftY();
 
-        readLiftButtons();
-        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
-            if (entry.getValue()) {
-                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
-                doingstuff = true;
-            }
-        }
+        setPosFromButtonMap(liftButtonVals, liftButtons, this::setPosition, doingstuff);
 
-        if (doingstuff) {
+        if (doingstuff.value) {
             if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
                 cleanupOpMode();
-            } else if(bReader.wasJustReleased() && !doingstuff) {
+            } else if(bReader.wasJustReleased() && !doingstuff.value) {
                 cleanupOpMode();
                 dump();
             } else {
@@ -146,7 +139,7 @@ public class ControllerTools extends AutoTools {
         runBoundedTool(liftMotor, wasOn[0], Position.MAX.liftPos, left, false, liftZeroPower);
         runBoundedTool(armMotor, wasOn[1], Position.MAX.armPos, -right, false, armZeroPower);
         if (wasDoingStuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wasDoingStuff = doingstuff;
+        wasDoingStuff = doingstuff.value;
 
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());

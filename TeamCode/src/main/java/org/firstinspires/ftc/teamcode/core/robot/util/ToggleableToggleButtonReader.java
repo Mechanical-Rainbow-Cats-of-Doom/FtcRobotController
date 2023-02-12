@@ -24,6 +24,7 @@ public class ToggleableToggleButtonReader extends ButtonReader {
 
         this.currToggleState = currToggleState;
     }
+
     public ToggleableToggleButtonReader(GamepadEx gamepad, GamepadKeys.Button button) {
         this(gamepad, button, false);
     }

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import java.util.Timer;
@@ -85,7 +86,7 @@ public class AutoTools {
      */
     protected int stage = 0;
     protected boolean waiting = true;
-    protected boolean doingstuff = false;
+    protected final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean(false);
     protected boolean isAuto = true;
     public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
@@ -107,7 +108,7 @@ public class AutoTools {
     }
 
     protected void dump() {
-        doingstuff = true;
+        doingstuff.value = true;
         if (!isAuto) {
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -135,7 +136,7 @@ public class AutoTools {
                                 liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                             }
                             intake.setPower(0);
-                            doingstuff = false;
+                            doingstuff.value = false;
                         });
                         thread.start();
                     }
@@ -163,7 +164,7 @@ public class AutoTools {
             // initial position
             case 0:
                 if(!waiting) {
-                    doingstuff = true;
+                    doingstuff.value = true;
                     liftMotor.setTargetPosition(position.liftPos);
                     armMotor.setTargetPosition(position.armPos);
                     liftMotor.setPower(1);
@@ -203,7 +204,7 @@ public class AutoTools {
                     waiting = true;
                 } else if ((isAuto && position.action != Action.NOTHING) || position == Position.INTAKE) position = Position.NEUTRAL;
                 if (!isAuto) {
-                    doingstuff = false;
+                    doingstuff.value = false;
                     armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     armMotor.setPower(armZeroPower);
@@ -211,19 +212,19 @@ public class AutoTools {
                 }
                 stage = 0;
                 if(isAuto) {
-                    doingstuff = false;
+                    doingstuff.value = false;
                 }
                 break;
         }
     }
 
     public boolean isDoingStuff() {
-        return doingstuff;
+        return doingstuff.value;
     }
 
     public void waitUntilFinished(BooleanSupplier shouldStop) {
         //noinspection StatementWithEmptyBody
-        while(doingstuff && !shouldStop.getAsBoolean());
+        while(doingstuff.value && !shouldStop.getAsBoolean());
     }
 
     public void setIntake(Action action) {

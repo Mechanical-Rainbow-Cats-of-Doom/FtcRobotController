@@ -18,7 +18,7 @@ import java.util.Objects;
 @Config
 public class ControllerTurret extends AutoTurret {
     private final GamepadEx gamepad;
-    private boolean doingstuff = false;
+    private final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean();
     public static double ampltiude = 0.5;
     private final LinkedHashMap<ButtonReader, AutoTurret.Rotation> turretButtons;
     private final HashMap<ButtonReader, Boolean> turretButtonVals = new HashMap<>();
@@ -40,23 +40,22 @@ public class ControllerTurret extends AutoTurret {
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_LEFT), Rotation.LEFT);
             put(new ButtonReader(gamepad, GamepadKeys.Button.LEFT_BUMPER), Rotation.FRONTLEFT);
             put(new ButtonReader(gamepad, GamepadKeys.Button.RIGHT_BUMPER), Rotation.FRONTRIGHT);
-
         }};
     }
 
     public void update() {
-        if (!doingstuff) {
+        ControllerTools.setPosFromButtonMap(turretButtonVals, turretButtons, (turPos) -> {
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            motor.setPower(1);
+            setPos(turPos);
+        }, doingstuff);
+        if (!doingstuff.value) {
             final double neg = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
             final double pos = gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
             motor.setPower(Math.max(neg, pos) == neg ? -neg*ampltiude : pos*ampltiude);
-            doingstuff = ControllerTools.setPosFromButtonMap(turretButtonVals, turretButtons, (turPos) -> {
-                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                motor.setPower(1);
-                setPos(turPos);
-            });
         } else {
             if (!isMoving()) {
-                doingstuff = false;
+                doingstuff.value = false;
                 cleanup();
             }
         }
