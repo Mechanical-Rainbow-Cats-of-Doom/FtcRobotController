@@ -118,7 +118,7 @@ public class ControllerTools extends AutoTools {
 
     @Override
     public void update() {
-        turret.update();
+        turret.whopper();
 
         final double right = gamepad.getRightY();
         final double left = gamepad.getLeftY();
