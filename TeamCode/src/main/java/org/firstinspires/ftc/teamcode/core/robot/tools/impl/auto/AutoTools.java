@@ -99,7 +99,7 @@ public class AutoTools {
 
     protected void initMotors() {
         ZeroMotorEncoder.zero(liftMotor);
-        ZeroMotorEncoder.zero(armMotor);
+        ZeroMotorEncoder.zero(armMotor, 1);
     }
 
     public void setPosition(@NonNull Position position) {

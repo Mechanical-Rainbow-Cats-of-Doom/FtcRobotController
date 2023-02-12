@@ -40,7 +40,7 @@ public class AutoTurret {
     public static final double ticksperdeg = tpr / 360;
     public static double offset = 0; // starting left corner
     protected void initMotors() {
-        ZeroMotorEncoder.zero(motor);
+        ZeroMotorEncoder.zero(motor, 1);
     }
 
     /**
