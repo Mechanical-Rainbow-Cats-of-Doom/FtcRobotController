@@ -123,11 +123,16 @@ public class ControllerTools extends AutoTools {
     }
     @Override
     public void update() {
-        turret.whopper();
-
         final double right = gamepad.getRightY();
         final double left = gamepad.getLeftY();
-        setPosFromButtonMap(liftButtonVals, liftButtons, doingstuff, this::setPosition);
+
+        readLiftButtons();
+        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
+            if (entry.getValue()) {
+                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
+                doingstuff.value = true;
+            }
+        }
 
         if (doingstuff.value) {
             if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
@@ -148,6 +153,7 @@ public class ControllerTools extends AutoTools {
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
+        turret.whopper();
         bReader.readValue();
     }
 
