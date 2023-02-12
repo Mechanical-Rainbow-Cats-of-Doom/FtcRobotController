@@ -12,8 +12,6 @@ import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
 
 @Config
 public class ControllerTurret extends AutoTurret {
@@ -43,7 +41,7 @@ public class ControllerTurret extends AutoTurret {
         }};
     }
 
-    public void update() {
+    public void whopper() {
         ControllerTools.setPosFromButtonMap(turretButtonVals, turretButtons, doingstuff, (turPos) -> {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motor.setPower(1);
