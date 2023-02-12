@@ -72,6 +72,10 @@ public class AutoTurret {
         motor.setTargetPosition((int) Math.round(pos));
     }
 
+    public void setPos(@NonNull Rotation rotation) {
+        setPos(rotation.val, Units.DEGREES);
+    }
+
     /**
      * don't call too often, relatively resource intensive
      *
@@ -89,5 +93,6 @@ public class AutoTurret {
     public void cleanup() {
         motor.setPower(0);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setPower(0);
     }
 }

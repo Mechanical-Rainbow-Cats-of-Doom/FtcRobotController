@@ -24,9 +24,9 @@ import java.util.Timer;
 
 @Autonomous
 public class NoRunnerAuto2 extends LinearOpMode {
-    public int forwardDistance = 45000;
-    public int leftDistance = 10418;
-    public int rightDistance = -28848;
+    public int forwardDistance = 47000;
+    public int leftDistance = 8000;
+    public int rightDistance = -27848;
     public static boolean isRed;
 
 
@@ -41,7 +41,6 @@ public class NoRunnerAuto2 extends LinearOpMode {
         Thread thread = new Thread(() -> {
             while (opModeIsActive()) {
                 tools.update();
-
             }
         });
 
@@ -72,7 +71,11 @@ public class NoRunnerAuto2 extends LinearOpMode {
             telemetry.addData("is it running drive", ((leftEncoder.getCurrentPosition()-LEReset)+(rightEncoder.getCurrentPosition()-REReset))/2);
             telemetry.update();
         }
-
+        drive.setWeightedDrivePower(new Pose2d(0,0,0));
+        tools.setIntake(1);
+        turret.setPos(-35, AutoTurret.Units.DEGREES);
+        tools.setPosition(AutoTools.Position.HIGH_TARGET_NODUMP);
+        Thread.sleep(2000);
         FEReset = frontEncoder.getCurrentPosition();
         while (frontEncoder.getCurrentPosition()-FEReset < leftDistance){
             if(!opModeIsActive()){return;}
@@ -80,6 +83,15 @@ public class NoRunnerAuto2 extends LinearOpMode {
             telemetry.addData("is it running left", frontEncoder.getCurrentPosition());
             telemetry.update();
         }
+        drive.setWeightedDrivePower(new Pose2d(0,0,0));
+
+        tools.setIntake(-1);
+        Thread.sleep(2000);
+        tools.setIntake(0);
+        turret.setPos(80, AutoTurret.Units.DEGREES);
+        Thread.sleep(500);
+        tools.setPosition(AutoTools.Position.HOVER_5);
+        Thread.sleep(1000);
 
         FEReset = frontEncoder.getCurrentPosition();
         while (frontEncoder.getCurrentPosition()-FEReset > rightDistance){
@@ -90,6 +102,9 @@ public class NoRunnerAuto2 extends LinearOpMode {
         }
         drive.setWeightedDrivePower(new Pose2d(0,0,0));
 
+        while(opModeIsActive()){
+            drive.setWeightedDrivePower(new Pose2d(0,0,0));
+        }
         tools.cleanup();
     }
 }
