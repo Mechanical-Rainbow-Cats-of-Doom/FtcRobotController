@@ -115,7 +115,12 @@ public class ControllerTools extends AutoTools {
             }
         }
     }
-
+    private void readLiftButtons() {
+        for (ButtonReader button : liftButtons.keySet()) {
+            button.readValue();
+            liftButtonVals.put(button, button.wasJustReleased());
+        }
+    }
     @Override
     public void update() {
         turret.whopper();
