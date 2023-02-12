@@ -18,7 +18,7 @@ public class ControllerTurret extends AutoTurret {
     private final GamepadEx gamepad;
     private final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean();
     public static double ampltiude = 0.5;
-    private final LinkedHashMap<ButtonReader, AutoTurret.Rotation> turretButtons;
+    private final LinkedHashMap<ButtonReader, Double> turretButtons;
     private final HashMap<ButtonReader, Boolean> turretButtonVals = new HashMap<>();
     @Override
     protected void initMotors() {
@@ -31,13 +31,13 @@ public class ControllerTurret extends AutoTurret {
     public ControllerTurret(HardwareMap hardwareMap, GamepadEx gamepad) {
         super(hardwareMap);
         this.gamepad = gamepad;
-        this.turretButtons = new LinkedHashMap<ButtonReader, Rotation>() {{
-            put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), Rotation.FRONT);
-            put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT), Rotation.RIGHT);
-            put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_DOWN), Rotation.BACK);
-            put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_LEFT), Rotation.LEFT);
-            put(new ButtonReader(gamepad, GamepadKeys.Button.LEFT_BUMPER), Rotation.FRONTLEFT);
-            put(new ButtonReader(gamepad, GamepadKeys.Button.RIGHT_BUMPER), Rotation.FRONTRIGHT);
+        this.turretButtons = new LinkedHashMap<ButtonReader, Double>() {{
+            put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), 0D);
+            put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT), 90D);
+            put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_DOWN), 180D);
+            put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_LEFT), 270D);
+            put(new ButtonReader(gamepad, GamepadKeys.Button.LEFT_BUMPER), 315D);
+            put(new ButtonReader(gamepad, GamepadKeys.Button.RIGHT_BUMPER), 45D);
         }};
     }
 
@@ -45,7 +45,7 @@ public class ControllerTurret extends AutoTurret {
         ControllerTools.setPosFromButtonMap(turretButtonVals, turretButtons, doingstuff, (turPos) -> {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motor.setPower(1);
-            setPos(turPos);
+            setPos(turPos, Units.DEGREES);
         });
         final double neg = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
         final double pos = gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
