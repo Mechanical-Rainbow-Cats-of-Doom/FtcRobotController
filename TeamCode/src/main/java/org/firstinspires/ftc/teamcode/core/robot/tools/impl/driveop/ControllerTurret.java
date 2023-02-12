@@ -44,20 +44,18 @@ public class ControllerTurret extends AutoTurret {
     }
 
     public void update() {
-        ControllerTools.setPosFromButtonMap(turretButtonVals, turretButtons, (turPos) -> {
+        ControllerTools.setPosFromButtonMap(turretButtonVals, turretButtons, doingstuff, (turPos) -> {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motor.setPower(1);
             setPos(turPos);
-        }, doingstuff);
+        });
+        final double neg = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
+        final double pos = gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         if (!doingstuff.value) {
-            final double neg = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
-            final double pos = gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
             motor.setPower(Math.max(neg, pos) == neg ? -neg*ampltiude : pos*ampltiude);
-        } else {
-            if (!isMoving()) {
-                doingstuff.value = false;
-                cleanup();
-            }
+        } else if (neg > 0.05 | pos > 0.05 || !isMoving()) {
+            doingstuff.value = false;
+            cleanup();
         }
     }
 }

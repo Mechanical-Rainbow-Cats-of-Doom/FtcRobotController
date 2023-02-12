@@ -105,7 +105,7 @@ public class ControllerTools extends AutoTools {
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public static <Pos> void setPosFromButtonMap(Map<ButtonReader, Boolean> buttonVals, Map<ButtonReader, Pos> buttonMap, Consumer<Pos> consumer, BoxedBoolean doingStuff) {
+    public static <Pos> void setPosFromButtonMap(Map<ButtonReader, Boolean> buttonVals, Map<ButtonReader, Pos> buttonMap, BoxedBoolean doingStuff, Consumer<Pos> consumer) {
         readButtons(buttonVals, buttonMap);
         for (Map.Entry<ButtonReader, Boolean> entry : buttonVals.entrySet()) {
             if (entry.getValue()) {
@@ -122,8 +122,7 @@ public class ControllerTools extends AutoTools {
 
         final double right = gamepad.getRightY();
         final double left = gamepad.getLeftY();
-
-        setPosFromButtonMap(liftButtonVals, liftButtons, this::setPosition, doingstuff);
+        setPosFromButtonMap(liftButtonVals, liftButtons, doingstuff, this::setPosition);
 
         if (doingstuff.value) {
             if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
