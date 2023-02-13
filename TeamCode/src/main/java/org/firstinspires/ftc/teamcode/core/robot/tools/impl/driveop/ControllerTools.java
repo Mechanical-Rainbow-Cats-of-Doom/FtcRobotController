@@ -36,6 +36,7 @@ public class ControllerTools extends AutoTools {
     private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>();
 
     private final BoxedBoolean[] wasOn = {new BoxedBoolean(), new BoxedBoolean()};
+    private double oldIntakePower = 0.0;
 
     public static class BoxedBoolean {
         public boolean value;
@@ -76,25 +77,11 @@ public class ControllerTools extends AutoTools {
         final Thread thread = new Thread(() -> {
             float oldPower = 0;
             while (!opMode.isStopRequested()) {
-                yReader.readValue();
-                if (yReader.getState()) {
-                    if (oldPower != -1) {
-                        intake.setPower(-1);
-                        xReader.forceVal(false);
-                        oldPower = -1;
-                    }
-                } else {
-                    xReader.readValue();
-                    float newPower = xReader.getState() ? 1 : 0;
-                    if (newPower != oldPower) {
-                        intake.setPower(newPower);
-                        oldPower = newPower;
-                    }
-                }
+
             }
         });
         thread.setPriority(Thread.MAX_PRIORITY-2);
-        thread.start();
+//        thread.start();
     }
 
     public static void readButtons(@NonNull Map<ButtonReader, Boolean> buttonVals, @NonNull Map<ButtonReader, ?> buttons) {
@@ -126,6 +113,25 @@ public class ControllerTools extends AutoTools {
     @Override
     public void update() {
         turret.whopper();
+
+        yReader.readValue();
+        if (yReader.getState()) {
+            if (oldIntakePower != -1) {
+                // this sucks but apparently is faster but it probably wont have any affect on the
+                // performance because the underlying code is shit
+                // also it will make ethan mad and i can call this ++i v2 (except it changes the code)
+                intake.getController().setServoPosition(intake.getPortNumber(), 0);
+                xReader.forceVal(false);
+                oldIntakePower = -1;
+            }
+        } else {
+            xReader.readValue();
+            double newPower = xReader.getState() ? 1 : 0.5;
+            if (newPower != oldIntakePower) {
+                intake.getController().setServoPosition(intake.getPortNumber(), newPower);
+                oldIntakePower = newPower;
+            }
+        }
 
         final double right = gamepad.getRightY();
         final double left = gamepad.getLeftY();

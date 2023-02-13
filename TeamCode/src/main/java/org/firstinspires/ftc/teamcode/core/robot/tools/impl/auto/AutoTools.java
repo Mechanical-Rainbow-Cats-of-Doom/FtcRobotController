@@ -44,23 +44,23 @@ public class AutoTools {
         HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING),
         HIGH_ARM(0, MAX.armPos, Action.NOTHING),
         //cone 5
-        HOVER_5(800,0,Action.NOTHING),
-        INTAKE_5(700,0,Action.NOTHING),
+        HOVER_5(900,0,Action.NOTHING),
+        INTAKE_5(600,0,Action.NOTHING),
         EXIT_5(1250,0,Action.NOTHING),
         //cone 4
-        HOVER_4(650,0,Action.NOTHING),
+        HOVER_4(750,0,Action.NOTHING),
         INTAKE_4(550,0,Action.NOTHING),
         EXIT_4(1050,0,Action.NOTHING),
         //cone 3
-        HOVER_3(470,0,Action.NOTHING),
+        HOVER_3(570,0,Action.NOTHING),
         INTAKE_3(370,0,Action.NOTHING),
         EXIT_3(900,0,Action.NOTHING),
         //cone 2
-        HOVER_2(260,0,Action.NOTHING),
+        HOVER_2(360,0,Action.NOTHING),
         INTAKE_2(160,0,Action.NOTHING),
         EXIT_2(700,0,Action.NOTHING),
         //cone 1
-        HOVER_1(100,0,Action.NOTHING),
+        HOVER_1(200,0,Action.NOTHING),
         INTAKE_1(0,0,Action.NOTHING),
         EXIT_1(500,0,Action.NOTHING);
 
@@ -226,6 +226,7 @@ public class AutoTools {
         //noinspection StatementWithEmptyBody
         while(doingstuff.value && !shouldStop.getAsBoolean());
     }
+
 
     public void setIntake(Action action) {
         intake.setPower(action == Action.INTAKE ? 1 : action == Action.DUMP ? -1 : 0);
