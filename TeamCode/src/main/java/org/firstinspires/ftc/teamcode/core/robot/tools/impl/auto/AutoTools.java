@@ -86,7 +86,7 @@ public class AutoTools {
      */
     protected int stage = 0;
     protected boolean waiting = true;
-    protected final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean(false);
+    protected final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean();
     protected boolean isAuto = true;
     public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");

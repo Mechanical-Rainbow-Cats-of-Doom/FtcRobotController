@@ -20,6 +20,7 @@ public class ControllerTurret extends AutoTurret {
     public static double ampltiude = 0.5;
     private final LinkedHashMap<ButtonReader, Double> turretButtons;
     private final HashMap<ButtonReader, Boolean> turretButtonVals = new HashMap<>();
+    private double speed = 1.0;
     @Override
     protected void initMotors() {
         ZeroMotorEncoder.zero(motor, DcMotor.RunMode.RUN_USING_ENCODER);
@@ -44,7 +45,7 @@ public class ControllerTurret extends AutoTurret {
     public void whopper() {
         ControllerTools.setPosFromButtonMap(turretButtonVals, turretButtons, doingstuff, (turPos) -> {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            motor.setPower(1);
+            motor.setPower(speed);
             setPos(turPos, Units.DEGREES);
         });
         final double neg = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
