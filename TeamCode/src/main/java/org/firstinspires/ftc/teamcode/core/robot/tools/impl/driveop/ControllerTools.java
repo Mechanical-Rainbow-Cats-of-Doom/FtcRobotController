@@ -25,7 +25,6 @@ import java.util.function.Consumer;
 @Config
 public class ControllerTools extends AutoTools {
     // lift and arm zero power moved to auto tools
-    public double test;
     private final GamepadEx gamepad;
     private final ControllerTurret turret;
     private final Telemetry telemetry;
@@ -135,9 +134,6 @@ public class ControllerTools extends AutoTools {
         if (doingstuff.value) {
             if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
                 cleanupOpMode();
-            } else if(bReader.wasJustReleased() && !doingstuff.value) {
-                cleanupOpMode();
-                dump();
             } else {
                 super.update();
                 return;
@@ -151,7 +147,6 @@ public class ControllerTools extends AutoTools {
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
-        bReader.readValue();
     }
 
 
