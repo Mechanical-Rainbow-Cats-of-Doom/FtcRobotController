@@ -19,11 +19,11 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import java.util.Timer;
 
 @Autonomous
-public class NoRunnerAuto2 extends LinearOpMode {
+public class RoRunnerRutoR extends LinearOpMode {
     public int forwardDistance = 47200;
-    public int leftDistance = 8000;
-    public int rightDistance = -30200;
-    public int leftDistance2 = (-rightDistance)-450;
+    public int placeCone1 = -8000;
+    public int pickUpCone5 = 30200;
+    public int rightDistance2 = (-pickUpCone5)+450;
     public static boolean isRed;
 
 
@@ -59,9 +59,7 @@ public class NoRunnerAuto2 extends LinearOpMode {
         AutoStorage.waitForDelay(timer);
 
         tools.setPosition(AutoTools.Position.HIGH_ARM);
-        tools.waitUntilFinished();
         turret.setPos(0, AutoTurret.Units.DEGREES);
-        tools.waitUntilFinished();
 
         REReset = -rightEncoder.getCurrentPosition();
         LEReset = leftEncoder.getCurrentPosition();
@@ -74,36 +72,33 @@ public class NoRunnerAuto2 extends LinearOpMode {
         drive.setWeightedDrivePower(new Pose2d(0,0,0));
         tools.setIntake(1);
         turret.setPos(-35, AutoTurret.Units.DEGREES);
-        tools.waitUntilFinished();
         tools.setPosition(AutoTools.Position.HIGH_TARGET_NODUMP);
-        tools.waitUntilFinished();
-        Thread.sleep(500);
+        Thread.sleep(2000);
         FEReset = frontEncoder.getCurrentPosition();
-        while (frontEncoder.getCurrentPosition()-FEReset < leftDistance){
+        while (frontEncoder.getCurrentPosition()-FEReset > placeCone1){
             if(!opModeIsActive()){return;}
-            drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
+            drive.setWeightedDrivePower(new Pose2d(0,0.5,0));
             telemetry.addData("is it running left", frontEncoder.getCurrentPosition());
             telemetry.update();
         }
         drive.setWeightedDrivePower(new Pose2d(0,0,0));
 
         tools.setIntake(-1);
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         tools.setIntake(0);
 
         // Cone 5
         turret.setPos(54, AutoTurret.Units.DEGREES);
         Thread.sleep(500);
         tools.setPosition(AutoTools.Position.HOVER_5);
-        tools.waitUntilFinished();
-        Thread.sleep(500);
+        Thread.sleep(1000);
 
         REReset = -rightEncoder.getCurrentPosition();
         LEReset = leftEncoder.getCurrentPosition();
         FEReset = frontEncoder.getCurrentPosition();
-        while (frontEncoder.getCurrentPosition()-FEReset > rightDistance){
+        while (frontEncoder.getCurrentPosition()-FEReset < pickUpCone5){
             if(!opModeIsActive()){return;}
-            drive.setWeightedDrivePower(new Pose2d(0,0.5,0));
+            drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
             telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
             telemetry.update();
         }
@@ -114,7 +109,7 @@ public class NoRunnerAuto2 extends LinearOpMode {
         Thread.sleep(1000);
         tools.setPosition(AutoTools.Position.INTAKE_5);
         tools.waitUntilFinished();
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         tools.setPosition(AutoTools.Position.EXIT_5);
         tools.waitUntilFinished();
         Thread.sleep(500);
@@ -123,9 +118,9 @@ public class NoRunnerAuto2 extends LinearOpMode {
         REReset = -rightEncoder.getCurrentPosition();
         LEReset = leftEncoder.getCurrentPosition();
         FEReset = frontEncoder.getCurrentPosition();
-        while (frontEncoder.getCurrentPosition()-FEReset < Math.round(leftDistance2/2)){
+        while (frontEncoder.getCurrentPosition()-FEReset > Math.round(rightDistance2 /2)){
             if(!opModeIsActive()){return;}
-            drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
+            drive.setWeightedDrivePower(new Pose2d(0,0.5,0));
             telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
             telemetry.update();
         }
@@ -142,9 +137,9 @@ public class NoRunnerAuto2 extends LinearOpMode {
         REReset = -rightEncoder.getCurrentPosition();
         LEReset = leftEncoder.getCurrentPosition();
         FEReset = frontEncoder.getCurrentPosition();
-        while (frontEncoder.getCurrentPosition()-FEReset < Math.round(leftDistance2/2)){
+        while (frontEncoder.getCurrentPosition()-FEReset > Math.round(rightDistance2 /2)){
             if(!opModeIsActive()){return;}
-            drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
+            drive.setWeightedDrivePower(new Pose2d(0,0.5,0));
             telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
             telemetry.update();
         }
@@ -242,12 +237,11 @@ public class NoRunnerAuto2 extends LinearOpMode {
         switch (color) {
             case(0):
                 turret.setPos(-90, AutoTurret.Units.DEGREES);
-                tools.waitUntilFinished();
-                Thread.sleep( 200);
+                Thread.sleep( 500);
                 tools.setPosition(AutoTools.Position.OFF);
-                while (frontEncoder.getCurrentPosition()-FEReset < 8500){
+                while (frontEncoder.getCurrentPosition()-FEReset > 8500){
                     if(!opModeIsActive()){return;}
-                    drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
+                    drive.setWeightedDrivePower(new Pose2d(0,0.5,0));
                     telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
                     telemetry.update();
                 }
@@ -255,12 +249,11 @@ public class NoRunnerAuto2 extends LinearOpMode {
 
             case(1):
                 turret.setPos(0, AutoTurret.Units.DEGREES);
-                tools.waitUntilFinished();
-                Thread.sleep( 200);
+                Thread.sleep( 500);
                 tools.setPosition(AutoTools.Position.OFF);
-                while (frontEncoder.getCurrentPosition()-FEReset > -10800){
+                while (frontEncoder.getCurrentPosition()-FEReset < -10800){
                     if(!opModeIsActive()){return;}
-                    drive.setWeightedDrivePower(new Pose2d(0,0.5,0));
+                    drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
                     telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
                     telemetry.update();
                 }
@@ -268,12 +261,11 @@ public class NoRunnerAuto2 extends LinearOpMode {
 
             case(2):
                 turret.setPos(0, AutoTurret.Units.DEGREES);
-                tools.waitUntilFinished();
-                Thread.sleep( 200);
+                Thread.sleep( 500);
                 tools.setPosition(AutoTools.Position.OFF);
-                while (frontEncoder.getCurrentPosition()-FEReset > -33100){
+                while (frontEncoder.getCurrentPosition()-FEReset < -33100){
                     if(!opModeIsActive()){return;}
-                    drive.setWeightedDrivePower(new Pose2d(0,0.5,0));
+                    drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
                     telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
                     telemetry.update();
                 }

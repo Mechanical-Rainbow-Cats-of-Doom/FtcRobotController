@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 
 @Config
 public class AutoTools {
+    private final LinearOpMode opMode;
     public static double armZeroPower = 0.075, liftZeroPower = 0.001;
     protected final DcMotor liftMotor, armMotor;
     protected AutoTurret turret;
@@ -31,6 +33,7 @@ public class AutoTools {
     //armpos on dump is above
     public enum Position { // THESE VALUES ARE JUST GUESSES
         NEUTRAL(0, 80, Action.NOTHING),
+        OFF(0, 0, Action.NOTHING),
         INTAKE(0, 25, Action.INTAKE),
         INTAKE_NO_INTAKE(INTAKE.liftPos, INTAKE.armPos, Action.NOTHING),
         GROUND_TARGET(INTAKE.liftPos, 280, Action.DUMP),
@@ -88,12 +91,13 @@ public class AutoTools {
     protected boolean waiting = true;
     protected final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean();
     protected boolean isAuto = true;
-    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret) {
+    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret, LinearOpMode opMode) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
         this.timer = timer;
+        this.opMode = opMode;
         initMotors();
     }
 
@@ -222,11 +226,15 @@ public class AutoTools {
         return doingstuff.value;
     }
 
-    public void waitUntilFinished(BooleanSupplier shouldStop) {
+    public void waitUntilFinished() {
         //noinspection StatementWithEmptyBody
-        while(doingstuff.value && !shouldStop.getAsBoolean());
+        while(doingstuff.value && !opMode.isStopRequested());
     }
 
+    public void waitUntilFinished(BooleanSupplier booleanSupplier) {
+        //noinspection StatementWithEmptyBody
+        while(doingstuff.value && !opMode.isStopRequested() && booleanSupplier.getAsBoolean());
+    }
 
     public void setIntake(Action action) {
         intake.setPower(action == Action.INTAKE ? 1 : action == Action.DUMP ? -1 : 0);
