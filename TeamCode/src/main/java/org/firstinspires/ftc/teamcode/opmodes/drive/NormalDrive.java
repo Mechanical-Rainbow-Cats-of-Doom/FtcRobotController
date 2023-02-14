@@ -41,7 +41,6 @@ public class NormalDrive extends LinearOpMode {
         final ControllerTools tools = new ControllerTools(hardwareMap, new Timer(), toolGamepad, moveGamepad, telemetry, this);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
         waitForStart();
-        tools.initIntake();
         while (opModeIsActive()) {
             drive.update();
             tools.update();

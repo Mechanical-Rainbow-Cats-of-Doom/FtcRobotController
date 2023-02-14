@@ -29,8 +29,6 @@ public class ControllerTools extends AutoTools {
     private final ControllerTurret turret;
     private final Telemetry telemetry;
     private final ToggleableToggleButtonReader xReader, yReader;
-    private final ButtonReader bReader;
-    private final LinearOpMode opMode;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final LinkedHashMap<ButtonReader, Position> liftButtons;
     private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>();
@@ -58,30 +56,17 @@ public class ControllerTools extends AutoTools {
         super(hardwareMap, timer, null, opMode);
         isAuto = false;
         gamepad = toolGamepad;
-        this.turret = new ControllerTurret(hardwareMap, driveGamepad);
+        this.turret = new ControllerTurret(hardwareMap, driveGamepad, toolGamepad);
         super.turret = turret;
         this.telemetry = telemetry;
-        this.opMode = opMode;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
         this.yReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.Y);
-        this.bReader = new ButtonReader(gamepad, GamepadKeys.Button.B);
         this.liftButtons = new LinkedHashMap<ButtonReader, Position>() {{
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), Position.HIGH_TARGET_NODUMP);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_DOWN), Position.GROUND_TARGET_NODUMP);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_LEFT), Position.LOW_TARGET_NODUMP);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT), Position.MEDIUM_TARGET_NODUMP);
         }};
-    }
-
-    public void initIntake() {
-        final Thread thread = new Thread(() -> {
-            float oldPower = 0;
-            while (!opMode.isStopRequested()) {
-
-            }
-        });
-        thread.setPriority(Thread.MAX_PRIORITY-2);
-//        thread.start();
     }
 
     public static void readButtons(@NonNull Map<ButtonReader, Boolean> buttonVals, @NonNull Map<ButtonReader, ?> buttons) {
@@ -116,13 +101,13 @@ public class ControllerTools extends AutoTools {
 
         yReader.readValue();
         if (yReader.getState()) {
-            if (oldIntakePower != -1) {
+            if (oldIntakePower != 0) {
                 // this sucks but apparently is faster but it probably wont have any affect on the
                 // performance because the underlying code is shit
                 // also it will make ethan mad and i can call this ++i v2 (except it changes the code)
                 intake.getController().setServoPosition(intake.getPortNumber(), 0);
                 xReader.forceVal(false);
-                oldIntakePower = -1;
+                oldIntakePower = 0;
             }
         } else {
             xReader.readValue();
@@ -147,8 +132,6 @@ public class ControllerTools extends AutoTools {
         }
         runBoundedTool(liftMotor, wasOn[0], Position.MAX.liftPos, left, false, liftZeroPower);
         runBoundedTool(armMotor, wasOn[1], Position.MAX.armPos, -right, false, armZeroPower);
-        if (wasDoingStuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wasDoingStuff = doingstuff.value;
 
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());

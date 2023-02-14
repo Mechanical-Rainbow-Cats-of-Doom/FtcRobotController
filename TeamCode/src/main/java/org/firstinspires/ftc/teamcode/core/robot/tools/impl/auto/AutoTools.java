@@ -31,7 +31,7 @@ public class AutoTools {
     }
 
     //armpos on dump is above
-    public enum Position { // THESE VALUES ARE JUST GUESSES
+    public enum Position {
         NEUTRAL(0, 80, Action.NOTHING),
         OFF(0, 0, Action.NOTHING),
         INTAKE(0, 25, Action.INTAKE),
