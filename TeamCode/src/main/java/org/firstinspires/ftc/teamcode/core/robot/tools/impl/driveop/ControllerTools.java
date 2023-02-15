@@ -78,8 +78,8 @@ public class ControllerTools extends AutoTools {
     }
     private void cleanupOpMode() {
         doingstuff.value = false;
-        armMotor.setPower(0);
-        liftMotor.setPower(0);
+        armMotor.setPower(armZeroPower);
+        liftMotor.setPower(liftZeroPower);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
