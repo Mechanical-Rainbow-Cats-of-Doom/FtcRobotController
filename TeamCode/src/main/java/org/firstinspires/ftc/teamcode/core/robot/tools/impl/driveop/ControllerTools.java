@@ -28,7 +28,7 @@ public class ControllerTools extends AutoTools {
     private final GamepadEx gamepad;
     private final ControllerTurret turret;
     private final Telemetry telemetry;
-    private final ToggleableToggleButtonReader xReader, yReader;
+    private final ToggleableToggleButtonReader xReader, yReader, toolCapHeight;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final LinkedHashMap<ButtonReader, Position> liftButtons;
     private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>();
@@ -61,6 +61,7 @@ public class ControllerTools extends AutoTools {
         this.telemetry = telemetry;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
         this.yReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.Y);
+        this.toolCapHeight = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.START, true);
         this.liftButtons = new LinkedHashMap<ButtonReader, Position>() {{
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), Position.HIGH_TARGET_NODUMP);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_DOWN), Position.GROUND_TARGET_NODUMP);
@@ -75,7 +76,6 @@ public class ControllerTools extends AutoTools {
             buttonVals.put(button, button.wasJustReleased());
         }
     }
-    private boolean wasDoingStuff = false;
     private void cleanupOpMode() {
         doingstuff.value = false;
         armMotor.setPower(0);
@@ -130,8 +130,9 @@ public class ControllerTools extends AutoTools {
                 return;
             }
         }
-        runBoundedTool(liftMotor, wasOn[0], Position.MAX.liftPos, left, false, liftZeroPower);
-        runBoundedTool(armMotor, wasOn[1], Position.MAX.armPos, -right, false, armZeroPower);
+        toolCapHeight.readValue();
+        runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
+        runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
 
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());

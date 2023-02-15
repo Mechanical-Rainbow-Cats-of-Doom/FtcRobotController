@@ -78,7 +78,7 @@ public class FunnyControllerMovement extends ControllerMovement {
             avg = calcAvg();
         }
         bReader.readValue();
-        Vector2d input = new Vector2d(avg.getX() * (inverseStrafe ? -1 : 1), avg.getY() * (inverseDrive ? -1 : 1));
+        Vector2d input = new Vector2d(avg.getX() * (inverseStrafe ? -1 : 1), avg.getY() * (inverseDrive && !bReader.getState() ? -1 : 1));
         if (!bReader.getState()) input = input.rotated(imu.getAngularOrientation().firstAngle - PI / 2);
         final double drivePow = input.getX();
         final double strafePow = input.getY();
