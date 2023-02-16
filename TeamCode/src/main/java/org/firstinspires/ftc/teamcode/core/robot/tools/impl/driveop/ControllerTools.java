@@ -25,18 +25,16 @@ import java.util.function.Consumer;
 @Config
 public class ControllerTools extends AutoTools {
     // lift and arm zero power moved to auto tools
-    public double test;
     private final GamepadEx gamepad;
     private final ControllerTurret turret;
     private final Telemetry telemetry;
-    private final ToggleableToggleButtonReader xReader, yReader;
-    private final ButtonReader bReader;
-    private final LinearOpMode opMode;
+    private final ToggleableToggleButtonReader xReader, yReader, toolCapHeight;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final LinkedHashMap<ButtonReader, Position> liftButtons;
     private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>();
 
     private final BoxedBoolean[] wasOn = {new BoxedBoolean(), new BoxedBoolean()};
+    private double oldIntakePower = 0.0;
 
     public static class BoxedBoolean {
         public boolean value;
@@ -55,16 +53,15 @@ public class ControllerTools extends AutoTools {
     }
 
     public ControllerTools(HardwareMap hardwareMap, Timer timer, GamepadEx toolGamepad, GamepadEx driveGamepad, Telemetry telemetry, LinearOpMode opMode) {
-        super(hardwareMap, timer, null);
+        super(hardwareMap, timer, null, opMode);
         isAuto = false;
         gamepad = toolGamepad;
-        this.turret = new ControllerTurret(hardwareMap, driveGamepad);
+        this.turret = new ControllerTurret(hardwareMap, driveGamepad, toolGamepad);
         super.turret = turret;
         this.telemetry = telemetry;
-        this.opMode = opMode;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
         this.yReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.Y);
-        this.bReader = new ButtonReader(gamepad, GamepadKeys.Button.B);
+        this.toolCapHeight = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.START, true);
         this.liftButtons = new LinkedHashMap<ButtonReader, Position>() {{
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), Position.HIGH_TARGET_NODUMP);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_DOWN), Position.GROUND_TARGET_NODUMP);
@@ -73,30 +70,12 @@ public class ControllerTools extends AutoTools {
         }};
     }
 
-    public void initIntake() {
-        final Thread thread = new Thread(() -> {
-            while (!opMode.isStopRequested()) {
-                yReader.readValue();
-                xReader.readValue();
-                if (yReader.getState()) {
-                    intake.setPower(-1);
-                    xReader.forceVal(false);
-                } else {
-                    intake.setPower(xReader.getState() ? 1 : 0);
-                }
-            }
-        });
-        thread.setPriority(Thread.MAX_PRIORITY-2);
-        thread.start();
-    }
-
     public static void readButtons(@NonNull Map<ButtonReader, Boolean> buttonVals, @NonNull Map<ButtonReader, ?> buttons) {
         for (ButtonReader button : buttons.keySet()) {
             button.readValue();
             buttonVals.put(button, button.wasJustReleased());
         }
     }
-    private boolean wasDoingStuff = false;
     private void cleanupOpMode() {
         doingstuff.value = false;
         armMotor.setPower(0);
@@ -115,46 +94,49 @@ public class ControllerTools extends AutoTools {
             }
         }
     }
-    private void readLiftButtons() {
-        for (ButtonReader button : liftButtons.keySet()) {
-            button.readValue();
-            liftButtonVals.put(button, button.wasJustReleased());
-        }
-    }
+
     @Override
     public void update() {
-        final double right = gamepad.getRightY();
-        final double left = gamepad.getLeftY();
+        turret.whopper();
 
-        readLiftButtons();
-        for (Map.Entry<ButtonReader, Boolean> entry : liftButtonVals.entrySet()) {
-            if (entry.getValue()) {
-                setPosition(Objects.requireNonNull(liftButtons.get(entry.getKey())));
-                doingstuff.value = true;
+        yReader.readValue();
+        if (yReader.getState()) {
+            if (oldIntakePower != 0) {
+                // this sucks but apparently is faster but it probably wont have any affect on the
+                // performance because the underlying code is shit
+                // also it will make ethan mad and i can call this ++i v2 (except it changes the code)
+                intake.getController().setServoPosition(intake.getPortNumber(), 0);
+                xReader.forceVal(false);
+                oldIntakePower = 0;
+            }
+        } else {
+            xReader.readValue();
+            double newPower = xReader.getState() ? 1 : 0.5;
+            if (newPower != oldIntakePower) {
+                intake.getController().setServoPosition(intake.getPortNumber(), newPower);
+                oldIntakePower = newPower;
             }
         }
+
+        final double right = gamepad.getRightY();
+        final double left = gamepad.getLeftY();
+        setPosFromButtonMap(liftButtonVals, liftButtons, doingstuff, this::setPosition);
 
         if (doingstuff.value) {
             if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
                 cleanupOpMode();
-            } else if(bReader.wasJustReleased() && !doingstuff.value) {
-                cleanupOpMode();
-                dump();
             } else {
                 super.update();
                 return;
             }
         }
-        runBoundedTool(liftMotor, wasOn[0], Position.MAX.liftPos, left, false, liftZeroPower);
-        runBoundedTool(armMotor, wasOn[1], Position.MAX.armPos, -right, false, armZeroPower);
-        if (wasDoingStuff) liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        wasDoingStuff = doingstuff.value;
+        toolCapHeight.readValue();
+        runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
+        runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
 
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
-        turret.whopper();
-        bReader.readValue();
     }
 
 

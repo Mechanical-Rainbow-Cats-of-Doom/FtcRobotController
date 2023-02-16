@@ -41,7 +41,7 @@ public class BlueAutoClose extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         ElapsedTime timer = new ElapsedTime();
         final AutoTurret turret = new AutoTurret(hardwareMap);
-        final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret);
+        final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret, this);
         Thread thread = new Thread(() -> {
            while (opModeIsActive()) {
                tools.update();

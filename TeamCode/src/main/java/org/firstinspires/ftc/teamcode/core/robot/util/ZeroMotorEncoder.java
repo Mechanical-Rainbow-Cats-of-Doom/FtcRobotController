@@ -5,11 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import androidx.annotation.NonNull;
 
 public class ZeroMotorEncoder {
-    /**
-     * Blocks for >100ms
-     * @param endRunMode if this is set to {@link DcMotor.RunMode#RUN_TO_POSITION} your motor power will be set to 1, deal with it
-     */
-    public static void zero(@NonNull DcMotor motor, DcMotor.RunMode endRunMode) {
+    public static void zero(@NonNull DcMotor motor, DcMotor.RunMode endRunMode, double endPower) {
         if (endRunMode == DcMotor.RunMode.RUN_TO_POSITION) {
             motor.setPower(0);
         }
@@ -19,14 +15,25 @@ public class ZeroMotorEncoder {
         motor.setTargetPosition(0);
         motor.setMode(endRunMode);
         if (endRunMode == DcMotor.RunMode.RUN_TO_POSITION) {
-            motor.setPower(1);
+            motor.setPower(endPower);
         }
+    }
+    /**
+     * Blocks for >100ms
+     * @param endRunMode if this is set to {@link DcMotor.RunMode#RUN_TO_POSITION} your motor power will be set to 1, deal with it
+     */
+    public static void zero(@NonNull DcMotor motor, DcMotor.RunMode endRunMode) {
+        zero(motor, endRunMode, 1);
     }
 
     /**
      * default is just running to position see other javadoc
      */
+    public static void zero(@NonNull DcMotor motor, double endPower) {
+        zero(motor, DcMotor.RunMode.RUN_TO_POSITION, endPower);
+    }
+
     public static void zero(@NonNull DcMotor motor) {
-        zero(motor, DcMotor.RunMode.RUN_TO_POSITION);
+        zero(motor, DcMotor.RunMode.RUN_TO_POSITION, 1);
     }
 }

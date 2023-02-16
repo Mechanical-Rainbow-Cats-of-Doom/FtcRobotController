@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 
 @Config
 public class AutoTools {
+    private final LinearOpMode opMode;
     public static double armZeroPower = 0.075, liftZeroPower = 0.001;
     protected final DcMotor liftMotor, armMotor;
     protected AutoTurret turret;
@@ -29,8 +31,9 @@ public class AutoTools {
     }
 
     //armpos on dump is above
-    public enum Position { // THESE VALUES ARE JUST GUESSES
+    public enum Position {
         NEUTRAL(0, 80, Action.NOTHING),
+        OFF(0, 0, Action.NOTHING),
         INTAKE(0, 25, Action.INTAKE),
         INTAKE_NO_INTAKE(INTAKE.liftPos, INTAKE.armPos, Action.NOTHING),
         GROUND_TARGET(INTAKE.liftPos, 280, Action.DUMP),
@@ -44,23 +47,23 @@ public class AutoTools {
         HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING),
         HIGH_ARM(0, MAX.armPos, Action.NOTHING),
         //cone 5
-        HOVER_5(800,0,Action.NOTHING),
-        INTAKE_5(700,0,Action.NOTHING),
+        HOVER_5(900,0,Action.NOTHING),
+        INTAKE_5(600,0,Action.NOTHING),
         EXIT_5(1250,0,Action.NOTHING),
         //cone 4
-        HOVER_4(650,0,Action.NOTHING),
+        HOVER_4(750,0,Action.NOTHING),
         INTAKE_4(550,0,Action.NOTHING),
         EXIT_4(1050,0,Action.NOTHING),
         //cone 3
-        HOVER_3(470,0,Action.NOTHING),
+        HOVER_3(570,0,Action.NOTHING),
         INTAKE_3(370,0,Action.NOTHING),
         EXIT_3(900,0,Action.NOTHING),
         //cone 2
-        HOVER_2(260,0,Action.NOTHING),
+        HOVER_2(360,0,Action.NOTHING),
         INTAKE_2(160,0,Action.NOTHING),
         EXIT_2(700,0,Action.NOTHING),
         //cone 1
-        HOVER_1(100,0,Action.NOTHING),
+        HOVER_1(200,0,Action.NOTHING),
         INTAKE_1(0,0,Action.NOTHING),
         EXIT_1(500,0,Action.NOTHING);
 
@@ -86,20 +89,21 @@ public class AutoTools {
      */
     protected int stage = 0;
     protected boolean waiting = true;
-    protected final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean(false);
+    protected final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean();
     protected boolean isAuto = true;
-    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret) {
+    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret, LinearOpMode opMode) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
         this.timer = timer;
+        this.opMode = opMode;
         initMotors();
     }
 
     protected void initMotors() {
         ZeroMotorEncoder.zero(liftMotor);
-        ZeroMotorEncoder.zero(armMotor);
+        ZeroMotorEncoder.zero(armMotor, 1);
     }
 
     public void setPosition(@NonNull Position position) {
@@ -222,9 +226,14 @@ public class AutoTools {
         return doingstuff.value;
     }
 
-    public void waitUntilFinished(BooleanSupplier shouldStop) {
+    public void waitUntilFinished() {
         //noinspection StatementWithEmptyBody
-        while(doingstuff.value && !shouldStop.getAsBoolean());
+        while(doingstuff.value && !opMode.isStopRequested());
+    }
+
+    public void waitUntilFinished(BooleanSupplier booleanSupplier) {
+        //noinspection StatementWithEmptyBody
+        while(doingstuff.value && !opMode.isStopRequested() && booleanSupplier.getAsBoolean());
     }
 
     public void setIntake(Action action) {

@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 
 @Config
 public class ControllerTurret extends AutoTurret {
-    private final GamepadEx gamepad;
+    private final GamepadEx gamepad, nihal;
     private final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean();
     public static double ampltiude = 0.5;
     private final LinkedHashMap<ButtonReader, Double> turretButtons;
@@ -28,9 +28,10 @@ public class ControllerTurret extends AutoTurret {
     /**
      * Only run after init, robot crashes otherwise
      */
-    public ControllerTurret(HardwareMap hardwareMap, GamepadEx gamepad) {
+    public ControllerTurret(HardwareMap hardwareMap, GamepadEx gamepad, GamepadEx nihal) {
         super(hardwareMap);
         this.gamepad = gamepad;
+        this.nihal = nihal;
         this.turretButtons = new LinkedHashMap<ButtonReader, Double>() {{
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), 0D);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT), 90D);
@@ -47,8 +48,8 @@ public class ControllerTurret extends AutoTurret {
             motor.setPower(1);
             setPos(turPos, Units.DEGREES);
         });
-        final double neg = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
-        final double pos = gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+        final double neg = nihal.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
+        final double pos = nihal.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
         if (!doingstuff.value) {
             motor.setPower(Math.max(neg, pos) == neg ? -neg*ampltiude : pos*ampltiude);
         } else if (neg > 0.05 | pos > 0.05 || !isMoving()) {

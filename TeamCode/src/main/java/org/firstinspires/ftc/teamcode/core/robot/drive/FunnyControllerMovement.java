@@ -78,22 +78,21 @@ public class FunnyControllerMovement extends ControllerMovement {
             avg = calcAvg();
         }
         bReader.readValue();
-        if (bReader.getState()) {
-            Vector2d input = new Vector2d(avg.getX() * (inverseStrafe ? -1 : 1), avg.getY() * (inverseDrive ? -1 : 1)).rotated(imu.getAngularOrientation().firstAngle - PI / 2);
-            final double drivePow = input.getX();
-            final double strafePow = input.getY();
-            final double rotatePow = gamepad.getRightX() * (inverseRotate ? -1 : 1);
-            drive.setWeightedDrivePower(new Pose2d(
-                    strafePow,
-                    drivePow,
-                    rotatePow
-            ));
-            drive.updatePoseEstimate();
-            if (telemetry != null) {
-                telemetry.addData("funnyDrive", drivePow);
-                telemetry.addData("funnyStrafe", strafePow);
-                telemetry.addData("funnyRotate", rotatePow);
-            }
-        } else super.update();
+        Vector2d input = new Vector2d(avg.getX() * (inverseStrafe ? -1 : 1), avg.getY() * (inverseDrive && !bReader.getState() ? -1 : 1));
+        if (!bReader.getState()) input = input.rotated(imu.getAngularOrientation().firstAngle - PI / 2);
+        final double drivePow = input.getX();
+        final double strafePow = input.getY();
+        final double rotatePow = gamepad.getRightX() * (inverseRotate ? -1 : 1);
+        drive.setWeightedDrivePower(new Pose2d(
+                !bReader.getState() ? strafePow : drivePow,
+                !bReader.getState() ? drivePow : strafePow,
+                rotatePow
+        ));
+        drive.updatePoseEstimate();
+        if (telemetry != null) {
+            telemetry.addData("funnyDrive", drivePow);
+            telemetry.addData("funnyStrafe", strafePow);
+            telemetry.addData("funnyRotate", rotatePow);
+        }
     }
 }
