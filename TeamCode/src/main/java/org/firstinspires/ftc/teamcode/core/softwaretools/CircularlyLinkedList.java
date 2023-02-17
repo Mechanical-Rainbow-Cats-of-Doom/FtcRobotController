@@ -1,12 +1,18 @@
 package org.firstinspires.ftc.teamcode.core.softwaretools;
 
-import java.io.Serializable;
-import java.util.LinkedList;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-public class CircularlyLinkedList<T> implements Serializable {
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+public class CircularlyLinkedList<T> implements Serializable, Collection<T> {
     public static class Node<T> implements Serializable {
         private T val;
         private Node<T> nextNode;
+
         public Node(T val) {
             this.val = val;
         }
@@ -14,11 +20,11 @@ public class CircularlyLinkedList<T> implements Serializable {
         public Node<T> getNextNode() {
             return nextNode;
         }
-        
+
         public void setNextNode(Node<T> nextNode) {
             this.nextNode = nextNode;
         }
-        
+
         public T getVal() {
             return val;
         }
@@ -27,6 +33,7 @@ public class CircularlyLinkedList<T> implements Serializable {
             this.val = val;
         }
     }
+
     private final Node<T> head;
     private Node<T> curNode, tail;
     private final int capacity;
@@ -68,7 +75,9 @@ public class CircularlyLinkedList<T> implements Serializable {
     public void set(int index, T val) {
         get(index).setVal(val);
     }
-    public void add(T val) {
+
+    @Override
+    public boolean add(T val) {
         if (size++ < capacity) {
             Node<T> newNode = new Node<>(val);
             tail.setNextNode(newNode);
@@ -78,10 +87,98 @@ public class CircularlyLinkedList<T> implements Serializable {
             curNode.setVal(val);
             curNode = curNode.getNextNode();
         }
+        return true;
     }
 
-    public int length() {
+    @Override
+    public boolean remove(@Nullable Object o) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean containsAll(@NonNull Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean addAll(@NonNull Collection<? extends T> c) {
+        c.forEach(this::add);
+        return true;
+    }
+
+    @Override
+    public boolean removeAll(@NonNull Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean retainAll(@NonNull Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int size() {
         return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size != 0;
+    }
+
+    @Override
+    public boolean contains(@Nullable Object o) {
+        return this.stream().anyMatch(a -> a == o);
+    }
+
+    public static class ListIterator<T> implements Iterator<T> {
+        Node<T> current, head;
+        private boolean iterated = false;
+
+        public ListIterator(@NonNull CircularlyLinkedList<T> list) {
+            head = list.getHead();
+            current = head;
+        }
+
+        public ListIterator(Node<T> node) {
+            current = node;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !iterated || current != head;
+        }
+
+        @Override
+        public T next() {
+            iterated = true;
+            T ret = current.getVal();
+            current = current.getNextNode();
+            return ret;
+        }
+    }
+
+    @NonNull
+    @Override
+    public Iterator<T> iterator() {
+        return new ListIterator<>(this);
+    }
+
+    @NonNull
+    @Override
+    public Object[] toArray() {
+        return new ArrayList<>(this).toArray();
+    }
+
+    @NonNull
+    @Override
+    public <T1> T1[] toArray(@NonNull T1[] a) {
+        throw new UnsupportedOperationException(); // this is bad
     }
 
 }

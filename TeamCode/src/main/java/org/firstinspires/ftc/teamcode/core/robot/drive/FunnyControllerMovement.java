@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.core.robot.drive;
 
+import static java.lang.Math.PI;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -14,17 +19,12 @@ import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonRead
 import org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinkedList;
 import org.jetbrains.annotations.Contract;
 
-import java.util.Arrays;
-import java.util.Vector;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import static java.lang.Math.PI;
-import static org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinkedList.Node;
+import java.util.LinkedList;
+import java.util.List;
 
 @Config
 public class FunnyControllerMovement extends ControllerMovement {
+    List<Integer> list = new LinkedList<>();
     public static int AVG_COUNT_ACCELERATING = 4, AVG_COUNT_DECELERATING = 2;
     public static boolean inverseDrive = true, inverseStrafe = false, inverseRotate = false;
     private final BNO055IMU imu;
@@ -50,16 +50,13 @@ public class FunnyControllerMovement extends ControllerMovement {
     @NonNull
     @Contract(" -> new")
     private Vector2d calcAvg() {
-        double ytotal = 0, xtotal = 0;
-        Node<Vector2d> node = vals.getHead();
-        int itercount = 0;
-        do {
-            ytotal += node.getVal().getY();
-            xtotal += node.getVal().getX();
-            node = node.getNextNode();
-            ++itercount;
-        } while (node != vals.getHead());
-        return new Vector2d(xtotal / itercount,ytotal / itercount);
+        list.size();
+        double[] totals = {0, 0}; // x, y
+        vals.forEach((vector) -> {
+            totals[0] += vector.getX();
+            totals[1] += vector.getY();
+        });
+        return new Vector2d(totals[0] / vals.size(), totals[1] / vals.size());
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
