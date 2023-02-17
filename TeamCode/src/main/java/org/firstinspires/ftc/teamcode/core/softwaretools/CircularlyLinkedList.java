@@ -60,7 +60,7 @@ public class CircularlyLinkedList<T> extends AbstractCollection<T> {
         return tail;
     }
 
-    public Node<T> get(int index) {
+    public Node<T> getNode(int index) {
         int iter = 0;
         Node<T> node = getHead();
         while (++iter < index) {
@@ -69,8 +69,12 @@ public class CircularlyLinkedList<T> extends AbstractCollection<T> {
         return node;
     }
 
+    public T get(int index) {
+        return getNode(index).getVal();
+    }
+
     public void set(int index, T val) {
-        get(index).setVal(val);
+        getNode(index).setVal(val);
     }
 
     @Override
