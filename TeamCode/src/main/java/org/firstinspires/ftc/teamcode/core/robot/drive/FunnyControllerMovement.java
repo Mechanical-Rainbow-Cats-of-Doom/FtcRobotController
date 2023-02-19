@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode.core.robot.drive;
 
+import static java.lang.Math.PI;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -13,15 +18,6 @@ import org.firstinspires.ftc.teamcode.core.robot.util.PoseStorage;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinkedList;
 import org.jetbrains.annotations.Contract;
-
-import java.util.Arrays;
-import java.util.Vector;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import static java.lang.Math.PI;
-import static org.firstinspires.ftc.teamcode.core.softwaretools.CircularlyLinkedList.Node;
 
 @Config
 public class FunnyControllerMovement extends ControllerMovement {
@@ -51,15 +47,11 @@ public class FunnyControllerMovement extends ControllerMovement {
     @Contract(" -> new")
     private Vector2d calcAvg() {
         double ytotal = 0, xtotal = 0;
-        Node<Vector2d> node = vals.getHead();
-        int itercount = 0;
-        do {
-            ytotal += node.getVal().getY();
-            xtotal += node.getVal().getX();
-            node = node.getNextNode();
-            ++itercount;
-        } while (node != vals.getHead());
-        return new Vector2d(xtotal / itercount,ytotal / itercount);
+        for (Vector2d vector : vals) {
+            ytotal += vector.getY();
+            xtotal += vector.getX();
+        }
+        return new Vector2d(xtotal / vals.size(), ytotal / vals.size());
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
