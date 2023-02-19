@@ -112,6 +112,7 @@ public class CircularlyLinkedList<T> extends AbstractCollection<T> {
 
         public OnceIterator(Node<T> node) {
             current = node;
+            head = current;
         }
 
         @Override
