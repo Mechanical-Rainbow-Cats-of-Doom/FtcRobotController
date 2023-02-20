@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -17,10 +18,10 @@ import java.util.function.BooleanSupplier;
 import androidx.annotation.NonNull;
 
 @Config
-public class AutoTools {
+public class AutoTools extends SubsystemBase {
     private final LinearOpMode opMode;
     public static double armZeroPower = 0.075, liftZeroPower = 0.001;
-    protected final DcMotor liftMotor, armMotor;
+    protected final DcMotor liftMotor, armMotor, cyclingMotor;
     protected AutoTurret turret;
     protected final CRServo intake;
     protected final Timer timer;
@@ -94,6 +95,7 @@ public class AutoTools {
     public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret, LinearOpMode opMode) {
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
+        this.cyclingMotor = hardwareMap.get(DcMotor.class, "cycle");
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
         this.timer = timer;
@@ -102,7 +104,7 @@ public class AutoTools {
     }
 
     protected void initMotors() {
-        ZeroMotorEncoder.zero(liftMotor);
+        ZeroMotorEncoder.zero(liftMotor, cyclingMotor);
         ZeroMotorEncoder.zero(armMotor, 1);
     }
 

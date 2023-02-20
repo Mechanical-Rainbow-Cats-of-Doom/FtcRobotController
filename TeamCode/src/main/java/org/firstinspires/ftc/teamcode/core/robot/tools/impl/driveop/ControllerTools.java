@@ -94,9 +94,13 @@ public class ControllerTools extends AutoTools {
             }
         }
     }
-
     @Override
     public void update() {
+
+    }
+
+    @Override
+    public void periodic() {
         turret.whopper();
 
         yReader.readValue();

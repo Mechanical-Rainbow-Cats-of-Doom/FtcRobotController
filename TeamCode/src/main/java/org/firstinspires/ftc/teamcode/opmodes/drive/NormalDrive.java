@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.drive;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -12,7 +13,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.core.robot.drive.ControllerMovement;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
-import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTurret;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 
@@ -43,7 +43,6 @@ public class NormalDrive extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             drive.update();
-            tools.update();
             telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition()-LEReset);
             telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition()-REReset);
             telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition()-FEReset);
@@ -51,6 +50,7 @@ public class NormalDrive extends LinearOpMode {
             telemetry.addData("forward/backward: ", moveGamepad.getLeftY());
             telemetry.addData("left/right: ", -moveGamepad.getLeftX());
             telemetry.update();
+            CommandScheduler.getInstance().run();
         }
         tools.cleanup();
     }
