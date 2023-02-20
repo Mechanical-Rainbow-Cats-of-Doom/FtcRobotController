@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import java.util.Locale;
 
 @Autonomous
-public class DistanceSensorTest extends LinearOpMode {
+public class DistanceSensorTestButForStraightPeople extends LinearOpMode {
     // heck whoever decided that locales are required you are terrible
     static final Locale a = Locale.US;
     @Override
