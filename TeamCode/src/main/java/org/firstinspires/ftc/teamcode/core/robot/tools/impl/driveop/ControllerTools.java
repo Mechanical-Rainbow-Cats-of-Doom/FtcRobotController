@@ -31,7 +31,7 @@ public class ControllerTools extends AutoTools {
     private final ControllerTurret turret;
     private final Telemetry telemetry;
     private final ToggleableToggleButtonReader xReader, yReader, toolCapHeight;
-    private final ButtonReader backReader;
+    private final ButtonReader backReader, leftStickClickReader;
     private final LinkedHashMap<ButtonReader, Position> liftButtons;
     private final LinkedHashMap<ButtonReader, Cycler.Cycles> cycleButtons;
     private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>(), cycleButtonVals = new HashMap<>();
@@ -63,7 +63,8 @@ public class ControllerTools extends AutoTools {
         this.telemetry = telemetry;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
         this.yReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.Y);
-        this.backReader = new ButtonReader(gamepad, GamepadKeys.Button.BACK);
+        this.backReader = new ButtonReader(driveGamepad, GamepadKeys.Button.BACK);
+        this.leftStickClickReader = new ButtonReader(driveGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON);
         this.toolCapHeight = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.START, true);
         this.liftButtons = new LinkedHashMap<ButtonReader, Position>() {{
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), Position.HIGH_TARGET_NODUMP);
@@ -114,7 +115,11 @@ public class ControllerTools extends AutoTools {
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
-        if (cycling) super.update();
+        if (cycling) {
+            leftStickClickReader.readValue();
+            if (leftStickClickReader.wasJustReleased()) stopCycling();
+            else super.update();
+        }
         else {
             setPosFromButtonMap(cycleButtonVals, cycleButtons, doingstuff, (cycleType) ->
                 startCycling(cycleType, () -> {
