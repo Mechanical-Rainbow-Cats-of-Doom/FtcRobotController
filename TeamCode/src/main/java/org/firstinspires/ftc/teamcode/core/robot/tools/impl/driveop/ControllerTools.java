@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.Cycler;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
@@ -22,6 +23,7 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.function.Consumer;
 
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 @Config
 public class ControllerTools extends AutoTools {
     // lift and arm zero power moved to auto tools
@@ -29,10 +31,10 @@ public class ControllerTools extends AutoTools {
     private final ControllerTurret turret;
     private final Telemetry telemetry;
     private final ToggleableToggleButtonReader xReader, yReader, toolCapHeight;
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final ButtonReader backReader;
     private final LinkedHashMap<ButtonReader, Position> liftButtons;
-    private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>();
-
+    private final LinkedHashMap<ButtonReader, Cycler.Cycles> cycleButtons;
+    private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>(), cycleButtonVals = new HashMap<>();
     private final BoxedBoolean[] wasOn = {new BoxedBoolean(), new BoxedBoolean()};
     private double oldIntakePower = 0.0;
 
@@ -61,12 +63,17 @@ public class ControllerTools extends AutoTools {
         this.telemetry = telemetry;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
         this.yReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.Y);
+        this.backReader = new ButtonReader(gamepad, GamepadKeys.Button.BACK);
         this.toolCapHeight = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.START, true);
         this.liftButtons = new LinkedHashMap<ButtonReader, Position>() {{
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), Position.HIGH_TARGET_NODUMP);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_DOWN), Position.GROUND_TARGET_NODUMP);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_LEFT), Position.LOW_TARGET_NODUMP);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT), Position.MEDIUM_TARGET_NODUMP);
+        }};
+        this.cycleButtons = new LinkedHashMap<ButtonReader, Cycler.Cycles>() {{
+           put(new ButtonReader(driveGamepad, GamepadKeys.Button.X), Cycler.Cycles.ALLIANCE_LEFT_HIGH);
+           put(new ButtonReader(driveGamepad, GamepadKeys.Button.B), Cycler.Cycles.ALLIANCE_RIGHT_HIGH);
         }};
     }
 
@@ -82,8 +89,13 @@ public class ControllerTools extends AutoTools {
         liftMotor.setPower(liftZeroPower);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        needsToChangeMode = true;
     }
-
+    @Override
+    public void stopCycling() {
+        super.stopCycling();
+        cleanupOpMode();
+    }
     public static <Pos> void setPosFromButtonMap(Map<ButtonReader, Boolean> buttonVals, Map<ButtonReader, Pos> buttonMap, BoxedBoolean doingStuff, Consumer<Pos> consumer) {
         readButtons(buttonVals, buttonMap);
         for (Map.Entry<ButtonReader, Boolean> entry : buttonVals.entrySet()) {
@@ -94,53 +106,61 @@ public class ControllerTools extends AutoTools {
             }
         }
     }
+
     @Override
     public void update() {
-
-    }
-
-    @Override
-    public void periodic() {
-        turret.whopper();
-
-        yReader.readValue();
-        if (yReader.getState()) {
-            if (oldIntakePower != 0) {
-                // this sucks but apparently is faster but it probably wont have any affect on the
-                // performance because the underlying code is shit
-                // also it will make ethan mad and i can call this ++i v2 (except it changes the code)
-                intake.getController().setServoPosition(intake.getPortNumber(), 0);
-                xReader.forceVal(false);
-                oldIntakePower = 0;
-            }
-        } else {
-            xReader.readValue();
-            double newPower = xReader.getState() ? 1 : 0.5;
-            if (newPower != oldIntakePower) {
-                intake.getController().setServoPosition(intake.getPortNumber(), newPower);
-                oldIntakePower = newPower;
-            }
-        }
-
-        final double right = gamepad.getRightY();
-        final double left = gamepad.getLeftY();
-        setPosFromButtonMap(liftButtonVals, liftButtons, doingstuff, this::setPosition);
-
-        if (doingstuff.value) {
-            if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
-                cleanupOpMode();
-            } else {
-                super.update();
-                return;
-            }
-        }
-        toolCapHeight.readValue();
-        runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
-        runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
-
         telemetry.addData("liftpos", liftMotor.getCurrentPosition());
         telemetry.addData("liftMotorPower", liftMotor.getPower());
         telemetry.addData("armpos", armMotor.getCurrentPosition());
+        if (cycling) super.update();
+        else {
+            readButtons(cycleButtonVals, cycleButtons);
+            setPosFromButtonMap(cycleButtonVals, cycleButtons, doingstuff, (cycleType) ->
+                startCycling(cycleType, () -> {
+                    backReader.readValue();
+                    return backReader.wasJustReleased();
+                })
+            );
+            if (cycling) {
+                super.update();
+                return;
+            }
+            turret.whopper();
+            yReader.readValue();
+            if (yReader.getState()) {
+                if (oldIntakePower != 0) {
+                    // this sucks but apparently is faster but it probably wont have any affect on the
+                    // performance because the underlying code is shit
+                    // also it will make ethan mad and i can call this ++i v2 (except it changes the code)
+                    intake.getController().setServoPosition(intake.getPortNumber(), 0);
+                    xReader.forceVal(false);
+                    oldIntakePower = 0;
+                }
+            } else {
+                xReader.readValue();
+                double newPower = xReader.getState() ? 1 : 0.5;
+                if (newPower != oldIntakePower) {
+                    intake.getController().setServoPosition(intake.getPortNumber(), newPower);
+                    oldIntakePower = newPower;
+                }
+            }
+
+            final double right = gamepad.getRightY();
+            final double left = gamepad.getLeftY();
+            setPosFromButtonMap(liftButtonVals, liftButtons, doingstuff, this::setPosition);
+
+            if (doingstuff.value) {
+                if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
+                    cleanupOpMode();
+                } else {
+                    super.update();
+                    return;
+                }
+            }
+            toolCapHeight.readValue();
+            runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
+            runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
+        }
     }
 
 
