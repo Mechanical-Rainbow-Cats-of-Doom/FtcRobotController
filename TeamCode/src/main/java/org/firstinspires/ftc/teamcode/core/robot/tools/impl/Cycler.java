@@ -129,7 +129,7 @@ public class Cycler {
                     setIntake.accept(AutoTools.Action.INTAKE);
                     armMotor.setTargetPosition(Math.max(cycle.intaking.armPos - 100, 0));
                 }
-                else if (good && timer.time(TimeUnit.MILLISECONDS) > intakeWaitTimeMs) {
+                else if (good && timer.time() > intakeWaitTimeMs) {
                     step = Steps.GO_TO_DUMP;
                 }
                 else if (distanceSensor.request() < isObjectDistance) {
