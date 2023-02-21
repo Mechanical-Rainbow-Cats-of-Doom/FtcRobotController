@@ -28,7 +28,7 @@ public class ToolTester extends LinearOpMode {
         ZeroMotorEncoder.zero(liftMotor);
         ZeroMotorEncoder.zero(armMotor);
         final MultipleTelemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), super.telemetry);
-        final AutoTurret turret = new AutoTurret(hardwareMap);
+        final AutoTurret turret = new AutoTurret(hardwareMap, 0);
         waitForStart();
         while (opModeIsActive()) {
             liftMotor.setTargetPosition(liftPos);

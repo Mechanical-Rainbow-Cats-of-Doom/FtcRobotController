@@ -140,6 +140,12 @@ public class AutoTools {
         cycling = true;
         doingstuff.value = true;
     }
+    public boolean isCycling() {
+        return cycling;
+    }
+    public int getConesDumped() {
+        return cycler.getConesDumped();
+    }
     public void stopCycling() {
         cycling = false;
         waiting = true;

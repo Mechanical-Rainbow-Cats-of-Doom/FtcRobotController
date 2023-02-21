@@ -33,7 +33,7 @@ public class NoRunnerAuto2 extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         final SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        final AutoTurret turret = new AutoTurret(hardwareMap);
+        final AutoTurret turret = new AutoTurret(hardwareMap, 0);
         turret.setMotorSpeed(0.5);
         final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret, this, telemetry);
         Thread thread = new Thread(() -> {

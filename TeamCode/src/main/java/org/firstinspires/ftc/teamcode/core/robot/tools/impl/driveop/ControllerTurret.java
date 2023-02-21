@@ -28,8 +28,8 @@ public class ControllerTurret extends AutoTurret {
     /**
      * Only run after init, robot crashes otherwise
      */
-    public ControllerTurret(HardwareMap hardwareMap, GamepadEx gamepad, GamepadEx nihal) {
-        super(hardwareMap);
+    public ControllerTurret(HardwareMap hardwareMap, GamepadEx gamepad, GamepadEx nihal, double offset) {
+        super(hardwareMap, offset);
         this.gamepad = gamepad;
         this.nihal = nihal;
         this.turretButtons = new LinkedHashMap<ButtonReader, Double>() {{

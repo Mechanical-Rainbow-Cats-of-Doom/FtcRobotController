@@ -58,7 +58,7 @@ public class ControllerTools extends AutoTools {
         super(hardwareMap, timer, null, opMode, telemetry);
         isAuto = false;
         gamepad = toolGamepad;
-        this.turret = new ControllerTurret(hardwareMap, driveGamepad, toolGamepad);
+        this.turret = new ControllerTurret(hardwareMap, driveGamepad, toolGamepad, 0);
         super.turret = turret;
         this.telemetry = telemetry;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);

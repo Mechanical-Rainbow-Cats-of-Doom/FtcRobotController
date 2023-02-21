@@ -38,7 +38,7 @@ public class AutoTurret {
     public static double tprmultiplier = 1;
     public static final double tpr = (((1+(46D/17))) * (1+(46D/11))) * 28 * 5 * tprmultiplier; // 5 for gear
     public static final double ticksperdeg = tpr / 360;
-    public static double offset = 0; // starting left corner
+    private final double offset; // starting left corner
     protected void initMotors() {
         ZeroMotorEncoder.zero(motor, 1);
     }
@@ -46,8 +46,9 @@ public class AutoTurret {
     /**
      * Only run after init, robot crashes otherwise
      */
-    public AutoTurret(@NonNull HardwareMap hardwareMap) {
+    public AutoTurret(@NonNull HardwareMap hardwareMap, double offset) {
         this.motor = hardwareMap.get(DcMotor.class, "turret");
+        this.offset = 0;
         motor.setZeroPowerBehavior(BRAKE);
         initMotors();
     }
