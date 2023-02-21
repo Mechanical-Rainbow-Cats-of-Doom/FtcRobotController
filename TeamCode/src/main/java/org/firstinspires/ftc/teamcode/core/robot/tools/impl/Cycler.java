@@ -26,9 +26,10 @@ public class Cycler {
     private final Consumer<AutoTools.Action> setIntake;
     private final Cycles cycle;
     private final Thread wrapUpThread;
-    private Steps step = Steps.GO_TO_INTAKING;
 
-    private boolean ran = false, detected = false, movedin = false, firstrun = true;
+    private Steps step = Steps.GO_TO_INTAKING;
+    private boolean ran = false, detected = false, movedin = false, firstrun = true, shouldEndVal = false;
+
     public Cycler(@NonNull BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
                   DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
                   @NonNull Cycles cycle, Runnable stop, BooleanSupplier shouldEnd) {
@@ -162,6 +163,7 @@ public class Cycler {
         turret.setPos(state.turretPos, AutoTurret.Units.DEGREES);
     }
     public void update() {
+        if (!shouldEndVal) shouldEndVal = shouldEnd.getAsBoolean();
         switch (step) {
             case GO_TO_INTAKING:
                 if (!ran) {
@@ -223,7 +225,7 @@ public class Cycler {
                 } else if (timer.time() > dumpWaitTimeMs) {
                     ++conesDumped;
                     ran = false;
-                    if (shouldEnd.getAsBoolean()) {
+                    if (shouldEndVal) {
                         wrapUpThread.start();
                         step = Steps.DONE;
                     } else {
