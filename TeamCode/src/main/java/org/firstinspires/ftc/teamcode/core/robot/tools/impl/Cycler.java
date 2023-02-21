@@ -25,13 +25,13 @@ public class Cycler {
     private final AutoTurret turret;
     private final Consumer<AutoTools.Action> setIntake;
     private final Cycles cycle;
-    private final Runnable stop;
+    private final Thread wrapUpThread;
     private Steps step = Steps.GO_TO_INTAKING;
 
     private boolean ran = false, detected = false, movedin = false, firstrun = true;
-    public Cycler(BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
+    public Cycler(@NonNull BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
                   DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
-                  Cycles cycle, Runnable stop, BooleanSupplier shouldEnd) {
+                  @NonNull Cycles cycle, Runnable stop, BooleanSupplier shouldEnd) {
         this.distanceSensor = distanceSensor;
         this.liftMotor = liftMotor;
         this.armMotor = armMotor;
@@ -40,7 +40,21 @@ public class Cycler {
         this.setIntake = setIntake;
         this.cycle = cycle;
         this.shouldEnd = shouldEnd;
-        this.stop = stop;
+        this.wrapUpThread = new Thread(() -> {
+            cyclingMotor.setTargetPosition(0);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {}
+            turret.setPos(0, AutoTurret.Units.DEGREES);
+            liftMotor.setTargetPosition(AutoTools.Position.NEUTRAL.liftPos);
+            armMotor.setTargetPosition(AutoTools.Position.NEUTRAL.armPos);
+            while(!ready()) {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignored) {}
+            }
+            stop.run();
+        });
         switchPoint = Math.abs(cycle.intaking.turretPos - cycle.dumping.turretPos) / 2;
         distanceSensor.start();
         distanceSensor.request(); //idk why this is there but kooky has it
@@ -61,7 +75,8 @@ public class Cycler {
         GO_TO_INTAKING,
         INTAKING,
         GO_TO_DUMP,
-        DUMP
+        DUMP,
+        DONE
     }
     
     public enum Cycles {
@@ -136,7 +151,6 @@ public class Cycler {
     }
     public void update() {
         switch (step) {
-            default:
             case GO_TO_INTAKING:
                 if (!ran) {
                     setToState(firstrun ? cycle.intaking : cycle.intaking.clone().setCyclingPos(0));
@@ -188,12 +202,13 @@ public class Cycler {
                 } else if (timer.time() > dumpWaitTimeMs / 1.5) {
                     armMotor.setTargetPosition(cycle.dumping.armPos);
                 } else if (timer.time() > dumpWaitTimeMs) {
-                    step = Steps.INTAKING;
                     ++conesDumped;
                     ran = false;
                     if (shouldEnd.getAsBoolean()) {
-                        cyclingMotor.setTargetPosition(0);
-                        stop.run();
+                        wrapUpThread.start();
+                        step = Steps.DONE;
+                    } else {
+                        step = Steps.INTAKING;
                     }
                 }
                 break;
