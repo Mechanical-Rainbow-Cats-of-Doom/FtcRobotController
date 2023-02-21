@@ -118,55 +118,56 @@ public class ControllerTools extends AutoTools {
         if (cycling) {
             leftStickClickReader.readValue();
             if (leftStickClickReader.wasJustReleased()) stopCycling();
-            else super.update();
-        }
-        else {
-            setPosFromButtonMap(cycleButtonVals, cycleButtons, doingstuff, (cycleType) ->
-                startCycling(cycleType, () -> {
-                    backReader.readValue();
-                    return backReader.wasJustReleased();
-                })
-            );
-            if (cycling) {
+            else {
                 super.update();
                 return;
             }
-            turret.whopper();
-            yReader.readValue();
-            if (yReader.getState()) {
-                if (oldIntakePower != 0) {
-                    // this sucks but apparently is faster but it probably wont have any affect on the
-                    // performance because the underlying code is shit
-                    // also it will make ethan mad and i can call this ++i v2 (except it changes the code)
-                    intake.getController().setServoPosition(intake.getPortNumber(), 0);
-                    xReader.forceVal(false);
-                    oldIntakePower = 0;
-                }
-            } else {
-                xReader.readValue();
-                double newPower = xReader.getState() ? 1 : 0.5;
-                if (newPower != oldIntakePower) {
-                    intake.getController().setServoPosition(intake.getPortNumber(), newPower);
-                    oldIntakePower = newPower;
-                }
-            }
-
-            final double right = gamepad.getRightY();
-            final double left = gamepad.getLeftY();
-            setPosFromButtonMap(liftButtonVals, liftButtons, doingstuff, this::setPosition);
-
-            if (doingstuff.value) {
-                if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
-                    cleanupOpMode();
-                } else {
-                    super.update();
-                    return;
-                }
-            }
-            toolCapHeight.readValue();
-            runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
-            runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
         }
+        setPosFromButtonMap(cycleButtonVals, cycleButtons, doingstuff, (cycleType) ->
+            startCycling(cycleType, () -> {
+                backReader.readValue();
+                return backReader.wasJustReleased();
+            })
+        );
+        if (cycling) {
+            super.update();
+            return;
+        }
+        turret.whopper();
+        yReader.readValue();
+        if (yReader.getState()) {
+            if (oldIntakePower != 0) {
+                // this sucks but apparently is faster but it probably wont have any affect on the
+                // performance because the underlying code is shit
+                // also it will make ethan mad and i can call this ++i v2 (except it changes the code)
+                intake.getController().setServoPosition(intake.getPortNumber(), 0);
+                xReader.forceVal(false);
+                oldIntakePower = 0;
+            }
+        } else {
+            xReader.readValue();
+            double newPower = xReader.getState() ? 1 : 0.5;
+            if (newPower != oldIntakePower) {
+                intake.getController().setServoPosition(intake.getPortNumber(), newPower);
+                oldIntakePower = newPower;
+            }
+        }
+
+        final double right = gamepad.getRightY();
+        final double left = gamepad.getLeftY();
+        setPosFromButtonMap(liftButtonVals, liftButtons, doingstuff, this::setPosition);
+
+        if (doingstuff.value) {
+            if (Math.abs(right) > 0.05 || Math.abs(left) > 0.05) {
+                cleanupOpMode();
+            } else {
+                super.update();
+                return;
+            }
+        }
+        toolCapHeight.readValue();
+        runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
+        runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
     }
 
 
