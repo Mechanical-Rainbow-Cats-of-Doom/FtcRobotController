@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.core.robot.drive.ControllerMovement;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
-import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTurret;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 
@@ -29,6 +28,10 @@ public class NormalDrive extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        PhotonCore.EXPANSION_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        PhotonCore.experimental.setMaximumParallelCommands(8);
+        PhotonCore.enable();
 
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
@@ -42,9 +45,7 @@ public class NormalDrive extends LinearOpMode {
         final ControllerMovement drive = createDrive(moveGamepad);
         final ControllerTools tools = new ControllerTools(hardwareMap, new Timer(), toolGamepad, moveGamepad, telemetry, this);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
-        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        PhotonCore.experimental.setMaximumParallelCommands(8);
-        PhotonCore.enable();
+
         waitForStart();
         while (opModeIsActive()) {
             drive.update();

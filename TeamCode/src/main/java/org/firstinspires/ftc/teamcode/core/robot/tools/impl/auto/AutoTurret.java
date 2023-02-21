@@ -76,10 +76,6 @@ public class AutoTurret {
         setPos(rotation.val, Units.DEGREES);
     }
 
-    public void detectPole(int initialVelocity) {
-
-    }
-
     /**
      * don't call too often, relatively resource intensive
      *
