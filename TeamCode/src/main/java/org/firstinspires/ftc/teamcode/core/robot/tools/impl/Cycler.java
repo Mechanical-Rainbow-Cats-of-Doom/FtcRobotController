@@ -50,6 +50,7 @@ public class Cycler {
             armMotor.setTargetPosition(AutoTools.Position.NEUTRAL.armPos);
             while(!ready()) {
                 try {
+                    //noinspection BusyWait
                     Thread.sleep(50);
                 } catch (InterruptedException ignored) {}
             }
@@ -66,6 +67,9 @@ public class Cycler {
         super.finalize();
     }
 
+    /**
+     * @param howManyCones Better be 5 or less if you are drawing from the stack
+     */
     public Cycler(BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
                   DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
                   Cycles cycle, Runnable stopPipeline, int howManyCones) {
@@ -82,37 +86,45 @@ public class Cycler {
     public enum Cycles {
         ALLIANCE_LEFT_HIGH(
                 new State(0, 0, 0, 0),
-                new State(0, 0, 0, 0)
+                new State(0, 0, 0, 0),
+                false
         ),
         ALLIANCE_RIGHT_HIGH(
-                new State(0, 0, 0, 0),
-                new State(0, 0, 0, 0)
+                new State(ALLIANCE_LEFT_HIGH.intaking.liftPos, ALLIANCE_LEFT_HIGH.intaking.armPos, ALLIANCE_LEFT_HIGH.intaking.cyclingPos, 0),
+                new State(ALLIANCE_LEFT_HIGH.dumping.liftPos, ALLIANCE_LEFT_HIGH.dumping.armPos, ALLIANCE_LEFT_HIGH.dumping.cyclingPos, 0),
+                false
         ),
         STACK_LEFT_HIGH(
                 new State(0, 0, 0, 0),
-                new State(0, 0, 0, 0)
+                new State(0, 0, 0, 0),
+                true
         ),
         STACK_RIGHT_HIGH(
-                new State(0, 0, 0, 0),
-                new State(0, 0, 0, 0)
+                new State(STACK_LEFT_HIGH.intaking.liftPos, STACK_LEFT_HIGH.intaking.armPos, STACK_LEFT_HIGH.intaking.cyclingPos, 0),
+                new State(STACK_LEFT_HIGH.dumping.liftPos, STACK_LEFT_HIGH.dumping.armPos, STACK_LEFT_HIGH.dumping.cyclingPos, 0),
+                true
         ),
         STACK_LEFT_MID(
                 new State(0, 0, 0, 0),
-                new State(0, 0, 0, 0)
+                new State(0, 0, 0, 0),
+                true
         ),
         STACK_RIGHT_MID(
-                new State(0, 0, 0, 0),
-                new State(0, 0, 0, 0)
+                new State(STACK_LEFT_MID.intaking.liftPos, STACK_LEFT_MID.intaking.armPos, STACK_LEFT_MID.intaking.cyclingPos, 0),
+                new State(STACK_LEFT_MID.dumping.liftPos, STACK_LEFT_MID.dumping.armPos, STACK_LEFT_MID.dumping.cyclingPos, 0),
+                true
         );
         public final State intaking;
         public final State dumping;
-
-        Cycles(State intaking, State dumping) {
+        public final boolean stack;
+        Cycles(State intaking, State dumping, boolean stack) {
             this.intaking = intaking;
             this.dumping = dumping;
+            this.stack = stack;
         }
     }
     
+    @SuppressWarnings("unused") // bro kys android studio
     public static int getConesDumped() {
         return conesDumped;
     }
@@ -168,9 +180,16 @@ public class Cycler {
             case INTAKING:
                 if (!ran) {
                     setIntake.accept(AutoTools.Action.INTAKE);
-                    armMotor.setTargetPosition(Math.max(cycle.intaking.armPos - 100, 0));
+                    if (!cycle.stack) {
+                        armMotor.setTargetPosition(Math.max(cycle.intaking.armPos - 100, 0));
+                    } else {
+                        liftMotor.setPower(0.6);
+                        liftMotor.setTargetPosition(Math.max(cycle.intaking.liftPos - 100 * (conesDumped + 1), 0));
+                    }
+                    ran = true;
                 } else if (!detected) {
                     if (distanceSensor.request() < isObjectDistance) {
+                        if (cycle.stack) liftMotor.setPower(1);
                         detected = true;
                         timer.reset();
                     }
