@@ -150,9 +150,12 @@ public class Cycler {
                 break;
             case DUMP:
                 if (!ran) {
+                    armMotor.setTargetPosition(cycle.dumping.armPos - 100);
                     setIntake.accept(AutoTools.Action.DUMP);
                     ran = true;
                     timer.reset();
+                } else if (timer.time(TimeUnit.MILLISECONDS) > dumpWaitTimeMs / 1.5) {
+                    armMotor.setTargetPosition(cycle.dumping.armPos);
                 } else if (timer.time(TimeUnit.MILLISECONDS) > dumpWaitTimeMs) {
                     step = Steps.INTAKING;
                     ++conesDumped;
