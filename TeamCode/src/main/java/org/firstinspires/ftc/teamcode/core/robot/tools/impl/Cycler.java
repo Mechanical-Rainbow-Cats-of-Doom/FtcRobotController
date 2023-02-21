@@ -16,12 +16,11 @@ import androidx.annotation.NonNull;
 public class Cycler {
     public static double isObjectDistance = 0;
     public static double dumpWaitTimeMs = 250, intakeWaitTimeMs = 150;
-    private static int conesDumped = 0;
     private final double switchPoint;
     private final ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private final BetterDistanceSensor distanceSensor;
     private final DcMotor liftMotor, armMotor, cyclingMotor;
-    private final BooleanSupplier shouldEnd;
+    private BooleanSupplier shouldEnd;
     private final AutoTurret turret;
     private final Consumer<AutoTools.Action> setIntake;
     private final Cycles cycle;
@@ -29,6 +28,7 @@ public class Cycler {
 
     private Steps step = Steps.GO_TO_INTAKING;
     private boolean ran = false, detected = false, movedin = false, firstrun = true, shouldEndVal = false;
+    private int conesDumped = 0;
 
     public Cycler(@NonNull BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
                   DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
@@ -40,7 +40,7 @@ public class Cycler {
         this.turret = turret;
         this.setIntake = setIntake;
         this.cycle = cycle;
-        this.shouldEnd = shouldEnd;
+        this.shouldEnd = shouldEnd; // do not call during constructor
         this.wrapUpThread = new Thread(() -> {
             cyclingMotor.setTargetPosition(0);
             try {
@@ -62,28 +62,49 @@ public class Cycler {
         distanceSensor.request(); //idk why this is there but kooky has it
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        distanceSensor.stop();
-        super.finalize();
-    }
-
     /**
      * @param howManyCones Better be 5 or less if you are drawing from the stack
      */
     public Cycler(BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
                   DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
                   Cycles cycle, Runnable stopPipeline, int howManyCones) {
-        this(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, setIntake, cycle, stopPipeline, () -> conesDumped >= howManyCones);
+        this(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, setIntake, cycle, stopPipeline, null);
+        shouldEnd = () -> conesDumped >= howManyCones;
     }
-    public enum Steps {
+
+    public static class State implements Cloneable {
+        public final int liftPos;
+        public final int armPos;
+        public int cyclingPos; // for things
+        public final double turretPos;
+
+        public State(int liftPos, int armPos, int cyclingPos, double turretPos) {
+            this.liftPos = liftPos;
+            this.armPos = armPos;
+            this.cyclingPos = cyclingPos;
+            this.turretPos = turretPos;
+        }
+
+        public State setCyclingPos(int cyclingPos) {
+            this.cyclingPos = cyclingPos;
+            return this;
+        }
+
+        @NonNull
+        @Override
+        public State clone() {
+            return new State(liftPos, armPos, cyclingPos, turretPos);
+        }
+    }
+
+    private enum Steps {
         GO_TO_INTAKING,
         INTAKING,
         GO_TO_DUMP,
         DUMP,
         DONE
     }
-    
+
     public enum Cycles {
         ALLIANCE_LEFT_HIGH(
                 new State(0, 0, 0, 0),
@@ -124,44 +145,22 @@ public class Cycler {
             this.stack = stack;
         }
     }
-    
-    @SuppressWarnings("unused") // bro kys android studio
-    public static int getConesDumped() {
+
+    public int getConesDumped() {
         return conesDumped;
     }
-    public static class State implements Cloneable {
-        public final int liftPos;
-        public final int armPos;
-        public int cyclingPos; // for things
-        public final double turretPos;
 
-        public State(int liftPos, int armPos, int cyclingPos, double turretPos) {
-            this.liftPos = liftPos;
-            this.armPos = armPos;
-            this.cyclingPos = cyclingPos;
-            this.turretPos = turretPos;
-        }
-
-        public State setCyclingPos(int cyclingPos) {
-            this.cyclingPos = cyclingPos;
-            return this;
-        }
-
-        @NonNull
-        @Override
-        public State clone() {
-            return new State(liftPos, armPos, cyclingPos, turretPos);
-        }
-    }
     private boolean ready() {
         return !(liftMotor.isBusy() || armMotor.isBusy() || cyclingMotor.isBusy() || turret.isMoving());
     }
+
     private void setToState(@NonNull State state) {
         liftMotor.setTargetPosition(state.liftPos);
         armMotor.setTargetPosition(state.armPos);
         cyclingMotor.setTargetPosition(state.cyclingPos);
         turret.setPos(state.turretPos, AutoTurret.Units.DEGREES);
     }
+
     public void update() {
         if (!shouldEndVal) shouldEndVal = shouldEnd.getAsBoolean();
         switch (step) {
@@ -234,5 +233,11 @@ public class Cycler {
                 }
                 break;
         }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        distanceSensor.stop();
+        super.finalize();
     }
 }

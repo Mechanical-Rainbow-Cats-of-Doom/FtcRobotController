@@ -35,7 +35,7 @@ public class NoRunnerAuto2 extends LinearOpMode {
         final SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         final AutoTurret turret = new AutoTurret(hardwareMap);
         turret.setMotorSpeed(0.5);
-        final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret, this);
+        final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret, this, telemetry);
         Thread thread = new Thread(() -> {
             while (opModeIsActive()) {
                 tools.update();

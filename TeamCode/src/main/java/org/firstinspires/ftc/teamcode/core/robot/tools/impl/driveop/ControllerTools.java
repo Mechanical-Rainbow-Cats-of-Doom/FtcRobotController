@@ -55,7 +55,7 @@ public class ControllerTools extends AutoTools {
     }
 
     public ControllerTools(HardwareMap hardwareMap, Timer timer, GamepadEx toolGamepad, GamepadEx driveGamepad, Telemetry telemetry, LinearOpMode opMode) {
-        super(hardwareMap, timer, null, opMode);
+        super(hardwareMap, timer, null, opMode, telemetry);
         isAuto = false;
         gamepad = toolGamepad;
         this.turret = new ControllerTurret(hardwareMap, driveGamepad, toolGamepad);

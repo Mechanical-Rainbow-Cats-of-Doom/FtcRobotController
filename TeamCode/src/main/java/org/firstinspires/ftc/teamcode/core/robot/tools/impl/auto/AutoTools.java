@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.core.robot.tools.BetterDistanceSensor;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.Cycler;
@@ -98,7 +99,8 @@ public class AutoTools {
     protected Cycler cycler;
     protected final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean();
     protected boolean isAuto = true;
-    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret, LinearOpMode opMode) {
+    private final Telemetry telemetry;
+    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret, LinearOpMode opMode, Telemetry telemetry) {
         this.distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
@@ -107,6 +109,7 @@ public class AutoTools {
         this.turret = turret;
         this.timer = timer;
         this.opMode = opMode;
+        this.telemetry = telemetry;
         initMotors();
     }
 
@@ -216,6 +219,7 @@ public class AutoTools {
                     break;
             }
         } else {
+            telemetry.addData("cones cycled", cycler.getConesDumped());
             cycler.update();
         }
     }
