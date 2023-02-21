@@ -74,6 +74,8 @@ public class ControllerTools extends AutoTools {
         this.cycleButtons = new LinkedHashMap<ButtonReader, Cycler.Cycles>() {{
            put(new ButtonReader(driveGamepad, GamepadKeys.Button.X), Cycler.Cycles.ALLIANCE_LEFT_HIGH);
            put(new ButtonReader(driveGamepad, GamepadKeys.Button.B), Cycler.Cycles.ALLIANCE_RIGHT_HIGH);
+           put(new ButtonReader(driveGamepad, GamepadKeys.Button.Y), Cycler.Cycles.STACK_LEFT_HIGH);
+           put(new ButtonReader(driveGamepad, GamepadKeys.Button.A), Cycler.Cycles.STACK_RIGHT_HIGH);
         }};
     }
 
@@ -114,7 +116,6 @@ public class ControllerTools extends AutoTools {
         telemetry.addData("armpos", armMotor.getCurrentPosition());
         if (cycling) super.update();
         else {
-            readButtons(cycleButtonVals, cycleButtons);
             setPosFromButtonMap(cycleButtonVals, cycleButtons, doingstuff, (cycleType) ->
                 startCycling(cycleType, () -> {
                     backReader.readValue();

@@ -10,7 +10,6 @@ import org.firstinspires.ftc.teamcode.core.robot.tools.BetterDistanceSensor;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
@@ -20,6 +19,7 @@ public class Cycler {
     public static double isObjectDistance = 0;
     public static double dumpWaitTimeMs = 250, intakeWaitTimeMs = 150;
     private static int conesDumped = 0;
+    private final double switchPoint;
     private final ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private final BetterDistanceSensor distanceSensor;
     private final DcMotor liftMotor, armMotor, cyclingMotor;
@@ -28,7 +28,11 @@ public class Cycler {
     private final Consumer<AutoTools.Action> setIntake;
     private final Cycles cycle;
     private final Runnable stop;
-    public Cycler(HardwareMap hardwareMap, DcMotor liftMotor, DcMotor armMotor, DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake, Cycles cycle, Runnable stop, BooleanSupplier shouldEnd) {
+    private Steps step = Steps.GO_TO_INTAKING;
+    private boolean ran = false, detected = false, movedin = false, firstrun = true;
+    public Cycler(HardwareMap hardwareMap, DcMotor liftMotor, DcMotor armMotor,
+                  DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
+                  Cycles cycle, Runnable stop, BooleanSupplier shouldEnd) {
         this.distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         this.liftMotor = liftMotor;
         this.armMotor = armMotor;
@@ -38,10 +42,13 @@ public class Cycler {
         this.cycle = cycle;
         this.shouldEnd = shouldEnd;
         this.stop = stop;
+        switchPoint = Math.abs(cycle.intaking.turretPos - cycle.dumping.turretPos) / 2;
         distanceSensor.start();
         distanceSensor.request(); //idk why this is there but kooky has it
     }
-    public Cycler(HardwareMap hardwareMap, DcMotor liftMotor, DcMotor armMotor, DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake, Cycles cycle, Runnable stopPipeline, int howManyCones) {
+    public Cycler(HardwareMap hardwareMap, DcMotor liftMotor, DcMotor armMotor,
+                  DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
+                  Cycles cycle, Runnable stopPipeline, int howManyCones) {
         this(hardwareMap, liftMotor, armMotor, cyclingMotor, turret, setIntake, cycle, stopPipeline, () -> conesDumped >= howManyCones);
     }
     public enum Steps {
@@ -88,12 +95,10 @@ public class Cycler {
     public static int getConesDumped() {
         return conesDumped;
     }
-    private Steps step = Steps.GO_TO_INTAKING;
-    private boolean ran = false, good = false;
-    public static class State {
+    public static class State implements Cloneable {
         public final int liftPos;
         public final int armPos;
-        public final int cyclingPos;
+        public int cyclingPos; // for things
         public final double turretPos;
 
         public State(int liftPos, int armPos, int cyclingPos, double turretPos) {
@@ -101,6 +106,17 @@ public class Cycler {
             this.armPos = armPos;
             this.cyclingPos = cyclingPos;
             this.turretPos = turretPos;
+        }
+
+        public State setCyclingPos(int cyclingPos) {
+            this.cyclingPos = cyclingPos;
+            return this;
+        }
+
+        @NonNull
+        @Override
+        public State clone() {
+            return new State(liftPos, armPos, cyclingPos, turretPos);
         }
     }
     private boolean ready() {
@@ -117,35 +133,44 @@ public class Cycler {
             default:
             case GO_TO_INTAKING:
                 if (!ran) {
-                    setToState(cycle.intaking);
+                    setToState(firstrun ? cycle.intaking : cycle.intaking.clone().setCyclingPos(0));
                     ran = true;
+                } else if (!firstrun && !movedin && Math.abs(turret.getPos(AutoTurret.Units.DEGREES) - cycle.intaking.turretPos) <= switchPoint) {
+                    cyclingMotor.setTargetPosition(cycle.intaking.cyclingPos);
+                    movedin = true;
                 } else if (ready()) {
                     step = Steps.INTAKING;
                     ran = false;
+                    movedin = false;
+                    firstrun = false;
                 }
                 break;
             case INTAKING:
                 if (!ran) {
                     setIntake.accept(AutoTools.Action.INTAKE);
                     armMotor.setTargetPosition(Math.max(cycle.intaking.armPos - 100, 0));
-                }
-                else if (good && timer.time() > intakeWaitTimeMs) {
-                    step = Steps.GO_TO_DUMP;
-                }
-                else if (distanceSensor.request() < isObjectDistance) {
+                } else if (!detected) {
+                    if (distanceSensor.request() < isObjectDistance) {
+                        detected = true;
+                        timer.reset();
+                    }
+                } else if (timer.time() > intakeWaitTimeMs) {
                     ran = false;
-                    good = true;
-                    timer.reset();
+                    detected = false;
+                    step = Steps.GO_TO_DUMP;
                 }
                 break;
             case GO_TO_DUMP:
                 if (!ran) {
-                    good = false;
-                    setToState(cycle.dumping);
+                    setToState(cycle.dumping.clone().setCyclingPos(0));
                     ran = true;
+                } else if (!movedin && Math.abs(turret.getPos(AutoTurret.Units.DEGREES) - cycle.dumping.turretPos) <= switchPoint) {
+                    cyclingMotor.setTargetPosition(cycle.dumping.cyclingPos);
+                    movedin = true;
                 } else if (ready()) {
                     step = Steps.DUMP;
                     ran = false;
+                    movedin = false;
                 }
                 break;
             case DUMP:
