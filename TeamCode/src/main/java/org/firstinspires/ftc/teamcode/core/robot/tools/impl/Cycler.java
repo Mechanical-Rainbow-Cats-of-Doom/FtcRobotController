@@ -29,11 +29,12 @@ public class Cycler {
     private final Cycles cycle;
     private final Runnable stop;
     private Steps step = Steps.GO_TO_INTAKING;
+
     private boolean ran = false, detected = false, movedin = false, firstrun = true;
-    public Cycler(HardwareMap hardwareMap, DcMotor liftMotor, DcMotor armMotor,
+    public Cycler(BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
                   DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
                   Cycles cycle, Runnable stop, BooleanSupplier shouldEnd) {
-        this.distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
+        this.distanceSensor = distanceSensor;
         this.liftMotor = liftMotor;
         this.armMotor = armMotor;
         this.cyclingMotor = cyclingMotor;
@@ -46,10 +47,17 @@ public class Cycler {
         distanceSensor.start();
         distanceSensor.request(); //idk why this is there but kooky has it
     }
-    public Cycler(HardwareMap hardwareMap, DcMotor liftMotor, DcMotor armMotor,
+
+    @Override
+    protected void finalize() throws Throwable {
+        distanceSensor.stop();
+        super.finalize();
+    }
+
+    public Cycler(BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
                   DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
                   Cycles cycle, Runnable stopPipeline, int howManyCones) {
-        this(hardwareMap, liftMotor, armMotor, cyclingMotor, turret, setIntake, cycle, stopPipeline, () -> conesDumped >= howManyCones);
+        this(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, setIntake, cycle, stopPipeline, () -> conesDumped >= howManyCones);
     }
     public enum Steps {
         GO_TO_INTAKING,

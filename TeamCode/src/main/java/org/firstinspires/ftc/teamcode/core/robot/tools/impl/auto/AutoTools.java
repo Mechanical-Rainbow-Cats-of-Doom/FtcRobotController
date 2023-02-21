@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.core.robot.tools.BetterDistanceSensor;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.Cycler;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
@@ -22,7 +24,7 @@ public class AutoTools {
     private final LinearOpMode opMode;
     public static double armZeroPower = 0.075, liftZeroPower = 0.001;
     protected final DcMotor liftMotor, armMotor, cyclingMotor;
-    private final HardwareMap hardwareMap;
+    private final BetterDistanceSensor distanceSensor;
     protected AutoTurret turret;
     protected final CRServo intake;
     protected final Timer timer;
@@ -97,7 +99,7 @@ public class AutoTools {
     protected final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean();
     protected boolean isAuto = true;
     public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret, LinearOpMode opMode) {
-        this.hardwareMap = hardwareMap;
+        this.distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
         this.cyclingMotor = hardwareMap.get(DcMotor.class, "cycle");
@@ -118,11 +120,11 @@ public class AutoTools {
         this.position = position;
     }
     public boolean setCycler(Cycler.Cycles cycle, int howManyCones) {
-        if (!cycling) cycler = new Cycler(hardwareMap, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, howManyCones);
+        if (!cycling) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, howManyCones);
         return !cycling;
     }
     public boolean setCycler(Cycler.Cycles cycle, BooleanSupplier shouldEnd) {
-        if (!cycling) cycler = new Cycler(hardwareMap, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, shouldEnd);
+        if (!cycling) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, shouldEnd);
         return !cycling;
     }
     public void startCycling(Cycler.Cycles cycle, int howManyCones) {
