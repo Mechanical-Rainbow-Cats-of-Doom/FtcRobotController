@@ -122,19 +122,19 @@ public class AutoTools {
         this.stage = 0;
         this.position = position;
     }
-    public boolean setCycler(Cycler.Cycles cycle, int howManyCones) {
-        if (!cycling) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, howManyCones);
+    public boolean setCycler(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
+        if (!cycling) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
         return !cycling;
     }
-    public boolean setCycler(Cycler.Cycles cycle, BooleanSupplier shouldEnd) {
-        if (!cycling) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, shouldEnd);
+    public boolean setCycler(Cycler.Cycles cycle, BooleanSupplier shouldEnd, boolean startWithDump) {
+        if (!cycling) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
         return !cycling;
     }
-    public void startCycling(Cycler.Cycles cycle, int howManyCones) {
-        if (setCycler(cycle, howManyCones)) startCycling();
+    public void startCycling(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
+        if (setCycler(cycle, howManyCones, startWithDump)) startCycling();
     }
-    public void startCycling(Cycler.Cycles cycle, BooleanSupplier shouldEnd) {
-        if (setCycler(cycle, shouldEnd)) startCycling();
+    public void startCycling(Cycler.Cycles cycle, BooleanSupplier shouldEnd, boolean startWithDump) {
+        if (setCycler(cycle, shouldEnd, startWithDump)) startCycling();
     }
     public void startCycling() {
         cycling = true;

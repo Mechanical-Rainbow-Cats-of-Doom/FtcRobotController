@@ -127,7 +127,7 @@ public class ControllerTools extends AutoTools {
             startCycling(cycleType, () -> {
                 backReader.readValue();
                 return backReader.wasJustReleased();
-            })
+            }, false)
         );
         if (cycling) {
             super.update();

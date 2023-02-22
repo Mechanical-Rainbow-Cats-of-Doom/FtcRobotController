@@ -27,7 +27,7 @@ public class CycleTester extends LinearOpMode {
             if (tools.isCycling()) {
                 telemetry.addData("cones dumped", tools.getConesDumped());
             } else if (howManyCones > 0) {
-                tools.startCycling(cycleType, howManyCones);
+                tools.startCycling(cycleType, howManyCones, false);
                 howManyCones = 0;
             }
             telemetry.update();

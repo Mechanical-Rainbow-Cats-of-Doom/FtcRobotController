@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 @Config
 public class Cycler {
     public static double isObjectDistance = 0;
-    public static double dumpWaitTimeMs = 250, intakeWaitTimeMs = 150;
+    public static double dumpWaitTimeMs = 250, intakeWaitTimeMs = 75;
     private final double switchPoint;
     private final ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private final BetterDistanceSensor distanceSensor;
@@ -26,13 +26,13 @@ public class Cycler {
     private final Cycles cycle;
     private final Thread wrapUpThread;
 
-    private Steps step = Steps.GO_TO_INTAKING;
+    private Steps step;
     private boolean ran = false, detected = false, movedin = false, firstrun = true, shouldEndVal = false;
     private int conesDumped = 0;
 
     public Cycler(@NonNull BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
                   DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
-                  @NonNull Cycles cycle, Runnable stop, BooleanSupplier shouldEnd) {
+                  @NonNull Cycles cycle, Runnable stop, BooleanSupplier shouldEnd, boolean startWithDump) {
         this.distanceSensor = distanceSensor;
         this.liftMotor = liftMotor;
         this.armMotor = armMotor;
@@ -57,6 +57,7 @@ public class Cycler {
             }
             stop.run();
         });
+        step = startWithDump ? Steps.GO_TO_DUMP : Steps.GO_TO_INTAKING;
         switchPoint = Math.abs(cycle.intaking.turretPos - cycle.dumping.turretPos) / 2;
         distanceSensor.start();
         distanceSensor.request(); //idk why this is there but kooky has it
@@ -67,15 +68,16 @@ public class Cycler {
      */
     public Cycler(BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
                   DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
-                  Cycles cycle, Runnable stopPipeline, int howManyCones) {
-        this(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, setIntake, cycle, stopPipeline, null);
+                  Cycles cycle, Runnable stopPipeline, int howManyCones, boolean startWithDump) {
+        this(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, setIntake, cycle, stopPipeline, null, startWithDump);
         shouldEnd = () -> conesDumped >= howManyCones;
+        assert !(cycle.stack && howManyCones > 5);
     }
 
-    public static class State implements Cloneable {
+    public static class State  {
         public final int liftPos;
         public final int armPos;
-        public int cyclingPos; // for things
+        public final int cyclingPos;
         public final double turretPos;
 
         public State(int liftPos, int armPos, int cyclingPos, double turretPos) {
@@ -85,14 +87,7 @@ public class Cycler {
             this.turretPos = turretPos;
         }
 
-        public State setCyclingPos(int cyclingPos) {
-            this.cyclingPos = cyclingPos;
-            return this;
-        }
-
-        @NonNull
-        @Override
-        public State clone() {
+        public State cloneWithCyclingPosChanged(int cyclingPos) {
             return new State(liftPos, armPos, cyclingPos, turretPos);
         }
     }
@@ -127,12 +122,12 @@ public class Cycler {
                 true
         ),
         STACK_LEFT_MID(
-                new State(0, 0, 0, 0),
+                STACK_LEFT_HIGH.intaking,
                 new State(0, 0, 0, 0),
                 true
         ),
         STACK_RIGHT_MID(
-                new State(STACK_LEFT_MID.intaking.liftPos, STACK_LEFT_MID.intaking.armPos, STACK_LEFT_MID.intaking.cyclingPos, 0),
+                STACK_RIGHT_HIGH.intaking,
                 new State(STACK_LEFT_MID.dumping.liftPos, STACK_LEFT_MID.dumping.armPos, STACK_LEFT_MID.dumping.cyclingPos, 0),
                 true
         );
@@ -166,7 +161,7 @@ public class Cycler {
         switch (step) {
             case GO_TO_INTAKING:
                 if (!ran) {
-                    setToState(firstrun ? cycle.intaking : cycle.intaking.clone().setCyclingPos(0));
+                    setToState(firstrun ? cycle.intaking : cycle.intaking.cloneWithCyclingPosChanged(0));
                     ran = true;
                 } else if (!firstrun && !movedin && Math.abs(turret.getPos(AutoTurret.Units.DEGREES) - cycle.intaking.turretPos) <= switchPoint) {
                     cyclingMotor.setTargetPosition(cycle.intaking.cyclingPos);
@@ -190,19 +185,25 @@ public class Cycler {
                     ran = true;
                 } else if (!detected) {
                     if (distanceSensor.request() < isObjectDistance) {
-                        if (cycle.stack) liftMotor.setPower(1);
                         detected = true;
                         timer.reset();
                     }
-                } else if (timer.time() > intakeWaitTimeMs) {
+                } else if (timer.time() > intakeWaitTimeMs && (!movedin || ready())) {
+                    if (cycle.stack && !movedin) {
+                        liftMotor.setTargetPosition(cycle.intaking.liftPos + 200);
+                        liftMotor.setPower(1);
+                        movedin = true;
+                        break;
+                    }
                     ran = false;
                     detected = false;
+                    movedin = false;
                     step = Steps.GO_TO_DUMP;
                 }
                 break;
             case GO_TO_DUMP:
                 if (!ran) {
-                    setToState(cycle.dumping.clone().setCyclingPos(0));
+                    setToState(cycle.dumping.cloneWithCyclingPosChanged(0));
                     ran = true;
                 } else if (!movedin && Math.abs(turret.getPos(AutoTurret.Units.DEGREES) - cycle.dumping.turretPos) <= switchPoint) {
                     cyclingMotor.setTargetPosition(cycle.dumping.cyclingPos);
@@ -227,9 +228,7 @@ public class Cycler {
                     if (shouldEndVal) {
                         wrapUpThread.start();
                         step = Steps.DONE;
-                    } else {
-                        step = Steps.INTAKING;
-                    }
+                    } else step = Steps.INTAKING;
                 }
                 break;
         }
