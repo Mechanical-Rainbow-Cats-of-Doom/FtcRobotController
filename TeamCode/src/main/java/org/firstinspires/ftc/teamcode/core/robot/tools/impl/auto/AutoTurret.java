@@ -46,11 +46,15 @@ public class AutoTurret {
     /**
      * Only run after init, robot crashes otherwise
      */
-    public AutoTurret(@NonNull HardwareMap hardwareMap, double offset) {
+    public AutoTurret(@NonNull HardwareMap hardwareMap, double offsetDeg) {
         this.motor = hardwareMap.get(DcMotor.class, "turret");
-        this.offset = 0;
+        this.offset = offsetDeg * ticksperdeg;
         motor.setZeroPowerBehavior(BRAKE);
         initMotors();
+    }
+
+    public AutoTurret(@NonNull HardwareMap hardwareMap, double offset, Units unit) {
+        this(hardwareMap, unit == Units.RADIANS ? Math.toDegrees(offset) : unit == Units.MOTOR_TICKS ? offset / ticksperdeg : offset);
     }
 
     public boolean isMoving() {
