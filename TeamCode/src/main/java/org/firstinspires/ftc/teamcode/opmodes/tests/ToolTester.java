@@ -37,6 +37,9 @@ public class ToolTester extends LinearOpMode {
             cyclingMotor.setTargetPosition(cyclingPos);
             turret.setPos(turretPos, unit);
             telemetry.addData("turret pos", turret.getPos(unit));
+            telemetry.addData("lift pos", liftMotor.getCurrentPosition());
+            telemetry.addData("arm pos", armMotor.getCurrentPosition());
+            telemetry.addData("cycling pos", cyclingMotor.getCurrentPosition());
             telemetry.update();
         }
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
