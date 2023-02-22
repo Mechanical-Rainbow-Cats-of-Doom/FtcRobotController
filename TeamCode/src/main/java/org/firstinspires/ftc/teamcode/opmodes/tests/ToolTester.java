@@ -44,6 +44,7 @@ public class ToolTester extends LinearOpMode {
         }
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        cyclingMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turret.cleanup();
     }
 }
