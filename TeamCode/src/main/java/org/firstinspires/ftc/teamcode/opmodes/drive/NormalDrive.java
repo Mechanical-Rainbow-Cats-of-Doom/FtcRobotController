@@ -17,19 +17,21 @@ import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTo
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
 
 @TeleOp
 public class NormalDrive extends LinearOpMode {
     protected MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
+    protected final ArrayList<LynxModule> hubs = new ArrayList<>(Arrays.asList(PhotonCore.CONTROL_HUB, PhotonCore.EXPANSION_HUB));
     ControllerMovement createDrive(GamepadEx gamepad) {
         return new ControllerMovement(hardwareMap, gamepad);
     }
 
     @Override
     public void runOpMode() {
-        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        PhotonCore.EXPANSION_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
         PhotonCore.experimental.setMaximumParallelCommands(8);
         PhotonCore.enable();
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
@@ -44,12 +46,10 @@ public class NormalDrive extends LinearOpMode {
         final ControllerMovement drive = createDrive(moveGamepad);
         final ControllerTools tools = new ControllerTools(hardwareMap, new Timer(), toolGamepad, moveGamepad, telemetry, this);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
-        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        PhotonCore.experimental.setMaximumParallelCommands(8);
-        PhotonCore.enable();
         waitForStart();
         while (opModeIsActive()) {
             drive.update();
+            tools.update();
             telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition()-LEReset);
             telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition()-REReset);
             telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition()-FEReset);
@@ -57,9 +57,7 @@ public class NormalDrive extends LinearOpMode {
             telemetry.addData("forward/backward: ", moveGamepad.getLeftY());
             telemetry.addData("left/right: ", -moveGamepad.getLeftX());
             telemetry.update();
+            hubs.forEach(LynxModule::clearBulkCache);
         }
-        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        PhotonCore.experimental.setMaximumParallelCommands(8);
-        PhotonCore.enable();
     }
 }
