@@ -28,7 +28,10 @@ public class NormalDrive extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
+        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.EXPANSION_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.experimental.setMaximumParallelCommands(8);
+        PhotonCore.enable();
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
         final ButtonReader xButton = new ButtonReader(moveGamepad, GamepadKeys.Button.X);
@@ -41,9 +44,6 @@ public class NormalDrive extends LinearOpMode {
         final ControllerMovement drive = createDrive(moveGamepad);
         final ControllerTools tools = new ControllerTools(hardwareMap, new Timer(), toolGamepad, moveGamepad, telemetry, this);
         final MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
-        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
-        PhotonCore.experimental.setMaximumParallelCommands(8);
-        PhotonCore.enable();
         waitForStart();
         while (opModeIsActive()) {
             drive.update();
@@ -55,6 +55,8 @@ public class NormalDrive extends LinearOpMode {
             telemetry.addData("left/right: ", -moveGamepad.getLeftX());
             telemetry.update();
         }
-        tools.cleanup();
+        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.experimental.setMaximumParallelCommands(8);
+        PhotonCore.enable();
     }
 }
