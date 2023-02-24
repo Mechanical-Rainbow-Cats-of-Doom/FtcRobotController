@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.opmodes.tests;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.core.robot.distance.SEN0304DistanceSensor;
 
 @TeleOp
-public class DisatnceSensorTest extends LinearOpMode{
+public class UltrasonicDistanceSensorTest extends LinearOpMode{
     SEN0304DistanceSensor distanceSensor;
     @Override
     public void runOpMode() throws InterruptedException {

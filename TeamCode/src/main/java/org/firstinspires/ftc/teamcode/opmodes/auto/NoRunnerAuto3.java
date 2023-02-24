@@ -34,8 +34,8 @@ public class NoRunnerAuto3 extends LinearOpMode {
 
         BlessedOdo Chassis = new BlessedOdo(hardwareMap);
         final SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        final AutoTurret turret = new AutoTurret(hardwareMap);
-        final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret, this);
+        final AutoTurret turret = new AutoTurret(hardwareMap, 0);
+        final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret, this, telemetry);
         Thread thread = new Thread(() -> {
             while (opModeIsActive()) {
                 tools.update();

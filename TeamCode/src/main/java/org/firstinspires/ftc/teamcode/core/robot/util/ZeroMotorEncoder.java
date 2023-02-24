@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.core.robot.util;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import java.util.Arrays;
+
 import androidx.annotation.NonNull;
 
 public class ZeroMotorEncoder {
@@ -35,5 +37,8 @@ public class ZeroMotorEncoder {
 
     public static void zero(@NonNull DcMotor motor) {
         zero(motor, DcMotor.RunMode.RUN_TO_POSITION, 1);
+    }
+    public static void zero (@NonNull DcMotor... motors) {
+        Arrays.stream(motors).forEach(ZeroMotorEncoder::zero);
     }
 }

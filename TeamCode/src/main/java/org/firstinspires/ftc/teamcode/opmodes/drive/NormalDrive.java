@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.core.robot.drive.ControllerMovement;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
-import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTurret;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 
@@ -29,7 +28,10 @@ public class NormalDrive extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
+        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.EXPANSION_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.experimental.setMaximumParallelCommands(8);
+        PhotonCore.enable();
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
         final ButtonReader xButton = new ButtonReader(moveGamepad, GamepadKeys.Button.X);
@@ -48,7 +50,6 @@ public class NormalDrive extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             drive.update();
-            tools.update();
             telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition()-LEReset);
             telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition()-REReset);
             telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition()-FEReset);
@@ -57,6 +58,8 @@ public class NormalDrive extends LinearOpMode {
             telemetry.addData("left/right: ", -moveGamepad.getLeftX());
             telemetry.update();
         }
-        tools.cleanup();
+        PhotonCore.CONTROL_HUB.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        PhotonCore.experimental.setMaximumParallelCommands(8);
+        PhotonCore.enable();
     }
 }
