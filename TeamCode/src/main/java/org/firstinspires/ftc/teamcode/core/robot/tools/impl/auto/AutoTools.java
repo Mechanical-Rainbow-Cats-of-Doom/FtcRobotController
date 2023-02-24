@@ -122,36 +122,55 @@ public class AutoTools {
         this.stage = 0;
         this.position = position;
     }
+
     public boolean setCycler(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
-        if (!cycling) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
-        return !cycling;
+        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
+        return isCycling();
     }
+
     public boolean setCycler(Cycler.Cycles cycle, BooleanSupplier shouldEnd, boolean startWithDump) {
-        if (!cycling) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
-        return !cycling;
+        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
+        return isCycling();
     }
+
     public void startCycling(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
         if (setCycler(cycle, howManyCones, startWithDump)) startCycling();
     }
+
     public void startCycling(Cycler.Cycles cycle, BooleanSupplier shouldEnd, boolean startWithDump) {
         if (setCycler(cycle, shouldEnd, startWithDump)) startCycling();
     }
-    public void startCycling() {
-        cycling = true;
-        doingstuff.value = true;
+
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean startCycling() {
+        if (cycler != null) {
+            cycling = true;
+            doingstuff.value = true;
+            return true;
+        } else return false;
     }
+    
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean endCyclingEarly(boolean safe) {
+        if (isCycling()) cycler.endEarly(safe);
+        return isCycling();
+    }
+    
     public boolean isCycling() {
         return cycling;
     }
+
     public int getConesDumped() {
         return cycler.getConesDumped();
     }
+
     public void stopCycling() {
         cycling = false;
         waiting = true;
         doingstuff.value = false;
         position = Position.NEUTRAL; // probably not needed
     }
+
     public void update() {
         if (!isAuto && needsToChangeMode) {
             try {

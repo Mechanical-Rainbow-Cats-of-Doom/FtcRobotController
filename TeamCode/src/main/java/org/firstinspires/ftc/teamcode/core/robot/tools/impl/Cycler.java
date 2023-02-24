@@ -25,6 +25,7 @@ public class Cycler {
     private final Consumer<AutoTools.Action> setIntake;
     private final Cycles cycle;
     private final Thread wrapUpThread;
+    private final Runnable unsafeStop;
 
     private Steps step;
     private boolean ran = false, detected = false, movedin = false, firstrun = true, shouldEndVal = false;
@@ -57,6 +58,7 @@ public class Cycler {
             }
             stop.run();
         });
+        this.unsafeStop = stop;
         step = startWithDump ? Steps.GO_TO_DUMP : Steps.GO_TO_INTAKING;
         switchPoint = Math.abs(cycle.intaking.turretPos - cycle.dumping.turretPos) / 2;
         distanceSensor.start();
@@ -154,6 +156,11 @@ public class Cycler {
         armMotor.setTargetPosition(state.armPos);
         cyclingMotor.setTargetPosition(state.cyclingPos);
         turret.setPos(state.turretPos, AutoTurret.Units.DEGREES);
+    }
+
+    public void endEarly(boolean safe) {
+        if (safe) this.shouldEndVal = true;
+        else unsafeStop.run();
     }
 
     public void update() {

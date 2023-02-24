@@ -80,12 +80,6 @@ public class ControllerTools extends AutoTools {
         }};
     }
 
-    public static void readButtons(@NonNull Map<ButtonReader, Boolean> buttonVals, @NonNull Map<ButtonReader, ?> buttons) {
-        for (ButtonReader button : buttons.keySet()) {
-            button.readValue();
-            buttonVals.put(button, button.wasJustReleased());
-        }
-    }
     private void cleanupOpMode() {
         doingstuff.value = false;
         armMotor.setPower(armZeroPower);
@@ -94,11 +88,20 @@ public class ControllerTools extends AutoTools {
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         needsToChangeMode = true;
     }
+
     @Override
     public void stopCycling() {
         super.stopCycling();
         cleanupOpMode();
     }
+
+    public static void readButtons(@NonNull Map<ButtonReader, Boolean> buttonVals, @NonNull Map<ButtonReader, ?> buttons) {
+        for (ButtonReader button : buttons.keySet()) {
+            button.readValue();
+            buttonVals.put(button, button.wasJustReleased());
+        }
+    }
+
     public static <Pos> void setPosFromButtonMap(Map<ButtonReader, Boolean> buttonVals, Map<ButtonReader, Pos> buttonMap, BoxedBoolean doingStuff, Consumer<Pos> consumer) {
         readButtons(buttonVals, buttonMap);
         for (Map.Entry<ButtonReader, Boolean> entry : buttonVals.entrySet()) {
@@ -117,7 +120,7 @@ public class ControllerTools extends AutoTools {
         telemetry.addData("armpos", armMotor.getCurrentPosition());
         if (cycling) {
             leftStickClickReader.readValue();
-            if (leftStickClickReader.wasJustReleased()) stopCycling();
+            if (leftStickClickReader.wasJustReleased()) endCyclingEarly(false);
             else {
                 super.update();
                 return;
