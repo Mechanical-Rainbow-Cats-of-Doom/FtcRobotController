@@ -5,6 +5,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -15,6 +16,7 @@ public class BlessedOdo {
     Encoder leftEncoder, rightEncoder, frontEncoder;
     private DcMotorEx leftFront, leftRear, rightRear, rightFront;
     private BNO055IMU imu;
+    private Telemetry telemetry;
 
     public BlessedOdo(HardwareMap hardwareMap){
 //        this.hardwareMap = hardwareMap;
@@ -32,11 +34,31 @@ public class BlessedOdo {
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
     }
+
+    public BlessedOdo(HardwareMap hardwareMap, Telemetry telemetry){
+        //Constructor for outputting telemetry
+        leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
+        rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
+        frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
+
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
+
+        this.telemetry = telemetry;
+    }
+
     private boolean drove;
     private boolean strafed;
     private boolean rotated;
     private int forwardDistance = 0;
-    private int driveReset = 0;
+    private double driveReset = 0;
     public static double driveSpeedMultiplier = 0.5;
     private int sidewaysDistance = 0;
     private int strafeReset = 0;
@@ -47,81 +69,99 @@ public class BlessedOdo {
     public static double accelerationAngle = 2;
     // https://www.desmos.com/calculator/jjdwtdu83r
 
-    public static int leftRearDirection = 1;
-    public static int leftFrontDirection = 1;
+    public static int leftRearDirection = -1;
+    public static int leftFrontDirection = -1;
     public static int rightRearDirection = 1;
     public static int rightFrontDirection = 1;
 
     public void ResetEncoders(){
-        this.driveReset = Math.round((rightEncoder.getCurrentPosition() + leftEncoder.getCurrentPosition())/2);
+        this.driveReset = (rightEncoder.getCurrentPosition() + leftEncoder.getCurrentPosition())/2D;
         this.strafeReset = leftEncoder.getCurrentPosition();
         this.rotateReset = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
-    public void Path(int forward, int sideways, double rotation){
+
+    public void path(int forward, int sideways, double rotation){
         ResetEncoders();
 
         this.rotationDistance = rotation;
 
-        if (forward == 0) {
-            this.forwardDistance = 1;
-        } else {
-            this.forwardDistance = forward;
-        }
+        this.forwardDistance = forward;
 
-        if (sideways == 0) {
-            this.sidewaysDistance = 1;
-        } else {
-            this.sidewaysDistance = sideways;
-        }
+        this.sidewaysDistance = sideways;
+
     }
 
-    public void SetMotors(double drive, double strafe, double rotate) {
-        this.leftFront.setPower((-drive + strafe + rotate)* -leftFrontDirection);
-        this.leftRear.setPower((-drive - strafe + rotate)* -leftRearDirection);
-        this.rightFront.setPower((drive + strafe + rotate)* rightFrontDirection);
-        this.rightRear.setPower((drive - strafe + rotate)* rightRearDirection);
+    public void setMotors(double drive, double strafe, double rotate) {
+        // Set Power
+        this.leftFront.setPower((drive + strafe + rotate)* leftFrontDirection);
+        this.leftRear.setPower((drive - strafe + rotate)* leftRearDirection);
+        this.rightFront.setPower((drive - strafe - rotate)* rightFrontDirection);
+        this.rightRear.setPower((drive + strafe - rotate)* rightRearDirection);
     }
 
-    public void Drive() {
+    public void drive() {
 
-        int drive = Math.round((rightEncoder.getCurrentPosition() + leftEncoder.getCurrentPosition())/2) - this.driveReset;
+        double drive = (rightEncoder.getCurrentPosition() + leftEncoder.getCurrentPosition())/2D - this.driveReset;
         int strafe = leftEncoder.getCurrentPosition() - this.strafeReset;
         double rotation = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - this.rotateReset;
+
 
         double driveMovement;
         double strafeMovement;
         double rotationMovement;
 
-        if (Math.abs(this.forwardDistance - drive) >= 100) {
-            driveMovement = Math.signum(this.forwardDistance - drive) * Math.max(0.15, driveSpeedMultiplier);
-        } else {
-            this.drove = true;
-            driveMovement = 0;
-        }
+//        if (Math.abs(this.forwardDistance - drive) >= 100) {
+//            driveMovement = Math.signum(this.forwardDistance - drive) * Math.max(0.15, driveSpeedMultiplier);
+//        } else {
+//            this.drove = true;
+//            driveMovement = 0;
+//        }
+//
+//        if (Math.abs(this.sidewaysDistance - strafe) >= 100) {
+//            strafeMovement = Math.signum(this.sidewaysDistance - strafe) * Math.max(0.15, strafeSpeedMultiplier);
+//        } else {
+//            this.strafed = true;
+//            strafeMovement = 0;
+//        }
 
-        if (Math.abs(this.sidewaysDistance - strafe) >= 50) {
-            strafeMovement = Math.signum(this.sidewaysDistance - strafe) * Math.max(0.15, strafeSpeedMultiplier);
-        } else {
-            this.strafed = true;
-            strafeMovement = 0;
-        }
-
-        if ((Math.abs(this.rotationDistance - rotation) >= 2)) {
+        if ((Math.abs(this.rotationDistance - rotation) >= 20)) {
             rotationMovement = Math.signum(this.rotationDistance - rotation) * Math.max(0.15, rotationSpeedMultiplier);
         } else {
             this.rotated = true;
             rotationMovement = 0;
         }
 
-        SetMotors(driveMovement,strafeMovement,rotationMovement);
+        try{
+            telemetry.addData("Drive reset", driveReset);
+            telemetry.addData("Strafe reset", strafeReset);
+            telemetry.addData("Rotate reset", rotateReset);
+            telemetry.addData("Driven", drive);
+            telemetry.addData("Strafed", strafe);
+            telemetry.addData("Rotated", rotation);
+            telemetry.addData("Drive left", this.forwardDistance - drive);
+            telemetry.addData("Strafe left", this.sidewaysDistance - strafe);
+            telemetry.addData("Rotate left", this.rotationDistance - rotation);
+//            telemetry.addData("Drive Value: ", driveMovement);
+//            telemetry.addData("Strafe Value: ", strafeMovement);
+            telemetry.addData("Rotate Value: ", rotationMovement);
+        } catch (Exception e){}
+
+//        setMotors(driveMovement,strafeMovement,rotationMovement);
+        setMotors(1,0,rotationMovement);
     }
 
     public void Drive2() {
 
-        int drive = Math.round((rightEncoder.getCurrentPosition() + leftEncoder.getCurrentPosition())/2) - this.driveReset;
+        double drive = (rightEncoder.getCurrentPosition() + leftEncoder.getCurrentPosition())/2D - this.driveReset;
         int strafe = leftEncoder.getCurrentPosition() - this.strafeReset;
         double rotation = imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle - this.rotateReset;
+
+        try{
+            telemetry.addData("Drive Value: ", drive);
+            telemetry.addData("Strafe Value: ", strafe);
+            telemetry.addData("Rotate Value: ", rotation);
+        } catch (Exception e){}
 
         double driveMovement;
         double strafeMovement;
@@ -148,7 +188,7 @@ public class BlessedOdo {
             rotationMovement = 0;
         }
 
-        SetMotors(driveMovement,strafeMovement,rotationMovement);
+        setMotors(driveMovement,strafeMovement,rotationMovement);
     }
 
     public boolean Moving(){
