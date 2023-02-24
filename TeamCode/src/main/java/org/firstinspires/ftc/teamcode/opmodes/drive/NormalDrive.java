@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.opmodes.drive;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -55,7 +54,6 @@ public class NormalDrive extends LinearOpMode {
             telemetry.addData("forward/backward: ", moveGamepad.getLeftY());
             telemetry.addData("left/right: ", -moveGamepad.getLeftX());
             telemetry.update();
-            CommandScheduler.getInstance().run();
         }
         tools.cleanup();
     }
