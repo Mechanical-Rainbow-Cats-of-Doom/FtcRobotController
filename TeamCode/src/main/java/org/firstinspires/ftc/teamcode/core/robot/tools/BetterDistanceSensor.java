@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class BetterDistanceSensor extends Rev2mDistanceSensorEx {
-    private int requestRate;
+    private double requestRate;
     private boolean isActive;
     protected long time;
     private double distance;
@@ -18,15 +18,15 @@ public class BetterDistanceSensor extends Rev2mDistanceSensorEx {
         this(hardwareMap, deviceName, 100, DistanceUnit.CM, RANGING_PROFILE.HIGH_SPEED);
     }
 
-    public BetterDistanceSensor(HardwareMap hardwareMap, String deviceName, int requestRate) {
+    public BetterDistanceSensor(HardwareMap hardwareMap, String deviceName, double requestRate) {
         this(hardwareMap, deviceName, requestRate, DistanceUnit.CM, RANGING_PROFILE.HIGH_SPEED);
     }
 
-    public BetterDistanceSensor(HardwareMap hardwareMap, String deviceName, int requestRate, DistanceUnit metric) {
+    public BetterDistanceSensor(HardwareMap hardwareMap, String deviceName, double requestRate, DistanceUnit metric) {
         this(hardwareMap, deviceName, requestRate, metric, RANGING_PROFILE.HIGH_SPEED);
     }
 
-    public BetterDistanceSensor(HardwareMap hardwareMap, String deviceName, int requestRate, DistanceUnit metric, RANGING_PROFILE profile) {
+    public BetterDistanceSensor(HardwareMap hardwareMap, String deviceName, double requestRate, DistanceUnit metric, RANGING_PROFILE profile) {
         super(hardwareMap.get(Rev2mDistanceSensor.class, deviceName).getDeviceClient(), true);
         super.setRangingProfile(profile);
         this.requestRate = requestRate;
