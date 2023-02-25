@@ -50,7 +50,7 @@ public class Cycler {
             turret.setPos(0, AutoTurret.Units.DEGREES);
             liftMotor.setTargetPosition(AutoTools.Position.NEUTRAL.liftPos);
             armMotor.setTargetPosition(AutoTools.Position.NEUTRAL.armPos);
-            while(!ready()) {
+            while (!ready()) {
                 try {
                     //noinspection BusyWait
                     Thread.sleep(50);
@@ -92,6 +92,10 @@ public class Cycler {
         public State cloneWithCyclingPosChanged(int cyclingPos) {
             return new State(liftPos, armPos, cyclingPos, turretPos);
         }
+
+        public State cloneWithTurretPosChanged(double turretPos) {
+            return new State(liftPos, armPos, cyclingPos, turretPos);
+        }
     }
 
     private enum Steps {
@@ -109,8 +113,8 @@ public class Cycler {
                 false
         ),
         ALLIANCE_RIGHT_HIGH(
-                new State(ALLIANCE_LEFT_HIGH.intaking.liftPos, ALLIANCE_LEFT_HIGH.intaking.armPos, ALLIANCE_LEFT_HIGH.intaking.cyclingPos, 0),
-                new State(ALLIANCE_LEFT_HIGH.dumping.liftPos, ALLIANCE_LEFT_HIGH.dumping.armPos, ALLIANCE_LEFT_HIGH.dumping.cyclingPos, 0),
+                ALLIANCE_LEFT_HIGH.intaking.cloneWithTurretPosChanged(0),
+                ALLIANCE_LEFT_HIGH.dumping.cloneWithTurretPosChanged(0),
                 false
         ),
         STACK_LEFT_HIGH(
@@ -119,8 +123,8 @@ public class Cycler {
                 true
         ),
         STACK_RIGHT_HIGH(
-                new State(STACK_LEFT_HIGH.intaking.liftPos, STACK_LEFT_HIGH.intaking.armPos, STACK_LEFT_HIGH.intaking.cyclingPos, 0),
-                new State(STACK_LEFT_HIGH.dumping.liftPos, STACK_LEFT_HIGH.dumping.armPos, STACK_LEFT_HIGH.dumping.cyclingPos, 0),
+                STACK_LEFT_HIGH.intaking.cloneWithTurretPosChanged(0),
+                STACK_LEFT_HIGH.dumping.cloneWithTurretPosChanged(0),
                 true
         ),
         STACK_LEFT_MID(
@@ -130,7 +134,7 @@ public class Cycler {
         ),
         STACK_RIGHT_MID(
                 STACK_RIGHT_HIGH.intaking,
-                new State(STACK_LEFT_MID.dumping.liftPos, STACK_LEFT_MID.dumping.armPos, STACK_LEFT_MID.dumping.cyclingPos, 0),
+                STACK_LEFT_MID.dumping.cloneWithTurretPosChanged(0),
                 true
         );
         public final State intaking;

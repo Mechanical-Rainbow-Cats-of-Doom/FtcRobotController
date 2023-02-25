@@ -104,7 +104,7 @@ public class AutoTools {
         this.distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
-        this.cyclingMotor = hardwareMap.get(DcMotor.class, "cycle");
+        this.cyclingMotor = hardwareMap.get(DcMotor.class, "cycler");
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
         this.timer = timer;

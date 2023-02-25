@@ -17,14 +17,14 @@ import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTo
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Timer;
 
 @TeleOp
 public class NormalDrive extends LinearOpMode {
     protected MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
-    protected final ArrayList<LynxModule> hubs = new ArrayList<>(Arrays.asList(PhotonCore.CONTROL_HUB, PhotonCore.EXPANSION_HUB));
+    protected final ArrayDeque<LynxModule> hubs = new ArrayDeque<>(Arrays.asList(PhotonCore.CONTROL_HUB, PhotonCore.EXPANSION_HUB));
     ControllerMovement createDrive(GamepadEx gamepad) {
         return new ControllerMovement(hardwareMap, gamepad);
     }
