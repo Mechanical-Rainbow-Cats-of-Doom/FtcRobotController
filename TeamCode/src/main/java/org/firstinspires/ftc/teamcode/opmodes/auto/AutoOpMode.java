@@ -18,8 +18,8 @@ public abstract class AutoOpMode extends LinearOpMode {
 
     public void initialize() {
         drive = new SampleMecanumDrive(hardwareMap);
-        turret = new AutoTurret(hardwareMap);
-        tools = new AutoTools(hardwareMap, new Timer(), turret, this);
+        turret = new AutoTurret(hardwareMap, 0);
+        tools = new AutoTools(hardwareMap, new Timer(), turret, this, telemetry);
         Thread thread = new Thread(() -> {
             while (opModeIsActive()) {
                 tools.update();
