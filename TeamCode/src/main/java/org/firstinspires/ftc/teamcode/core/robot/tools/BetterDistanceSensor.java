@@ -51,7 +51,7 @@ public class BetterDistanceSensor extends Rev2mDistanceSensorEx {
         this.requestRate = requestRate;
     }
 
-    public int getRequestRate() {
+    public double getRequestRate() {
         return this.requestRate;
     }
 
