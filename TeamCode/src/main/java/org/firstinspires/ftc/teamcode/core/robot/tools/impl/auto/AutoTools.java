@@ -7,6 +7,10 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.core.robot.tools.BetterDistanceSensor;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.Cycler;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
@@ -20,7 +24,8 @@ import androidx.annotation.NonNull;
 public class AutoTools {
     private final LinearOpMode opMode;
     public static double armZeroPower = 0.075, liftZeroPower = 0.001;
-    protected final DcMotor liftMotor, armMotor;
+    protected final DcMotor liftMotor, armMotor, cyclingMotor;
+    private final BetterDistanceSensor distanceSensor;
     protected AutoTurret turret;
     protected final CRServo intake;
     protected final Timer timer;
@@ -89,20 +94,27 @@ public class AutoTools {
      */
     protected int stage = 0;
     protected boolean waiting = true;
+    protected boolean cycling = false;
+    protected boolean needsToChangeMode = true;
+    protected Cycler cycler;
     protected final ControllerTools.BoxedBoolean doingstuff = new ControllerTools.BoxedBoolean();
     protected boolean isAuto = true;
-    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret, LinearOpMode opMode) {
+    private final Telemetry telemetry;
+    public AutoTools(@NonNull HardwareMap hardwareMap, Timer timer, AutoTurret turret, LinearOpMode opMode, Telemetry telemetry) {
+        this.distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
+        this.cyclingMotor = hardwareMap.get(DcMotor.class, "cycler");
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
         this.timer = timer;
         this.opMode = opMode;
+        this.telemetry = telemetry;
         initMotors();
     }
 
     protected void initMotors() {
-        ZeroMotorEncoder.zero(liftMotor);
+        ZeroMotorEncoder.zero(liftMotor, cyclingMotor);
         ZeroMotorEncoder.zero(armMotor, 1);
     }
 
@@ -111,114 +123,129 @@ public class AutoTools {
         this.position = position;
     }
 
-    protected void dump() {
-        doingstuff.value = true;
-        if (!isAuto) {
-            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        }
-        final int startPos = armMotor.getCurrentPosition();
-        armMotor.setTargetPosition(startPos-50);
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                intake.setPower(1);
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        armMotor.setTargetPosition(startPos);
-                        Thread thread = new Thread(() -> {
-                            while (armMotor.isBusy()) {
-                                try {
-                                    //noinspection BusyWait
-                                    Thread.sleep(60);
-                                } catch (InterruptedException ignored) {}
-                            }
-                            if (isAuto) stage++;
-                            else {
-                                armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                                liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                            }
-                            intake.setPower(0);
-                            doingstuff.value = false;
-                        });
-                        thread.start();
-                    }
-                }, 300);
-            }
-        }, 60);
+    public boolean setCycler(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
+        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
+        return isCycling();
+    }
+
+    public boolean setCycler(Cycler.Cycles cycle, BooleanSupplier shouldEnd, boolean startWithDump) {
+        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
+        return isCycling();
+    }
+
+    public void startCycling(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
+        if (setCycler(cycle, howManyCones, startWithDump)) startCycling();
+    }
+
+    public void startCycling(Cycler.Cycles cycle, BooleanSupplier shouldEnd, boolean startWithDump) {
+        if (setCycler(cycle, shouldEnd, startWithDump)) startCycling();
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean startCycling() {
+        if (cycler != null) {
+            cycling = true;
+            doingstuff.value = true;
+            return true;
+        } else return false;
+    }
+    
+    @SuppressWarnings("UnusedReturnValue")
+    public boolean endCyclingEarly(boolean safe) {
+        if (isCycling()) cycler.endEarly(safe);
+        return isCycling();
+    }
+    
+    public boolean isCycling() {
+        return cycling;
+    }
+
+    public int getConesDumped() {
+        return cycler.getConesDumped();
+    }
+
+    public void stopCycling() {
+        cycling = false;
+        waiting = true;
+        doingstuff.value = false;
+        position = Position.NEUTRAL; // probably not needed
     }
 
     public void update() {
-        if(!isAuto) {
+        if (!isAuto && needsToChangeMode) {
             try {
                 armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                needsToChangeMode = false;
             } catch (TargetPositionNotSetException ignored) {
                 // who
             }
         }
-
-        if(lastPosition != position) {
-            this.stage = 0;
-            this.lastPosition = position;
-            waiting = false;
-        }
-        switch (stage) {
-            // initial position
-            case 0:
-                if(!waiting) {
-                    doingstuff.value = true;
-                    liftMotor.setTargetPosition(position.liftPos);
-                    armMotor.setTargetPosition(position.armPos);
-                    liftMotor.setPower(1);
-                    armMotor.setPower(1);
-                    if (position.action == Action.INTAKE) intake.setPower(-1);
-                }
-                stage++;
-                break;
-            case 1:
-                 if(!liftMotor.isBusy() && !armMotor.isBusy()) {
-                    stage++;
-                    if (position.action == Action.INTAKE) intake.setPower(0);
-                 }
-                 break;
-            case 2:
-                if (!waiting) {
-                    waiting = true;
-                    if (position.action == Action.DUMP) {
-                        dump();
-                    } else if (position.action == Action.INTAKE) {
-                        timer.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                intake.setPower(0);
-                                stage++;
-                                waiting = false;
-                            }
-                        }, 350);
-                    } else {
-                        stage++;
-                        waiting = false;
+        if (!cycling) {
+            if (lastPosition != position) {
+                this.stage = 0;
+                this.lastPosition = position;
+                waiting = false;
+            }
+            switch (stage) {
+                // initial position
+                case 0:
+                    if (!waiting) {
+                        doingstuff.value = true;
+                        liftMotor.setTargetPosition(position.liftPos);
+                        armMotor.setTargetPosition(position.armPos);
+                        liftMotor.setPower(1);
+                        armMotor.setPower(1);
+                        if (position.action == Action.INTAKE) intake.setPower(-1);
                     }
-                }
-                break;
-            case 3:
-                if (position == Position.NEUTRAL) {
-                    waiting = true;
-                } else if ((isAuto && position.action != Action.NOTHING) || position == Position.INTAKE) position = Position.NEUTRAL;
-                if (!isAuto) {
-                    doingstuff.value = false;
-                    armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    armMotor.setPower(armZeroPower);
-                    liftMotor.setPower(liftZeroPower);
-                }
-                stage = 0;
-                if(isAuto) {
-                    doingstuff.value = false;
-                }
-                break;
+                    stage++;
+                    break;
+                case 1:
+                    if (!liftMotor.isBusy() && !armMotor.isBusy()) {
+                        stage++;
+                        if (position.action == Action.INTAKE) intake.setPower(0);
+                    }
+                    break;
+                case 2:
+                    if (!waiting) {
+                        waiting = true;
+                        if (position.action == Action.INTAKE) {
+                            timer.schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    intake.setPower(0);
+                                    stage++;
+                                    waiting = false;
+                                }
+                            }, 350);
+                        } else {
+                            stage++;
+                            waiting = false;
+                        }
+                    }
+                    break;
+                case 3:
+                    if (position == Position.NEUTRAL) {
+                        waiting = true;
+                    } else if ((isAuto && position.action != Action.NOTHING) || position == Position.INTAKE)
+                        position = Position.NEUTRAL;
+                    if (!isAuto) {
+                        doingstuff.value = false;
+                        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        needsToChangeMode = true;
+                        armMotor.setPower(armZeroPower);
+                        liftMotor.setPower(liftZeroPower);
+                    }
+                    stage = 0;
+                    if (isAuto) {
+                        doingstuff.value = false;
+                    }
+                    break;
+            }
+        } else {
+            telemetry.addData("cones cycled", cycler.getConesDumped());
+            cycler.update();
         }
     }
 
@@ -249,6 +276,7 @@ public class AutoTools {
         liftMotor.setPower(liftZeroPower);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        needsToChangeMode = true;
         turret.cleanup();
     }
 

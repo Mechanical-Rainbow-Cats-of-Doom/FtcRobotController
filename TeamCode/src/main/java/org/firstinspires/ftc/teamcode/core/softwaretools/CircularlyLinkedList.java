@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode.core.softwaretools;
 
-import java.io.Serializable;
-import java.util.LinkedList;
+import androidx.annotation.NonNull;
 
-public class CircularlyLinkedList<T> implements Serializable {
-    public static class Node<T> implements Serializable {
+import java.util.AbstractCollection;
+import java.util.Iterator;
+
+public class CircularlyLinkedList<T> extends AbstractCollection<T> {
+    public static class Node<T> {
         private T val;
         private Node<T> nextNode;
+
         public Node(T val) {
             this.val = val;
         }
@@ -14,11 +17,11 @@ public class CircularlyLinkedList<T> implements Serializable {
         public Node<T> getNextNode() {
             return nextNode;
         }
-        
+
         public void setNextNode(Node<T> nextNode) {
             this.nextNode = nextNode;
         }
-        
+
         public T getVal() {
             return val;
         }
@@ -27,6 +30,7 @@ public class CircularlyLinkedList<T> implements Serializable {
             this.val = val;
         }
     }
+
     private final Node<T> head;
     private Node<T> curNode, tail;
     private final int capacity;
@@ -56,7 +60,7 @@ public class CircularlyLinkedList<T> implements Serializable {
         return tail;
     }
 
-    public Node<T> get(int index) {
+    public Node<T> getNode(int index) {
         int iter = 0;
         Node<T> node = getHead();
         while (++iter < index) {
@@ -65,10 +69,16 @@ public class CircularlyLinkedList<T> implements Serializable {
         return node;
     }
 
-    public void set(int index, T val) {
-        get(index).setVal(val);
+    public T get(int index) {
+        return getNode(index).getVal();
     }
-    public void add(T val) {
+
+    public void set(int index, T val) {
+        getNode(index).setVal(val);
+    }
+
+    @Override
+    public boolean add(T val) {
         if (size++ < capacity) {
             Node<T> newNode = new Node<>(val);
             tail.setNextNode(newNode);
@@ -78,10 +88,65 @@ public class CircularlyLinkedList<T> implements Serializable {
             curNode.setVal(val);
             curNode = curNode.getNextNode();
         }
+        return true;
     }
 
-    public int length() {
+    @Override
+    public int size() {
         return size;
     }
 
+    @Override
+    public boolean isEmpty() {
+        return size != 0;
+    }
+
+    public static class OnceIterator<T> implements Iterator<T> {
+        Node<T> current, head;
+        private boolean iterated = false;
+
+        public OnceIterator(@NonNull CircularlyLinkedList<T> list) {
+            head = list.getHead();
+            current = head;
+        }
+
+        public OnceIterator(Node<T> node) {
+            current = node;
+            head = current;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !iterated || current != head;
+        }
+
+        @Override
+        public T next() {
+            iterated = true;
+            T ret = current.getVal();
+            current = current.getNextNode();
+            return ret;
+        }
+    }
+
+    public static class CircularIterator<T> extends OnceIterator<T> {
+        public CircularIterator(@NonNull CircularlyLinkedList<T> list) {
+            super(list);
+        }
+
+        public CircularIterator(Node<T> node) {
+            super(node);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return true;
+        }
+    }
+
+    @NonNull
+    @Override
+    public Iterator<T> iterator() {
+        return new OnceIterator<>(this);
+    }
 }

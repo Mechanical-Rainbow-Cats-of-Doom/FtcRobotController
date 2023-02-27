@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.Cycler;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
 import org.firstinspires.ftc.teamcode.core.robot.util.ToggleableToggleButtonReader;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
@@ -22,6 +23,7 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.function.Consumer;
 
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 @Config
 public class ControllerTools extends AutoTools {
     // lift and arm zero power moved to auto tools
@@ -29,10 +31,10 @@ public class ControllerTools extends AutoTools {
     private final ControllerTurret turret;
     private final Telemetry telemetry;
     private final ToggleableToggleButtonReader xReader, yReader, toolCapHeight;
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final ButtonReader backReader, leftStickClickReader;
     private final LinkedHashMap<ButtonReader, Position> liftButtons;
-    private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>();
-
+    private final LinkedHashMap<ButtonReader, Cycler.Cycles> cycleButtons;
+    private final HashMap<ButtonReader, Boolean> liftButtonVals = new HashMap<>(), cycleButtonVals = new HashMap<>();
     private final BoxedBoolean[] wasOn = {new BoxedBoolean(), new BoxedBoolean()};
     private double oldIntakePower = 0.0;
 
@@ -53,14 +55,16 @@ public class ControllerTools extends AutoTools {
     }
 
     public ControllerTools(HardwareMap hardwareMap, Timer timer, GamepadEx toolGamepad, GamepadEx driveGamepad, Telemetry telemetry, LinearOpMode opMode) {
-        super(hardwareMap, timer, null, opMode);
+        super(hardwareMap, timer, null, opMode, telemetry);
         isAuto = false;
         gamepad = toolGamepad;
-        this.turret = new ControllerTurret(hardwareMap, driveGamepad, toolGamepad);
+        this.turret = new ControllerTurret(hardwareMap, driveGamepad, toolGamepad, 0);
         super.turret = turret;
         this.telemetry = telemetry;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
         this.yReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.Y);
+        this.backReader = new ButtonReader(driveGamepad, GamepadKeys.Button.BACK);
+        this.leftStickClickReader = new ButtonReader(driveGamepad, GamepadKeys.Button.LEFT_STICK_BUTTON);
         this.toolCapHeight = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.START, true);
         this.liftButtons = new LinkedHashMap<ButtonReader, Position>() {{
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), Position.HIGH_TARGET_NODUMP);
@@ -68,6 +72,27 @@ public class ControllerTools extends AutoTools {
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_LEFT), Position.LOW_TARGET_NODUMP);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT), Position.MEDIUM_TARGET_NODUMP);
         }};
+        this.cycleButtons = new LinkedHashMap<ButtonReader, Cycler.Cycles>() {{
+           put(new ButtonReader(driveGamepad, GamepadKeys.Button.X), Cycler.Cycles.ALLIANCE_LEFT_HIGH);
+           put(new ButtonReader(driveGamepad, GamepadKeys.Button.B), Cycler.Cycles.ALLIANCE_RIGHT_HIGH);
+           put(new ButtonReader(driveGamepad, GamepadKeys.Button.Y), Cycler.Cycles.STACK_LEFT_HIGH);
+           put(new ButtonReader(driveGamepad, GamepadKeys.Button.A), Cycler.Cycles.STACK_RIGHT_HIGH);
+        }};
+    }
+
+    private void cleanupOpMode() {
+        doingstuff.value = false;
+        armMotor.setPower(armZeroPower);
+        liftMotor.setPower(liftZeroPower);
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        needsToChangeMode = true;
+    }
+
+    @Override
+    public void stopCycling() {
+        super.stopCycling();
+        cleanupOpMode();
     }
 
     public static void readButtons(@NonNull Map<ButtonReader, Boolean> buttonVals, @NonNull Map<ButtonReader, ?> buttons) {
@@ -75,13 +100,6 @@ public class ControllerTools extends AutoTools {
             button.readValue();
             buttonVals.put(button, button.wasJustReleased());
         }
-    }
-    private void cleanupOpMode() {
-        doingstuff.value = false;
-        armMotor.setPower(0);
-        liftMotor.setPower(0);
-        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public static <Pos> void setPosFromButtonMap(Map<ButtonReader, Boolean> buttonVals, Map<ButtonReader, Pos> buttonMap, BoxedBoolean doingStuff, Consumer<Pos> consumer) {
@@ -97,8 +115,28 @@ public class ControllerTools extends AutoTools {
 
     @Override
     public void update() {
+        telemetry.addData("liftpos", liftMotor.getCurrentPosition());
+        telemetry.addData("liftMotorPower", liftMotor.getPower());
+        telemetry.addData("armpos", armMotor.getCurrentPosition());
+        if (cycling) {
+            leftStickClickReader.readValue();
+            if (leftStickClickReader.wasJustReleased()) endCyclingEarly(false);
+            else {
+                super.update();
+                return;
+            }
+        }
+        setPosFromButtonMap(cycleButtonVals, cycleButtons, doingstuff, (cycleType) ->
+            startCycling(cycleType, () -> {
+                backReader.readValue();
+                return backReader.wasJustReleased();
+            }, false)
+        );
+        if (cycling) {
+            super.update();
+            return;
+        }
         turret.whopper();
-
         yReader.readValue();
         if (yReader.getState()) {
             if (oldIntakePower != 0) {
@@ -133,10 +171,6 @@ public class ControllerTools extends AutoTools {
         toolCapHeight.readValue();
         runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
         runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
-
-        telemetry.addData("liftpos", liftMotor.getCurrentPosition());
-        telemetry.addData("liftMotorPower", liftMotor.getPower());
-        telemetry.addData("armpos", armMotor.getCurrentPosition());
     }
 
 

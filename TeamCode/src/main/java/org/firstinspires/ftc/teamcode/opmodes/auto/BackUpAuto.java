@@ -37,8 +37,8 @@ public class BackUpAuto extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         final SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        final AutoTurret turret = new AutoTurret(hardwareMap);
-        final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret, this);
+        final AutoTurret turret = new AutoTurret(hardwareMap, 0);
+        final AutoTools tools = new AutoTools(hardwareMap, new Timer(), turret, this, telemetry);
         final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
         int LEReset;
         final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));

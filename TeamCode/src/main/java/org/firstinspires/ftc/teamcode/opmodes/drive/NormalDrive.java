@@ -5,6 +5,8 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.outoftheboxrobotics.photoncore.PhotonCore;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,22 +14,26 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.core.robot.drive.ControllerMovement;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
-import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTurret;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 
+import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Timer;
 
 @TeleOp
 public class NormalDrive extends LinearOpMode {
     protected MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
+    protected final ArrayDeque<LynxModule> hubs = new ArrayDeque<>(Arrays.asList(PhotonCore.CONTROL_HUB, PhotonCore.EXPANSION_HUB));
     ControllerMovement createDrive(GamepadEx gamepad) {
         return new ControllerMovement(hardwareMap, gamepad);
     }
 
     @Override
     public void runOpMode() {
-
+        hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
+        PhotonCore.experimental.setMaximumParallelCommands(8);
+        PhotonCore.enable();
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
         final ButtonReader xButton = new ButtonReader(moveGamepad, GamepadKeys.Button.X);
@@ -51,7 +57,7 @@ public class NormalDrive extends LinearOpMode {
             telemetry.addData("forward/backward: ", moveGamepad.getLeftY());
             telemetry.addData("left/right: ", -moveGamepad.getLeftX());
             telemetry.update();
+            hubs.forEach(LynxModule::clearBulkCache);
         }
-        tools.cleanup();
     }
 }
