@@ -59,9 +59,10 @@ public class NoRunnerAuto2 extends LinearOpMode {
         AutoStorage.waitForDelay(timer);
 
         tools.setPosition(AutoTools.Position.HIGH_ARM);
-        tools.waitUntilFinished();
+//        tools.waitUntilFinished();
         turret.setPos(0, AutoTurret.Units.DEGREES);
-        tools.waitUntilFinished();
+//        tools.waitUntilFinished();
+        Thread.sleep(2000);
 
         REReset = -rightEncoder.getCurrentPosition();
         LEReset = leftEncoder.getCurrentPosition();
@@ -74,10 +75,11 @@ public class NoRunnerAuto2 extends LinearOpMode {
         drive.setWeightedDrivePower(new Pose2d(0,0,0));
         tools.setIntake(1);
         turret.setPos(-35, AutoTurret.Units.DEGREES);
-        tools.waitUntilFinished();
-        tools.setPosition(AutoTools.Position.HIGH_TARGET_NODUMP);
-        tools.waitUntilFinished();
+//        tools.waitUntilFinished();
         Thread.sleep(500);
+        tools.setPosition(AutoTools.Position.HIGH_TARGET_NODUMP);
+//        tools.waitUntilFinished();
+        Thread.sleep(1500);
         FEReset = frontEncoder.getCurrentPosition();
         while (frontEncoder.getCurrentPosition()-FEReset < leftDistance){
             if(!opModeIsActive()){return;}
@@ -87,73 +89,74 @@ public class NoRunnerAuto2 extends LinearOpMode {
         }
         drive.setWeightedDrivePower(new Pose2d(0,0,0));
 
+        Thread.sleep(500);
         tools.setIntake(-1);
         Thread.sleep(1000);
         tools.setIntake(0);
 
         // Cone 5
-        turret.setPos(54, AutoTurret.Units.DEGREES);
-        Thread.sleep(500);
-        tools.setPosition(AutoTools.Position.HOVER_5);
-        tools.waitUntilFinished();
-        Thread.sleep(500);
-
-        REReset = -rightEncoder.getCurrentPosition();
-        LEReset = leftEncoder.getCurrentPosition();
-        FEReset = frontEncoder.getCurrentPosition();
-        while (frontEncoder.getCurrentPosition()-FEReset > rightDistance){
-            if(!opModeIsActive()){return;}
-            drive.setWeightedDrivePower(new Pose2d(0,0.5,0));
-            telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
-            telemetry.update();
-        }
-        drive.setWeightedDrivePower(new Pose2d(0,0,0));
-
-
-        tools.setIntake(1);
-        Thread.sleep(1000);
-        tools.setPosition(AutoTools.Position.INTAKE_5);
-        tools.waitUntilFinished();
-        Thread.sleep(1000);
-        tools.setPosition(AutoTools.Position.EXIT_5);
-        tools.waitUntilFinished();
-        Thread.sleep(500);
-        tools.setIntake(0);
-
-        REReset = -rightEncoder.getCurrentPosition();
-        LEReset = leftEncoder.getCurrentPosition();
-        FEReset = frontEncoder.getCurrentPosition();
-        while (frontEncoder.getCurrentPosition()-FEReset < Math.round(leftDistance2/2)){
-            if(!opModeIsActive()){return;}
-            drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
-            telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
-            telemetry.update();
-        }
-        drive.setWeightedDrivePower(new Pose2d(0,0,0));
-
-        Thread.sleep(500);
-        tools.setIntake(1);
-        turret.setPos(-35, AutoTurret.Units.DEGREES);
-        Thread.sleep(1000);
-        tools.setPosition(AutoTools.Position.HIGH_TARGET_NODUMP);
-        tools.waitUntilFinished();
-        Thread.sleep(500);
-
-        REReset = -rightEncoder.getCurrentPosition();
-        LEReset = leftEncoder.getCurrentPosition();
-        FEReset = frontEncoder.getCurrentPosition();
-        while (frontEncoder.getCurrentPosition()-FEReset < Math.round(leftDistance2/2)){
-            if(!opModeIsActive()){return;}
-            drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
-            telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
-            telemetry.update();
-        }
-        drive.setWeightedDrivePower(new Pose2d(0,0,0));
-
-        Thread.sleep(1000);
-        tools.setIntake(-1);
-        Thread.sleep(500);
-        tools.setIntake(0);
+//        turret.setPos(54, AutoTurret.Units.DEGREES);
+//        Thread.sleep(500);
+//        tools.setPosition(AutoTools.Position.HOVER_5);
+////        tools.waitUntilFinished();
+//        Thread.sleep(1000);
+//
+//        REReset = -rightEncoder.getCurrentPosition();
+//        LEReset = leftEncoder.getCurrentPosition();
+//        FEReset = frontEncoder.getCurrentPosition();
+//        while (frontEncoder.getCurrentPosition()-FEReset > rightDistance){
+//            if(!opModeIsActive()){return;}
+//            drive.setWeightedDrivePower(new Pose2d(0,0.5,0));
+//            telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
+//            telemetry.update();
+//        }
+//        drive.setWeightedDrivePower(new Pose2d(0,0,0));
+//
+//
+//        tools.setIntake(1);
+//        Thread.sleep(1000);
+//        tools.setPosition(AutoTools.Position.INTAKE_5);
+////        tools.waitUntilFinished();
+//        Thread.sleep(1000);
+//        tools.setPosition(AutoTools.Position.EXIT_5);
+////        tools.waitUntilFinished();
+//        Thread.sleep(1500);
+//        tools.setIntake(0);
+//
+//        REReset = -rightEncoder.getCurrentPosition();
+//        LEReset = leftEncoder.getCurrentPosition();
+//        FEReset = frontEncoder.getCurrentPosition();
+//        while (frontEncoder.getCurrentPosition()-FEReset < Math.round(leftDistance2/2)){
+//            if(!opModeIsActive()){return;}
+//            drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
+//            telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
+//            telemetry.update();
+//        }
+//        drive.setWeightedDrivePower(new Pose2d(0,0,0));
+//
+//        Thread.sleep(500);
+//        tools.setIntake(1);
+//        turret.setPos(-35, AutoTurret.Units.DEGREES);
+//        Thread.sleep(1000);
+//        tools.setPosition(AutoTools.Position.HIGH_TARGET_NODUMP);
+////        tools.waitUntilFinished();
+//        Thread.sleep(1500);
+//
+//        REReset = -rightEncoder.getCurrentPosition();
+//        LEReset = leftEncoder.getCurrentPosition();
+//        FEReset = frontEncoder.getCurrentPosition();
+//        while (frontEncoder.getCurrentPosition()-FEReset < Math.round(leftDistance2/2)){
+//            if(!opModeIsActive()){return;}
+//            drive.setWeightedDrivePower(new Pose2d(0,-0.5,0));
+//            telemetry.addData("is it running right", frontEncoder.getCurrentPosition());
+//            telemetry.update();
+//        }
+//        drive.setWeightedDrivePower(new Pose2d(0,0,0));
+//
+//        Thread.sleep(500);
+//        tools.setIntake(-1);
+//        Thread.sleep(500);
+//        tools.setIntake(0);
 
         //cone 4
 //        turret.setPos(54, AutoTurret.Units.DEGREES);
@@ -242,8 +245,8 @@ public class NoRunnerAuto2 extends LinearOpMode {
         switch (color) {
             case(0):
                 turret.setPos(-90, AutoTurret.Units.DEGREES);
-                tools.waitUntilFinished();
-                Thread.sleep( 200);
+//                tools.waitUntilFinished();
+                Thread.sleep( 1000);
                 tools.setPosition(AutoTools.Position.OFF);
                 while (frontEncoder.getCurrentPosition()-FEReset < 8500){
                     if(!opModeIsActive()){return;}
@@ -255,8 +258,8 @@ public class NoRunnerAuto2 extends LinearOpMode {
 
             case(1):
                 turret.setPos(0, AutoTurret.Units.DEGREES);
-                tools.waitUntilFinished();
-                Thread.sleep( 200);
+//                tools.waitUntilFinished();
+                Thread.sleep( 1000);
                 tools.setPosition(AutoTools.Position.OFF);
                 while (frontEncoder.getCurrentPosition()-FEReset > -10800){
                     if(!opModeIsActive()){return;}
@@ -268,8 +271,8 @@ public class NoRunnerAuto2 extends LinearOpMode {
 
             case(2):
                 turret.setPos(0, AutoTurret.Units.DEGREES);
-                tools.waitUntilFinished();
-                Thread.sleep( 200);
+//                tools.waitUntilFinished();
+                Thread.sleep( 1000);
                 tools.setPosition(AutoTools.Position.OFF);
                 while (frontEncoder.getCurrentPosition()-FEReset > -33100){
                     if(!opModeIsActive()){return;}
