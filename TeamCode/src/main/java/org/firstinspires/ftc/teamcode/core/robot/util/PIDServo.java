@@ -73,7 +73,7 @@ public class PIDServo {
     }
 
     public boolean isBusy() {
-        final int curPos = encoder.getCurrentPosition();
+        final int curPos = getCurrentPosition();
         return targetPosition - busyRange <= curPos && targetPosition <= curPos + busyRange;
     }
 }
