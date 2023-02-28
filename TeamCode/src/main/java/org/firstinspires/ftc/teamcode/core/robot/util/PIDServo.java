@@ -74,6 +74,6 @@ public class PIDServo {
 
     public boolean isBusy() {
         final int curPos = getCurrentPosition();
-        return targetPosition - busyRange <= curPos && targetPosition <= curPos + busyRange;
+        return targetPosition - busyRange <= curPos && curPos <= targetPosition + busyRange;
     }
 }
