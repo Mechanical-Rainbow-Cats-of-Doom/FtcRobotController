@@ -1,13 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.robot.util;
 import com.qualcomm.robotcore.R;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.PwmControl;
-import com.qualcomm.robotcore.hardware.ServoControllerEx;
-import com.qualcomm.robotcore.hardware.configuration.ConfigurationTypeManager;
+import com.qualcomm.robotcore.hardware.*;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.ServoConfigurationType;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Rotation;
@@ -17,14 +11,14 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
  * ContinuousRotationServoImpl provides an implementation of continuous
  * rotation servo functionality.
  */
-public class CRServoEncoderImpl implements DcMotor, PwmControl
-{//----------------------------------------------------------------------------------------------
+public class CRServoEncoderImpl implements DcMotor {
+    //----------------------------------------------------------------------------------------------
     // State
     //----------------------------------------------------------------------------------------------
 
-    protected ServoControllerEx controller    = null;
-    protected int             portNumber    = -1;
-    protected Direction       direction     = Direction.FORWARD;
+    protected ServoController servoController = null;
+    protected int servoPortNumber = -1;
+    protected Direction servoDirection = Direction.FORWARD;
 
     protected static final double apiPowerMin = -1.0;
     protected static final double apiPowerMax =  1.0;
@@ -45,7 +39,7 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
     @Override
     public Manufacturer getManufacturer()
     {
-        return controller.getManufacturer();
+        return servoController.getManufacturer();
     }
 
     @Override
@@ -57,7 +51,7 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
     @Override
     public String getConnectionInfo()
     {
-        return controller.getConnectionInfo() + "; port " + portNumber;
+        return servoController.getConnectionInfo() + "; port " + servoPortNumber;
     }
 
     @Override
@@ -69,7 +63,7 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
     @Override
     public synchronized void resetDeviceConfigurationForOpMode()
     {
-        this.direction = Direction.FORWARD;
+        this.servoDirection = Direction.FORWARD;
     }
 
     @Override
@@ -84,24 +78,22 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
     /**
      * Constructor
      *
-     * @param controller Servo controller that this servo is attached to
-     * @param portNumber physical port number on the servo controller
-     * @param direction  FORWARD for normal operation, REVERSE to reverse operation
+     * @param servoDirection  FORWARD for normal operation, REVERSE to reverse operation
      */
-    public CRServoEncoderImpl(ServoControllerEx controller, int portNumber, Direction direction, DcMotorController encoderController, int encoderPortNumber, Direction encoderDirection)
-    {
-        this.direction = direction;
-        this.controller = controller;
-        this.portNumber = portNumber;
-        this.encoderController = encoderController;
-        this.encoderPortNumber = encoderPortNumber;
+    public CRServoEncoderImpl(HardwareMap hardwareMap, String servoName, Direction servoDirection, String encoderName, Direction encoderDirection) {
+        final CRServo servo = hardwareMap.get(CRServo.class, servoName);
+        this.servoDirection = servoDirection;
+        this.servoController = servo.getController();
+        this.servoPortNumber = servo.getPortNumber();
+        final DcMotorEx encoder = hardwareMap.get(DcMotorEx.class, encoderName);
+        this.encoderPortNumber = encoder.getPortNumber();
+        this.encoderController = encoder.getController();
         this.encoderDirection = encoderDirection;
         this.encoderMotorType = new MotorConfigurationType();
         encoderMotorType.setGearing(1);
         encoderMotorType.setMaxRPM(90);
         encoderMotorType.setTicksPerRev(4096);
         encoderMotorType.setAchieveableMaxRPMFraction(1);
-        controller.setServoType(portNumber, (ServoConfigurationType) new ConfigurationTypeManager().configurationTypeFromTag(ConfigurationTypeManager.getXmlTag(CRServo.class)));
     }
 
     protected DcMotorController            encoderController = null;
@@ -119,7 +111,7 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
      */
     @Override
     public MotorConfigurationType getMotorType() {
-        return encoderController.getMotorType(portNumber);
+        return encoderController.getMotorType(servoPortNumber);
     }
 
     /**
@@ -215,7 +207,7 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
     }
 
     protected Direction getOperationalDirection() {
-        return encoderMotorType.getOrientation() == Rotation.CCW ? direction.inverted() : direction;
+        return encoderMotorType.getOrientation() == Rotation.CCW ? servoDirection.inverted() : servoDirection;
     }
 
     protected int adjustPosition(int position) {
@@ -275,7 +267,7 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
      */
     @Override
     synchronized public int getCurrentPosition() {
-        int position = encoderController.getMotorCurrentPosition(portNumber);
+        int position = encoderController.getMotorCurrentPosition(servoPortNumber);
         return adjustPosition(position);
     }
 
@@ -287,7 +279,7 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
      */
     @Override
     public boolean isBusy() {
-        return encoderController.isBusy(portNumber);
+        return encoderController.isBusy(servoPortNumber);
     }
 
     protected void internalSetMode(RunMode mode) {
@@ -322,13 +314,13 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
     @Override
     public synchronized void setDirection(Direction direction)
     {
-        this.direction = direction;
+        this.servoDirection = direction;
     }
 
     @Override
     public synchronized Direction getDirection()
     {
-        return this.direction;
+        return this.servoDirection;
     }
 
     @Override
@@ -340,48 +332,19 @@ public class CRServoEncoderImpl implements DcMotor, PwmControl
         //      128 == stopped
         //      255 == full speed forward
         //
-        if (this.direction == Direction.REVERSE) power = -power;
+        if (this.servoDirection == Direction.REVERSE) power = -power;
         power = Range.clip(power, apiPowerMin, apiPowerMax);
         power = Range.scale(power, apiPowerMin, apiPowerMax, apiServoPositionMin, apiServoPositionMax);
-        this.controller.setServoPosition(this.portNumber, power);
+        this.servoController.setServoPosition(this.servoPortNumber, power);
     }
 
     @Override
     public double getPower()
     {
-        double power = this.controller.getServoPosition(this.portNumber);
+        double power = this.servoController.getServoPosition(this.servoPortNumber);
         power = Range.scale(power, apiServoPositionMin, apiServoPositionMax, apiPowerMin, apiPowerMax);
-        if (this.direction == Direction.REVERSE) power = -power;
+        if (this.servoDirection == Direction.REVERSE) power = -power;
         return power;
-    }
-    @Override
-    public void setPwmRange(PwmRange range)
-    {
-        controller.setServoPwmRange(portNumber, range);
-    }
-
-    @Override
-    public PwmRange getPwmRange()
-    {
-        return controller.getServoPwmRange(portNumber);
-    }
-
-    @Override
-    public void setPwmEnable()
-    {
-        controller.setServoPwmEnable(portNumber);
-    }
-
-    @Override
-    public void setPwmDisable()
-    {
-        controller.setServoPwmDisable(portNumber);
-    }
-
-    @Override
-    public boolean isPwmEnabled()
-    {
-        return controller.isServoPwmEnabled(portNumber);
     }
 }
 

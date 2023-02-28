@@ -19,7 +19,8 @@ public class Cycler {
     private final double switchPoint;
     private final ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private final BetterDistanceSensor distanceSensor;
-    private final DcMotor liftMotor, armMotor, cyclingMotor;
+    private final DcMotor liftMotor, armMotor;
+    private final CyclerArm cyclerArm;
     private BooleanSupplier shouldEnd;
     private final AutoTurret turret;
     private final Consumer<AutoTools.Action> setIntake;
@@ -32,18 +33,18 @@ public class Cycler {
     private int conesDumped = 0;
 
     public Cycler(@NonNull BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
-                  DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
+                  CyclerArm cyclerArm, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
                   @NonNull Cycles cycle, Runnable stop, BooleanSupplier shouldEnd, boolean startWithDump) {
         this.distanceSensor = distanceSensor;
         this.liftMotor = liftMotor;
         this.armMotor = armMotor;
-        this.cyclingMotor = cyclingMotor;
+        this.cyclerArm = cyclerArm;
         this.turret = turret;
         this.setIntake = setIntake;
         this.cycle = cycle;
         this.shouldEnd = shouldEnd; // do not call during constructor
         this.wrapUpThread = new Thread(() -> {
-            cyclingMotor.setTargetPosition(0);
+            cyclerArm.setTargetPosition(0);
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ignored) {}
@@ -69,9 +70,9 @@ public class Cycler {
      * @param howManyCones Better be 5 or less if you are drawing from the stack
      */
     public Cycler(BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
-                  DcMotor cyclingMotor, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
+                  CyclerArm cyclerArm, AutoTurret turret, Consumer<AutoTools.Action> setIntake,
                   Cycles cycle, Runnable stopPipeline, int howManyCones, boolean startWithDump) {
-        this(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, setIntake, cycle, stopPipeline, null, startWithDump);
+        this(distanceSensor, liftMotor, armMotor, cyclerArm, turret, setIntake, cycle, stopPipeline, null, startWithDump);
         shouldEnd = () -> conesDumped >= howManyCones;
         assert !(cycle.stack && howManyCones > 5);
     }
@@ -152,13 +153,13 @@ public class Cycler {
     }
 
     private boolean ready() {
-        return !(liftMotor.isBusy() || armMotor.isBusy() || cyclingMotor.isBusy() || turret.isMoving());
+        return !(liftMotor.isBusy() || armMotor.isBusy() || cyclerArm.isBusy() || turret.isMoving());
     }
 
     private void setToState(@NonNull State state) {
         liftMotor.setTargetPosition(state.liftPos);
         armMotor.setTargetPosition(state.armPos);
-        cyclingMotor.setTargetPosition(state.cyclingPos);
+        cyclerArm.setTargetPosition(state.cyclingPos);
         turret.setPos(state.turretPos, AutoTurret.Units.DEGREES);
     }
 
@@ -175,7 +176,7 @@ public class Cycler {
                     setToState(firstrun ? cycle.intaking : cycle.intaking.cloneWithCyclingPosChanged(0));
                     ran = true;
                 } else if (!firstrun && !movedin && Math.abs(turret.getPos(AutoTurret.Units.DEGREES) - cycle.intaking.turretPos) <= switchPoint) {
-                    cyclingMotor.setTargetPosition(cycle.intaking.cyclingPos);
+                    cyclerArm.setTargetPosition(cycle.intaking.cyclingPos);
                     movedin = true;
                 } else if (ready()) {
                     step = Steps.INTAKING;
@@ -217,7 +218,7 @@ public class Cycler {
                     setToState(cycle.dumping.cloneWithCyclingPosChanged(0));
                     ran = true;
                 } else if (!movedin && Math.abs(turret.getPos(AutoTurret.Units.DEGREES) - cycle.dumping.turretPos) <= switchPoint) {
-                    cyclingMotor.setTargetPosition(cycle.dumping.cyclingPos);
+                    cyclerArm.setTargetPosition(cycle.dumping.cyclingPos);
                     movedin = true;
                 } else if (ready()) {
                     step = Steps.DUMP;

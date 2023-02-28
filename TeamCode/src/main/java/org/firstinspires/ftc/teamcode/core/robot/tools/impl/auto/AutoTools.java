@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.core.robot.tools.BetterDistanceSensor;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.Cycler;
+import org.firstinspires.ftc.teamcode.core.robot.tools.impl.CyclerArm;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.driveop.ControllerTools;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
@@ -24,7 +25,8 @@ import androidx.annotation.NonNull;
 public class AutoTools {
     private final LinearOpMode opMode;
     public static double armZeroPower = 0.075, liftZeroPower = 0.001;
-    protected final DcMotor liftMotor, armMotor, cyclingMotor;
+    protected final DcMotor liftMotor, armMotor;
+    protected final CyclerArm cyclerArm;
     private final BetterDistanceSensor distanceSensor;
     protected AutoTurret turret;
     protected final CRServo intake;
@@ -104,7 +106,7 @@ public class AutoTools {
         this.distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
-        this.cyclingMotor = hardwareMap.get(DcMotor.class, "cycler");
+        this.cyclerArm = new CyclerArm(hardwareMap, telemetry);
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
         this.timer = timer;
@@ -114,7 +116,7 @@ public class AutoTools {
     }
 
     protected void initMotors() {
-        ZeroMotorEncoder.zero(liftMotor, cyclingMotor);
+        ZeroMotorEncoder.zero(liftMotor);
         ZeroMotorEncoder.zero(armMotor, 1);
     }
 
@@ -124,12 +126,12 @@ public class AutoTools {
     }
 
     public boolean setCycler(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
-        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
+        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
         return isCycling();
     }
 
     public boolean setCycler(Cycler.Cycles cycle, BooleanSupplier shouldEnd, boolean startWithDump) {
-        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclingMotor, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
+        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
         return isCycling();
     }
 
