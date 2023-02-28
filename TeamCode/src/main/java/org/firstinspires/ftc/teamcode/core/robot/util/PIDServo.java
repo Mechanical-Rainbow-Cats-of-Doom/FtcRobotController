@@ -14,12 +14,12 @@ import org.jetbrains.annotations.NotNull;
 @Config
 public class PIDServo {
     public static int busyRange = 8;
-    public int targetPosition = 0;
-    public final Encoder encoder;
-    public final CRServo servo;
-    public final Telemetry telemetry;
-    public final PIDEx controller;
-    public final PIDCoefficientsEx coefficients;
+    private int targetPosition = 0;
+    private final Encoder encoder;
+    private final CRServo servo;
+    private final Telemetry telemetry;
+    private final PIDEx controller;
+    private final PIDCoefficientsEx coefficients;
     private final String servoName;
     private int offset;
     public PIDServo(HardwareMap hardwareMap, Telemetry telemetry, String servoName, String encoderName,
