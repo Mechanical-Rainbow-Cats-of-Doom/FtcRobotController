@@ -45,8 +45,8 @@ public class Main {
 
         meep.addEntity(closeBase(meep, false));
         meep.addEntity(closeBase(meep, true));
-        meep.addEntity(patrickOpMODe(meep,false));
-        meep.addEntity(patrickOpMODe(meep,true));
+//        meep.addEntity(patrickOpMODe(meep,false));
+//        meep.addEntity(patrickOpMODe(meep,true));
 //        RoadRunnerBotEntity bot = coordinateBot(meep);
 //        meep.addEntity(bot);
 //        bot.setLooping(false);
@@ -68,16 +68,14 @@ public class Main {
                 new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL),
                 DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL);
 
-        builder.strafeTo(cMirrorY(new Vector2d(-60, 58), mirror));
-
-        builder.strafeTo(cMirrorY(new Vector2d(-57, 13), mirror));
-        builder.strafeTo(cMirrorY(new Vector2d(-22, 13), mirror));
+        builder.strafeTo(cMirrorY(new Vector2d(-35, 12), mirror));
+        builder.strafeTo(cMirrorY(new Vector2d(-22, 12), mirror));
         builder.waitSeconds(0.5);
 
         for (int i = 1; i <= 5; i++) {
-            builder.strafeTo(cMirrorY(new Vector2d(-57, 13), mirror));
+            builder.strafeTo(cMirrorY(new Vector2d(-57, 12), mirror));
             builder.waitSeconds(0.5);
-            builder.strafeTo(cMirrorY(new Vector2d(-22, 13), mirror));
+            builder.strafeTo(cMirrorY(new Vector2d(-22, 12), mirror));
             builder.waitSeconds(0.5);
         }
 
