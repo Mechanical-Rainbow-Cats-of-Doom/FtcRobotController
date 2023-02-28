@@ -23,6 +23,7 @@ public class PIDServo {
     public final PIDEx controller;
     public final PIDCoefficientsEx coefficients;
     private final String servoName;
+    private int offset;
     public PIDServo(HardwareMap hardwareMap, Telemetry telemetry, String servoName, String encoderName,
                     PIDCoefficientsEx coefficients, Encoder.Direction encoderDirection,
                     DcMotorSimple.Direction servoDirection) {
@@ -34,10 +35,19 @@ public class PIDServo {
         this.coefficients = coefficients;
         this.controller = new PIDEx(coefficients);
         this.telemetry = telemetry;
+        zero();
+    }
+
+    public void zero() {
+        offset = encoder.getCurrentPosition();
+    }
+
+    public int getCurrentPosition() {
+        return encoder.getCurrentPosition() - offset;
     }
 
     public void update() {
-        final int curPos = encoder.getCurrentPosition();
+        final int curPos = getCurrentPosition();
         final double power = controller.calculate(targetPosition, curPos);
         servo.setPower(power);
         telemetry.addData(servoName + " power", power);
@@ -51,10 +61,6 @@ public class PIDServo {
 
     public int getTargetPosition() {
         return targetPosition;
-    }
-
-    public int getCurrentPosition() {
-        return encoder.getCurrentPosition();
     }
     
     public void updateCoefficients(@NotNull PIDCoefficientsEx newCoefficients) {
