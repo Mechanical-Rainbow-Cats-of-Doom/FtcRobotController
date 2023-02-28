@@ -31,6 +31,8 @@ public class NormalDrive extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        // this is neccessary to keep the robot from throwing a npe because the control hub and
+        // expansion hub arent initialized. do not remove!
         hubs = new ArrayDeque<>(Arrays.asList(PhotonCore.CONTROL_HUB, PhotonCore.EXPANSION_HUB));
         hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
         PhotonCore.experimental.setMaximumParallelCommands(8);
