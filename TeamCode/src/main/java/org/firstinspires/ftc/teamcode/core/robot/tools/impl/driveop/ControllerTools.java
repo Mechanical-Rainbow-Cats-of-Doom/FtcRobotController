@@ -171,7 +171,7 @@ public class ControllerTools extends AutoTools {
         toolCapHeight.readValue();
         runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
         runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
-        if (cyclerArm.isBusy()) cyclerArm.update();
+        if (cyclerArm.isBusy()) cyclerArm.debugUpdate();
     }
 
 
