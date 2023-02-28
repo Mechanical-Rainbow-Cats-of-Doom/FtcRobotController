@@ -5,14 +5,14 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.core.robot.distance.FourDistanceSensors;
+import org.firstinspires.ftc.teamcode.core.robot.distance.MultipleDistanceSensors;
 
 @TeleOp
 public class DistanceSensorTest extends LinearOpMode {
     @Override
     public void runOpMode(){
         MultipleTelemetry goodTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        FourDistanceSensors sensors = new FourDistanceSensors(hardwareMap);
+        MultipleDistanceSensors sensors = new MultipleDistanceSensors(hardwareMap, this);
         waitForStart();
         sensors.init(); // front right back left
         while (opModeIsActive()) {

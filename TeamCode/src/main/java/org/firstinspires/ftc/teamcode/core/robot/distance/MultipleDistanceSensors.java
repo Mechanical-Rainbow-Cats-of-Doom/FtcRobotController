@@ -1,34 +1,24 @@
 package org.firstinspires.ftc.teamcode.core.robot.distance;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.I2cDeviceSynch;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
-public class FourDistanceSensors {
-    private final int[][] distances = { // sensor, last 4 values
-            {100, 100, 100, 100},
-            {100, 100, 100, 100},
-            {100, 100, 100, 100},
-            {100, 100, 100, 100}
-    };
+public class MultipleDistanceSensors {
+    private final int[][] distances;
     private final SEN0304DistanceSensor[] sensors;
     final Thread updateThread;
 
-    public FourDistanceSensors(HardwareMap hardwareMap) {
-        this.sensors = new SEN0304DistanceSensor[]{
-                hardwareMap.get(SEN0304DistanceSensor.class, "frontSensor"),
-                hardwareMap.get(SEN0304DistanceSensor.class, "rightSensor"),
-                hardwareMap.get(SEN0304DistanceSensor.class, "backSensor"),
-                hardwareMap.get(SEN0304DistanceSensor.class, "leftSensor")
-        };
+    public MultipleDistanceSensors(SEN0304DistanceSensor[] sensors, LinearOpMode opmode) {
+        this.sensors = sensors;
+        this.distances = new int[4][sensors.length];
+        Arrays.fill(distances, new int[]{10, 10, 10, 10});
 
         this.updateThread = new Thread(() -> {
-            while (true) { // ask fin what to put here idk
+            while (!opmode.isStopRequested()) { // ask fin what to put here idk
                 for (int val = 0; val < distances[0].length; val++) {
                     for (int i = 0; i < sensors.length; i++) {
                         sensors[i].readDistance();
@@ -36,12 +26,23 @@ public class FourDistanceSensors {
                             //noinspection BusyWait
                             Thread.sleep(20);
                         } catch (InterruptedException ignored) {}
-                        distances[i][val] = sensors[(i > 0 ? i - 1 : 3)].getDistance();
+                        distances[i][val] = sensors[(i > 0 ? i - 1 : sensors.length - 1)].getDistance();
                     }
 
                 }
             }
         });
+
+        updateThread.start();
+    }
+
+    public MultipleDistanceSensors(HardwareMap hardwareMap, LinearOpMode opmode) {
+        this(new SEN0304DistanceSensor[]{
+                hardwareMap.get(SEN0304DistanceSensor.class, "frontSensor"),
+                hardwareMap.get(SEN0304DistanceSensor.class, "rightSensor"),
+                hardwareMap.get(SEN0304DistanceSensor.class, "backSensor"),
+                hardwareMap.get(SEN0304DistanceSensor.class, "leftSensor")
+        }, opmode);
     }
 
     //takes 80*repetitions milliseconds

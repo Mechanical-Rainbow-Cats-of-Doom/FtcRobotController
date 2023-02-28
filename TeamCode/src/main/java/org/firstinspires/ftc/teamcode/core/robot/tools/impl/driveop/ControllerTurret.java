@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.core.robot.distance.MultipleDistanceSensors;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
@@ -22,7 +23,7 @@ public class ControllerTurret extends AutoTurret {
     public static double ampltiude = 0.5;
     private final LinkedHashMap<ButtonReader, Double> turretButtons;
     private final HashMap<ButtonReader, Boolean> turretButtonVals = new HashMap<>();
-    public final Rev2mDistanceSensorEx leftSensor, rightSensor;
+    public final MultipleDistanceSensors sensors;
     private boolean findingPole = false;
     private double poleFindingVelocity = 0;
     private final ButtonReader poleButtonLeft, poleButtonRight;
@@ -34,14 +35,14 @@ public class ControllerTurret extends AutoTurret {
     /**
      * Only run after init, robot crashes otherwise
      */
-    public ControllerTurret(HardwareMap hardwareMap, GamepadEx gamepad, GamepadEx nihal, double offset) {
+    public ControllerTurret(HardwareMap hardwareMap, MultipleDistanceSensors sensors,
+                            GamepadEx gamepad, GamepadEx nihal, double offset) {
         super(hardwareMap, offset);
         this.gamepad = gamepad;
         this.nihal = nihal;
-        leftSensor = hardwareMap.get(Rev2mDistanceSensorEx.class, "leftPoleDetector");
-        leftSensor.setRangingProfile(Rev2mDistanceSensorEx.RANGING_PROFILE.HIGH_SPEED);
-        rightSensor = hardwareMap.get(Rev2mDistanceSensorEx.class, "rightPoleDetector");
-        rightSensor.setRangingProfile(Rev2mDistanceSensorEx.RANGING_PROFILE.HIGH_SPEED);
+
+        this.sensors = sensors;
+
         this.turretButtons = new LinkedHashMap<ButtonReader, Double>() {{
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), 0D);
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_RIGHT), 90D);
@@ -81,8 +82,8 @@ public class ControllerTurret extends AutoTurret {
                 return;
             }
 
-            double distanceLeft = leftSensor.getDistance(DistanceUnit.CM);
-            double distanceRight = rightSensor.getDistance(DistanceUnit.CM);
+            double distanceLeft = sensors.getDistance(0);
+            double distanceRight = sensors.getDistance(1);
             boolean leftSeePole = distanceLeft < 50;
             boolean rightSeePole = distanceRight < 50;
             if (Math.abs(poleFindingVelocity) >= 1) {
