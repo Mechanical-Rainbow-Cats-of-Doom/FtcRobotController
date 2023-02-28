@@ -58,7 +58,7 @@ public class ControllerTools extends AutoTools {
         super(hardwareMap, timer, null, opMode, telemetry);
         isAuto = false;
         gamepad = toolGamepad;
-        this.turret = new ControllerTurret(hardwareMap, driveGamepad, toolGamepad, 0);
+        this.turret = new ControllerTurret(hardwareMap, driveGamepad, toolGamepad, 0); // fin fix this plz thx
         super.turret = turret;
         this.telemetry = telemetry;
         this.xReader = new ToggleableToggleButtonReader(gamepad, GamepadKeys.Button.X);
@@ -171,6 +171,7 @@ public class ControllerTools extends AutoTools {
         toolCapHeight.readValue();
         runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
         runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
+        if (cyclerArm.isBusy()) cyclerArm.update();
     }
 
 

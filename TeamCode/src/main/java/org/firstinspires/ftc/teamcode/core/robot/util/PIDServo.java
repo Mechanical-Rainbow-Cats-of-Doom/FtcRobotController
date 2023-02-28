@@ -11,8 +11,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Method;
-
 @Config
 public class PIDServo {
     public static int busyRange = 8;
@@ -51,7 +49,7 @@ public class PIDServo {
         final double power = controller.calculate(targetPosition, curPos);
         servo.setPower(power);
         telemetry.addData(servoName + " power", power);
-        telemetry.addData(servoName + " error", curPos);
+        telemetry.addData(servoName + " error", curPos - targetPosition);
         telemetry.addData(servoName + " target", targetPosition);
     }
 
