@@ -74,7 +74,7 @@ public class Main {
         builder.strafeTo(cMirrorY(new Vector2d(-22, 13), mirror));
         builder.waitSeconds(0.5);
 
-        for (int i = 1; i <= 4 ; i++) {
+        for (int i = 1; i <= 5; i++) {
             builder.strafeTo(cMirrorY(new Vector2d(-57, 13), mirror));
             builder.waitSeconds(0.5);
             builder.strafeTo(cMirrorY(new Vector2d(-22, 13), mirror));

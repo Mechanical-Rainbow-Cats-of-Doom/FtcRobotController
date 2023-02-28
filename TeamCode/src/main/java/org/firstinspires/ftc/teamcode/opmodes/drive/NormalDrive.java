@@ -24,13 +24,14 @@ import java.util.Timer;
 @TeleOp
 public class NormalDrive extends LinearOpMode {
     protected MultipleTelemetry telemetry = new MultipleTelemetry(super.telemetry, FtcDashboard.getInstance().getTelemetry());
-    protected final ArrayDeque<LynxModule> hubs = new ArrayDeque<>(Arrays.asList(PhotonCore.CONTROL_HUB, PhotonCore.EXPANSION_HUB));
+    protected ArrayDeque<LynxModule> hubs;
     ControllerMovement createDrive(GamepadEx gamepad) {
         return new ControllerMovement(hardwareMap, gamepad);
     }
 
     @Override
     public void runOpMode() {
+        hubs = new ArrayDeque<>(Arrays.asList(PhotonCore.CONTROL_HUB, PhotonCore.EXPANSION_HUB));
         hubs.forEach(hub -> hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
         PhotonCore.experimental.setMaximumParallelCommands(8);
         PhotonCore.enable();
