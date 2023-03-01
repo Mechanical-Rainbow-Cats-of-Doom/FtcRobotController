@@ -13,8 +13,9 @@ import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-@Config
 public class CyclerArm {
+    private final PIDServo top, bottom;
+
     @Config
     public static class TopArm {
         public static double P = 0.6, I = 1.2, D = 0.075, stabilityThresh = 25, lowPassGain = 0.65, integralSumMax0IfNotUsed = 0;
@@ -39,11 +40,12 @@ public class CyclerArm {
             return new PIDCoefficientsEx(P, I, D, getIntegralSumMax(), stabilityThresh, lowPassGain);
         }
     }
-    private final PIDServo top, bottom;
 
     public CyclerArm(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.top = new PIDServo(hardwareMap, telemetry, "top", EncoderNames.topArm, TopArm.getCoefficients(), Encoder.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
-        this.bottom = new PIDServo(hardwareMap, telemetry, "bottom", EncoderNames.bottomArm, BottomArm.getCoefficients(), Encoder.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
+        this.top = new PIDServo(hardwareMap, telemetry, "top", EncoderNames.topArm,
+                TopArm.getCoefficients(), Encoder.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
+        this.bottom = new PIDServo(hardwareMap, telemetry, "bottom", EncoderNames.bottomArm,
+                BottomArm.getCoefficients(), Encoder.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
     }
 
     public void debugUpdate() {

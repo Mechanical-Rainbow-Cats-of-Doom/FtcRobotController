@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.core.robot.tools.impl.Cycler;
 
 @TeleOp
 @Config
+@Disabled
 public class LaserDistanceSensorTest extends LinearOpMode{
     public static double requestRate = 50;
     public static DistanceUnit unit = DistanceUnit.CM;

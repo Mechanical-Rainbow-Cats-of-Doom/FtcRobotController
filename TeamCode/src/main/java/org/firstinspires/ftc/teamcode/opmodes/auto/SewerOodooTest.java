@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.core.robot.util.SewerOodoo;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
 
 @Autonomous
+@Disabled
 public class SewerOodooTest extends LinearOpMode {
 
     @Override
