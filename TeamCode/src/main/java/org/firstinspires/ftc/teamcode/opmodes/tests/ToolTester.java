@@ -24,7 +24,7 @@ public class ToolTester extends LinearOpMode {
     public static int armPos = AutoTools.Position.GROUND_TARGET_NODUMP.armPos;
     public static int cyclingPos = 0;
     public static boolean manualServoControl = true;
-    public static double servoPowers;
+    public static double servoPowers = 0D;
     @Override
     public void runOpMode() throws InterruptedException {
         final DcMotor liftMotor = hardwareMap.get(DcMotor.class, "lift");
