@@ -23,7 +23,7 @@ public class ControllerTurret extends AutoTurret {
     public static double ampltiude = 0.5;
     private final LinkedHashMap<ButtonReader, Double> turretButtons;
     private final HashMap<ButtonReader, Boolean> turretButtonVals = new HashMap<>();
-    public final MultipleDistanceSensors sensors;
+   //public final MultipleDistanceSensors sensors;
     private boolean findingPole = false;
     private double poleFindingVelocity = 0;
     private final ButtonReader poleButtonLeft, poleButtonRight;
@@ -35,13 +35,13 @@ public class ControllerTurret extends AutoTurret {
     /**
      * Only run after init, robot crashes otherwise
      */
-    public ControllerTurret(HardwareMap hardwareMap, MultipleDistanceSensors sensors,
+    public ControllerTurret(HardwareMap hardwareMap, //MultipleDistanceSensors sensors,
                             GamepadEx gamepad, GamepadEx nihal, double offset) {
         super(hardwareMap, offset);
         this.gamepad = gamepad;
         this.nihal = nihal;
 
-        this.sensors = sensors;
+        //this.sensors = sensors;
 
         this.turretButtons = new LinkedHashMap<ButtonReader, Double>() {{
             put(new ButtonReader(gamepad, GamepadKeys.Button.DPAD_UP), 0D);
@@ -59,11 +59,12 @@ public class ControllerTurret extends AutoTurret {
         ControllerTools.setPosFromButtonMap(turretButtonVals, turretButtons, doingstuff, (turPos) -> {
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             motor.setPower(1);
-            setPos(turPos, Units.DEGREES);
             findingPole = false;
+            setPos(turPos, Units.DEGREES);
         });
         final double neg = nihal.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
         final double pos = nihal.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+        /*
         poleButtonLeft.readValue();
         poleButtonRight.readValue();
         if (poleButtonLeft.wasJustPressed()) {
@@ -119,6 +120,7 @@ public class ControllerTurret extends AutoTurret {
 
             return;
         }
+ */
 
         if (!doingstuff.value) {
             motor.setPower(Math.max(neg, pos) == neg ? -neg*ampltiude : pos*ampltiude);

@@ -5,7 +5,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.CyclerArm;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
@@ -23,10 +25,15 @@ public class ToolTester extends LinearOpMode {
     public static int liftPos = AutoTools.Position.GROUND_TARGET_NODUMP.liftPos;
     public static int armPos = AutoTools.Position.GROUND_TARGET_NODUMP.armPos;
     public static int cyclingPos = 0;
+    public static double servoPowers;
     @Override
     public void runOpMode() throws InterruptedException {
         final DcMotor liftMotor = hardwareMap.get(DcMotor.class, "lift");
         final DcMotor armMotor = hardwareMap.get(DcMotor.class, "arm");
+        final CRServo top = hardwareMap.get(CRServo.class, "top");
+        top.setDirection(DcMotorSimple.Direction.REVERSE);
+        final CRServo bottom = hardwareMap.get(CRServo.class, "bottom");
+        bottom.setDirection(DcMotorSimple.Direction.REVERSE);
         final CyclerArm cyclerArm = new CyclerArm(hardwareMap, telemetry);
         ZeroMotorEncoder.zero(liftMotor, armMotor);
         final MultipleTelemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), super.telemetry);
@@ -38,6 +45,8 @@ public class ToolTester extends LinearOpMode {
             cyclerArm.setTargetPosition(cyclingPos);
             cyclerArm.debugUpdate();
             turret.setPos(turretPos, unit);
+            top.setPower(servoPowers);
+            bottom.setPower(servoPowers);
             telemetry.addData("turret pos", turret.getPos(unit));
             telemetry.addData("lift pos", liftMotor.getCurrentPosition());
             telemetry.addData("arm pos", armMotor.getCurrentPosition());

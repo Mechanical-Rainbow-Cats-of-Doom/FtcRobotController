@@ -18,7 +18,7 @@ public class CyclerArm {
 
     @Config
     public static class TopArm {
-        public static double P = 0.6, I = 1.2, D = 0.075, stabilityThresh = 25, lowPassGain = 0.65, integralSumMax0IfNotUsed = 0;
+        public static double P = 0, I = 0, D = 0, stabilityThresh = 25, lowPassGain = 0.65, integralSumMax0IfNotUsed = 0;
         public static double getIntegralSumMax() {
             return integralSumMax0IfNotUsed == 0 ? 1/I : integralSumMax0IfNotUsed;
         }
@@ -30,7 +30,7 @@ public class CyclerArm {
     }
     @Config
     public static class BottomArm {
-        public static double P = 0.6, I = 1.2, D = 0.075, stabilityThresh = 25, lowPassGain = 0.65, integralSumMax0IfNotUsed = 0;
+        public static double P = 0, I = 0, D = 0, stabilityThresh = 25, lowPassGain = 0.65, integralSumMax0IfNotUsed = 0;
         public static double getIntegralSumMax() {
             return integralSumMax0IfNotUsed == 0 ? 1/I : integralSumMax0IfNotUsed;
         }
@@ -43,9 +43,9 @@ public class CyclerArm {
 
     public CyclerArm(HardwareMap hardwareMap, Telemetry telemetry) {
         this.top = new PIDServo(hardwareMap, telemetry, "top", EncoderNames.topArm,
-                TopArm.getCoefficients(), Encoder.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
+                TopArm.getCoefficients(), Encoder.Direction.REVERSE, DcMotorSimple.Direction.FORWARD);
         this.bottom = new PIDServo(hardwareMap, telemetry, "bottom", EncoderNames.bottomArm,
-                BottomArm.getCoefficients(), Encoder.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
+                BottomArm.getCoefficients(), Encoder.Direction.REVERSE, DcMotorSimple.Direction.FORWARD);
     }
 
     public void debugUpdate() {
