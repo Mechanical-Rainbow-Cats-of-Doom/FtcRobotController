@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.exception.TargetPositionNotSetException;
@@ -18,8 +20,6 @@ import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.BooleanSupplier;
-
-import androidx.annotation.NonNull;
 
 @Config
 public class AutoTools {
@@ -46,7 +46,7 @@ public class AutoTools {
         GROUND_TARGET(INTAKE.liftPos, 280, Action.DUMP),
         LOW_TARGET(0, 752, Action.DUMP),
         MEDIUM_TARGET(1251, 671, Action.DUMP),
-        MAX(2523, 1000, Action.NOTHING), //armpos max is verified
+        MAX(2050, 1000, Action.NOTHING), //lift max is not verified
         HIGH_TARGET(1875, MAX.armPos, Action.DUMP),
         GROUND_TARGET_NODUMP(GROUND_TARGET.liftPos, GROUND_TARGET.armPos, Action.NOTHING),
         LOW_TARGET_NODUMP(LOW_TARGET.liftPos, LOW_TARGET.armPos, Action.NOTHING),
@@ -54,9 +54,9 @@ public class AutoTools {
         HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING),
         HIGH_ARM(0, MAX.armPos, Action.NOTHING),
         //cone 5
-        HOVER_5(900,0,Action.NOTHING),
-        INTAKE_5(600,0,Action.NOTHING),
-        EXIT_5(1250,0,Action.NOTHING),
+        HOVER_5(900, 0, Action.NOTHING),
+        INTAKE_5(600, 0, Action.NOTHING),
+        EXIT_5(1250, 0, Action.NOTHING),
         //cone 4
         HOVER_4(750,0,Action.NOTHING),
         INTAKE_4(550,0,Action.NOTHING),
