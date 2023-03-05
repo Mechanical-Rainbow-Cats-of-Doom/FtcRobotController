@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 import org.firstinspires.ftc.teamcode.core.robot.util.EncoderNames;
 import org.firstinspires.ftc.teamcode.core.robot.util.PIDServo;
 import org.firstinspires.ftc.teamcode.roadrunner.util.Encoder;
@@ -43,9 +42,9 @@ public class CyclerArm {
 
     public CyclerArm(HardwareMap hardwareMap, Telemetry telemetry) {
         this.top = new PIDServo(hardwareMap, telemetry, "top", EncoderNames.topArm,
-                TopArm.getCoefficients(), Encoder.Direction.REVERSE, DcMotorSimple.Direction.FORWARD);
+                TopArm.getCoefficients(), Encoder.Direction.REVERSE, DcMotorSimple.Direction.REVERSE);
         this.bottom = new PIDServo(hardwareMap, telemetry, "bottom", EncoderNames.bottomArm,
-                BottomArm.getCoefficients(), Encoder.Direction.REVERSE, DcMotorSimple.Direction.FORWARD);
+                BottomArm.getCoefficients(), Encoder.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
     }
 
     public void debugUpdate() {

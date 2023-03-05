@@ -14,8 +14,6 @@ import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 
-import java.util.Timer;
-
 @Config
 @TeleOp
 public class ToolTester extends LinearOpMode {
@@ -25,6 +23,7 @@ public class ToolTester extends LinearOpMode {
     public static int liftPos = AutoTools.Position.GROUND_TARGET_NODUMP.liftPos;
     public static int armPos = AutoTools.Position.GROUND_TARGET_NODUMP.armPos;
     public static int cyclingPos = 0;
+    public static boolean manualServoControl = true;
     public static double servoPowers;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -33,7 +32,7 @@ public class ToolTester extends LinearOpMode {
         final CRServo top = hardwareMap.get(CRServo.class, "top");
         top.setDirection(DcMotorSimple.Direction.REVERSE);
         final CRServo bottom = hardwareMap.get(CRServo.class, "bottom");
-        bottom.setDirection(DcMotorSimple.Direction.REVERSE);
+        bottom.setDirection(DcMotorSimple.Direction.FORWARD);
         final CyclerArm cyclerArm = new CyclerArm(hardwareMap, telemetry);
         ZeroMotorEncoder.zero(liftMotor, armMotor);
         final MultipleTelemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), super.telemetry);
@@ -42,11 +41,14 @@ public class ToolTester extends LinearOpMode {
         while (opModeIsActive()) {
             liftMotor.setTargetPosition(liftPos);
             armMotor.setTargetPosition(armPos);
-            cyclerArm.setTargetPosition(cyclingPos);
-            cyclerArm.debugUpdate();
+            if (manualServoControl) {
+                top.setPower(servoPowers);
+                bottom.setPower(servoPowers);
+            } else {
+                cyclerArm.setTargetPosition(cyclingPos);
+                cyclerArm.debugUpdate();
+            }
             turret.setPos(turretPos, unit);
-            top.setPower(servoPowers);
-            bottom.setPower(servoPowers);
             telemetry.addData("turret pos", turret.getPos(unit));
             telemetry.addData("lift pos", liftMotor.getCurrentPosition());
             telemetry.addData("arm pos", armMotor.getCurrentPosition());
