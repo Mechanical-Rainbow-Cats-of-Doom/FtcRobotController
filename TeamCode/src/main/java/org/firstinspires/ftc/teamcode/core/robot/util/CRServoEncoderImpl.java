@@ -45,13 +45,13 @@ public class CRServoEncoderImpl implements DcMotor {
     @Override
     public String getDeviceName()
     {
-        return AppUtil.getDefContext().getString(R.string.configTypeContinuousRotationServo);
+        return AppUtil.getDefContext().getString(R.string.configTypeMotor);
     }
 
     @Override
     public String getConnectionInfo()
     {
-        return servoController.getConnectionInfo() + "; port " + servoPortNumber;
+        return encoderController.getConnectionInfo() + "; port " + encoderController;
     }
 
     @Override
@@ -267,7 +267,7 @@ public class CRServoEncoderImpl implements DcMotor {
      */
     @Override
     synchronized public int getCurrentPosition() {
-        int position = encoderController.getMotorCurrentPosition(servoPortNumber);
+        int position = encoderController.getMotorCurrentPosition(encoderPortNumber);
         return adjustPosition(position);
     }
 
@@ -279,7 +279,7 @@ public class CRServoEncoderImpl implements DcMotor {
      */
     @Override
     public boolean isBusy() {
-        return encoderController.isBusy(servoPortNumber);
+        return encoderController.isBusy(encoderPortNumber);
     }
 
     protected void internalSetMode(RunMode mode) {

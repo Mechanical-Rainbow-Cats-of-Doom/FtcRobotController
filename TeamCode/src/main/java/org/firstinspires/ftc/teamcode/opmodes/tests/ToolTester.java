@@ -26,7 +26,7 @@ public class ToolTester extends LinearOpMode {
     public static boolean manualServoControl = true;
     public static double servoPowers = 0D;
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         final DcMotor liftMotor = hardwareMap.get(DcMotor.class, "lift");
         final DcMotor armMotor = hardwareMap.get(DcMotor.class, "arm");
         final CRServo top = hardwareMap.get(CRServo.class, "top");
