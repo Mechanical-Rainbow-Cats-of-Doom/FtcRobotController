@@ -29,6 +29,7 @@ public class CyclerArm {
         ));
         this.telemetry = telemetry;
         final Encoder topEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.topArm));
+        topEncoder.setDirection(Encoder.Direction.REVERSE);
         this.encoders = new ArrayDeque<>(Arrays.asList(
                 topEncoder,
                 new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.bottomArm))
@@ -36,8 +37,12 @@ public class CyclerArm {
     }
 
     public void update() {
-        servos.forEach((servo) -> servo.setPower(extended ? 1 : -1));
+        servos.forEach(servo -> servo.setPower(extended ? 1 : -1));
         telemetry.addData("Cycler extended", extended);
+        byte i = 0;
+        for (Encoder encoder : encoders) {
+            telemetry.addData("servo " + ++i, encoder.getCurrentPosition());
+        }
     }
 
     public void setExtended(boolean extended) {
