@@ -44,7 +44,7 @@ public class Cycler {
         this.cycle = cycle;
         this.shouldEnd = shouldEnd; // do not call during constructor
         this.wrapUpThread = new Thread(() -> {
-            cyclerArm.setTargetPosition(0);
+            cyclerArm.setExtended(false);
             try {
                 Thread.sleep(100);
             } catch (InterruptedException ignored) {}
@@ -80,17 +80,17 @@ public class Cycler {
     public static class State  {
         public final int liftPos;
         public final int armPos;
-        public final int cyclingPos;
+        public final boolean cyclingPos; // false not extended true extended
         public final double turretPos;
 
-        public State(int liftPos, int armPos, int cyclingPos, double turretPos) {
+        public State(int liftPos, int armPos, boolean cyclingPos, double turretPos) {
             this.liftPos = liftPos;
             this.armPos = armPos;
             this.cyclingPos = cyclingPos;
             this.turretPos = turretPos;
         }
 
-        public State cloneWithCyclingPosChanged(int cyclingPos) {
+        public State cloneWithCyclingPosChanged(boolean cyclingPos) {
             return new State(liftPos, armPos, cyclingPos, turretPos);
         }
 
@@ -109,8 +109,8 @@ public class Cycler {
 
     public enum Cycles {
         ALLIANCE_LEFT_HIGH(
-                new State(0, 0, 0, 0),
-                new State(0, 0, 0, 0),
+                new State(0, 0, true, 0),
+                new State(0, 0, true, 0),
                 false
         ),
         ALLIANCE_RIGHT_HIGH(
@@ -119,8 +119,8 @@ public class Cycler {
                 false
         ),
         STACK_LEFT_HIGH(
-                new State(0, 0, 0, 0),
-                new State(0, 0, 0, 0),
+                new State(0, 0, true, 0),
+                new State(0, 0, true, 0),
                 true
         ),
         STACK_RIGHT_HIGH(
@@ -130,7 +130,7 @@ public class Cycler {
         ),
         STACK_LEFT_MID(
                 STACK_LEFT_HIGH.intaking,
-                new State(0, 0, 0, 0),
+                new State(0, 0, true, 0),
                 true
         ),
         STACK_RIGHT_MID(
@@ -159,7 +159,7 @@ public class Cycler {
     private void setToState(@NonNull State state) {
         liftMotor.setTargetPosition(state.liftPos);
         armMotor.setTargetPosition(state.armPos);
-        cyclerArm.setTargetPosition(state.cyclingPos);
+        cyclerArm.setExtended(state.cyclingPos);
         turret.setPos(state.turretPos, AutoTurret.Units.DEGREES);
     }
 
@@ -173,10 +173,10 @@ public class Cycler {
         switch (step) {
             case GO_TO_INTAKING:
                 if (!ran) {
-                    setToState(firstrun ? cycle.intaking : cycle.intaking.cloneWithCyclingPosChanged(0));
+                    setToState(firstrun ? cycle.intaking : cycle.intaking.cloneWithCyclingPosChanged(false));
                     ran = true;
                 } else if (!firstrun && !movedin && Math.abs(turret.getPos(AutoTurret.Units.DEGREES) - cycle.intaking.turretPos) <= switchPoint) {
-                    cyclerArm.setTargetPosition(cycle.intaking.cyclingPos);
+                    cyclerArm.setExtended(cycle.intaking.cyclingPos);
                     movedin = true;
                 } else if (ready()) {
                     step = Steps.INTAKING;
@@ -215,10 +215,10 @@ public class Cycler {
                 break;
             case GO_TO_DUMP:
                 if (!ran) {
-                    setToState(cycle.dumping.cloneWithCyclingPosChanged(0));
+                    setToState(cycle.dumping.cloneWithCyclingPosChanged(false));
                     ran = true;
                 } else if (!movedin && Math.abs(turret.getPos(AutoTurret.Units.DEGREES) - cycle.dumping.turretPos) <= switchPoint) {
-                    cyclerArm.setTargetPosition(cycle.dumping.cyclingPos);
+                    cyclerArm.setExtended(cycle.dumping.cyclingPos);
                     movedin = true;
                 } else if (ready()) {
                     step = Steps.DUMP;

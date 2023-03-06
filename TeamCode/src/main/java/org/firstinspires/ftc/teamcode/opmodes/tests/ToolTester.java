@@ -22,7 +22,7 @@ public class ToolTester extends LinearOpMode {
     public static AutoTools.Position position = AutoTools.Position.GROUND_TARGET_NODUMP;
     public static int liftPos = AutoTools.Position.GROUND_TARGET_NODUMP.liftPos;
     public static int armPos = AutoTools.Position.GROUND_TARGET_NODUMP.armPos;
-    public static int cyclingPos = 0;
+    public static boolean extended = false;
     public static boolean manualServoControl = true;
     public static double servoPowers = 0D;
     @Override
@@ -45,8 +45,8 @@ public class ToolTester extends LinearOpMode {
                 top.setPower(servoPowers);
                 bottom.setPower(servoPowers);
             } else {
-                cyclerArm.setTargetPosition(cyclingPos);
-                cyclerArm.debugUpdate();
+                cyclerArm.setExtended(extended);
+                cyclerArm.update();
             }
             turret.setPos(turretPos, unit);
             telemetry.addData("turret pos", turret.getPos(unit));

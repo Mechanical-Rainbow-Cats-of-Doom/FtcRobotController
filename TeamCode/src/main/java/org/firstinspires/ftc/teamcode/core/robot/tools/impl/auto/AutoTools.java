@@ -249,7 +249,7 @@ public class AutoTools {
             telemetry.addData("cones cycled", cycler.getConesDumped());
             cycler.update();
         }
-        cyclerArm.debugUpdate();
+        cyclerArm.update();
     }
 
     public boolean isDoingStuff() {
