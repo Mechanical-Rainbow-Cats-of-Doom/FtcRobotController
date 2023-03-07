@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.core.robot.tools.BetterDistanceSensor;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.CyclerArm;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
@@ -23,7 +25,7 @@ public class ToolTester extends LinearOpMode {
     public static int liftPos = AutoTools.Position.GROUND_TARGET_NODUMP.liftPos;
     public static int armPos = AutoTools.Position.GROUND_TARGET_NODUMP.armPos;
     public static boolean extended = false;
-    public static boolean manualServoControl = true;
+    public static boolean manualServoControl = false;
     public static double servoPowers = 0D;
     @Override
     public void runOpMode() {
@@ -32,11 +34,13 @@ public class ToolTester extends LinearOpMode {
         final CRServo top = hardwareMap.get(CRServo.class, "top");
         top.setDirection(DcMotorSimple.Direction.REVERSE);
         final CRServo bottom = hardwareMap.get(CRServo.class, "bottom");
+        final BetterDistanceSensor distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         bottom.setDirection(DcMotorSimple.Direction.FORWARD);
         final CyclerArm cyclerArm = new CyclerArm(hardwareMap, telemetry);
         ZeroMotorEncoder.zero(liftMotor, armMotor);
         final MultipleTelemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), super.telemetry);
         final AutoTurret turret = new AutoTurret(hardwareMap, 0);
+        final CRServo servo = hardwareMap.get(CRServo.class, "intake");
         waitForStart();
         while (opModeIsActive()) {
             liftMotor.setTargetPosition(liftPos);
@@ -52,6 +56,7 @@ public class ToolTester extends LinearOpMode {
             telemetry.addData("turret pos", turret.getPos(unit));
             telemetry.addData("lift pos", liftMotor.getCurrentPosition());
             telemetry.addData("arm pos", armMotor.getCurrentPosition());
+            telemetry.addData("distance sensor", distanceSensor.request());
             telemetry.update();
         }
         liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

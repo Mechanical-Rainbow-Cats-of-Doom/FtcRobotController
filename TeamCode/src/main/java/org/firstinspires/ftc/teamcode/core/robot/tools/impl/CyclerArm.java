@@ -23,12 +23,16 @@ public class CyclerArm {
     public CyclerArm(@NotNull HardwareMap hardwareMap, Telemetry telemetry) {
         final CRServo bottomServo = hardwareMap.get(CRServo.class, "bottom");
         bottomServo.setDirection(DcMotorSimple.Direction.REVERSE);
+        final CRServo topServo = hardwareMap.get(CRServo.class, "top");
+        topServo.setDirection(DcMotorSimple.Direction.FORWARD);
         this.servos = new ArrayDeque<>(Arrays.asList(
-                hardwareMap.get(CRServo.class, "top"),
+                topServo,
                 bottomServo
         ));
         this.telemetry = telemetry;
         final Encoder topEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.topArm));
+        final Encoder bottomEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.bottomArm));
+        bottomEncoder.setDirection(Encoder.Direction.FORWARD);
         topEncoder.setDirection(Encoder.Direction.REVERSE);
         this.encoders = new ArrayDeque<>(Arrays.asList(
                 topEncoder,
@@ -38,10 +42,14 @@ public class CyclerArm {
 
     public void update() {
         servos.forEach(servo -> servo.setPower(extended ? 1 : -1));
+        byte a = 0;
+        for (CRServo servo : servos) {
+            telemetry.addData("servo power " + ++a, servo.getPower());
+        }
         telemetry.addData("Cycler extended", extended);
-        byte i = 0;
+        byte i = 0; // byte to annoy fin
         for (Encoder encoder : encoders) {
-            telemetry.addData("servo " + ++i, encoder.getCurrentPosition());
+            telemetry.addData("servo " + ++i, encoder.getCurrentPosition()); // prefix increment also to annoy fin
         }
     }
 
@@ -56,7 +64,7 @@ public class CyclerArm {
     public boolean isBusy() {
         for (Encoder encoder : encoders) {
             final int curVal = encoder.getCurrentPosition();
-            if (curVal < bottomFinishedBound || curVal > topFinishedBound) return false;
+            if (curVal <= bottomFinishedBound || curVal >= topFinishedBound) return false;
         }
         return true;
     }
