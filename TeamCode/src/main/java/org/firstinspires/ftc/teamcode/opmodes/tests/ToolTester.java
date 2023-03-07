@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.core.robot.util.ZeroMotorEncoder;
 @TeleOp
 public class ToolTester extends LinearOpMode {
     public static double turretPos = 0;
+    public static double armPower = 0.5;
     public static AutoTurret.Units unit = AutoTurret.Units.DEGREES;
     public static AutoTools.Position position = AutoTools.Position.GROUND_TARGET_NODUMP;
     public static int liftPos = AutoTools.Position.GROUND_TARGET_NODUMP.liftPos;
@@ -29,6 +30,7 @@ public class ToolTester extends LinearOpMode {
     public static double servoPowers = 0D;
     @Override
     public void runOpMode() {
+        final MultipleTelemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), super.telemetry);
         final DcMotor liftMotor = hardwareMap.get(DcMotor.class, "lift");
         final DcMotor armMotor = hardwareMap.get(DcMotor.class, "arm");
         final CRServo top = hardwareMap.get(CRServo.class, "top");
@@ -36,13 +38,13 @@ public class ToolTester extends LinearOpMode {
         final CRServo bottom = hardwareMap.get(CRServo.class, "bottom");
         final BetterDistanceSensor distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         bottom.setDirection(DcMotorSimple.Direction.FORWARD);
-        final CyclerArm cyclerArm = new CyclerArm(hardwareMap, telemetry);
+        final CyclerArm cyclerArm = new CyclerArm(hardwareMap, telemetry, this);
         ZeroMotorEncoder.zero(liftMotor, armMotor);
-        final MultipleTelemetry telemetry = new MultipleTelemetry(FtcDashboard.getInstance().getTelemetry(), super.telemetry);
         final AutoTurret turret = new AutoTurret(hardwareMap, 0);
         final CRServo servo = hardwareMap.get(CRServo.class, "intake");
         waitForStart();
         while (opModeIsActive()) {
+            armMotor.setPower(armPower);
             liftMotor.setTargetPosition(liftPos);
             armMotor.setTargetPosition(armPos);
             if (manualServoControl) {

@@ -104,4 +104,8 @@ public class AutoTurret {
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motor.setPower(0);
     }
+
+    public void setPower(double power) {
+        motor.setPower(power);
+    }
 }

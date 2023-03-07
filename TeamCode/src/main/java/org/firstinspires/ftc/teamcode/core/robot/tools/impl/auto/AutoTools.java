@@ -106,7 +106,7 @@ public class AutoTools {
         this.distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
-        this.cyclerArm = new CyclerArm(hardwareMap, telemetry);
+        this.cyclerArm = new CyclerArm(hardwareMap, telemetry, opMode);
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
         this.timer = timer;
@@ -126,13 +126,13 @@ public class AutoTools {
     }
 
     public boolean setCycler(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
-        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
-        return isCycling();
+        if (!isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
+        return !isCycling();
     }
 
     public boolean setCycler(Cycler.Cycles cycle, BooleanSupplier shouldEnd, boolean startWithDump) {
-        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
-        return isCycling();
+        if (!isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
+        return !isCycling();
     }
 
     public void startCycling(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
@@ -154,8 +154,8 @@ public class AutoTools {
     
     @SuppressWarnings("UnusedReturnValue")
     public boolean endCyclingEarly(boolean safe) {
-        if (isCycling()) cycler.endEarly(safe);
-        return isCycling();
+        if (!isCycling()) cycler.endEarly(safe);
+        return !isCycling();
     }
     
     public boolean isCycling() {
@@ -184,6 +184,7 @@ public class AutoTools {
             }
         }
         if (!cycling) {
+            cyclerArm.setExtended(false);
             if (lastPosition != position) {
                 this.stage = 0;
                 this.lastPosition = position;
