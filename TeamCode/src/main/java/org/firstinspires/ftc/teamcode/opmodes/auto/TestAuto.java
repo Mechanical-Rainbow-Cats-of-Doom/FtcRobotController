@@ -28,58 +28,57 @@ public class TestAuto extends AutoOpMode {
 
         setStartingPos(-35, 65, 180);
 
-//        goForward(20,0.2);
         tools.setPosition(AutoTools.Position.HIGH_ARM);
         turret.setPos(-34, AutoTurret.Units.DEGREES);
         goLeft(3);
         goBackward(54);
         tools.setPosition(AutoTools.Position.HIGH_TARGET_LOWER);
         tools.setIntake(1);
-        Thread.sleep(1000);
-        goRight(11);
-        Thread.sleep(500);
+        wait(1000);
+        goRight(11, 0.5);
+        wait(500);
         turret.setPos(-35, AutoTurret.Units.DEGREES);
         tools.setIntake(-1);
-        Thread.sleep(500);
+        wait(500);
         turret.setPos(54, AutoTurret.Units.DEGREES);
-        Thread.sleep(100);
+        wait(100);
         tools.setPosition(AutoTools.Position.HOVER_5);
-        Thread.sleep(100);
-        goForward(5); //slow this down
-        Thread.sleep(1000);
+        wait(100);
+        goForward(5, 0.5); //slow this down
+        wait(1000);
         goLeft(35.5);
         goBackward(1.25);
         tools.setIntake(1);
         tools.setPosition(AutoTools.Position.INTAKE_5);
-        Thread.sleep(1000);
+        wait(1000);
         tools.setPosition(AutoTools.Position.EXIT_5);
-        Thread.sleep(1000);
+        wait(1000);
         goRight(20);
         turret.setPos(-34, AutoTurret.Units.DEGREES);
         tools.setPosition(AutoTools.Position.HIGH_TARGET_LOWER);
-        goRight(14.5);
-        goBackward(3.75);
-        Thread.sleep(500);
+        goRight(14.5, 0.5);
+        goBackward(3.75, 0.5);
+        wait(500);
         turret.setPos(-35, AutoTurret.Units.DEGREES);
         tools.setIntake(-1);
-        Thread.sleep(500);
+        wait(500);
         turret.setPos(54, AutoTurret.Units.DEGREES);
-        Thread.sleep(100);
+        wait(100);
         tools.setPosition(AutoTools.Position.HOVER_4);
-        Thread.sleep(100);
-        goForward(5);
-        Thread.sleep(1000);
+        wait(100);
+        goForward(5, 0.5);
+        wait(1000);
         goLeft(35.5);
         goBackward(1.25);
         tools.setIntake(1);
         tools.setPosition(AutoTools.Position.INTAKE_4);
-        Thread.sleep(1000);
+        wait(1000);
         tools.setPosition(AutoTools.Position.EXIT_4);
-        Thread.sleep(1000);
+        wait(1000);
         goRight(20);
 
         tools.setPosition(AutoTools.Position.HIGH_ARM);
-        Thread.sleep(1000);
+        wait(1000);
 
 
 
