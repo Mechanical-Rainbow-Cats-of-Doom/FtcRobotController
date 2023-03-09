@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import java.util.Timer;
 
 @Autonomous
-@Disabled
+
 public class TestAuto extends AutoOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
@@ -28,16 +28,60 @@ public class TestAuto extends AutoOpMode {
 
         setStartingPos(-35, 65, 180);
 
-        tools.setPosition(AutoTools.Position.NEUTRAL);
+        tools.setPosition(AutoTools.Position.HIGH_ARM);
+        turret.setPos(-34, AutoTurret.Units.DEGREES);
         goLeft(3);
-        goBackward(50);
-        goRight(10);
-        for(int i = 0; i < 4; i++){
-            goLeft(30);
-            goRight(30);
-        }
+        goBackward(54);
+        tools.setPosition(AutoTools.Position.HIGH_TARGET_LOWER);
+        tools.setIntake(1);
+        wait(1000);
+        goRight(11, 0.5);
+        wait(500);
+        turret.setPos(-35, AutoTurret.Units.DEGREES);
+        tools.setIntake(-1);
+        wait(500);
+        turret.setPos(54, AutoTurret.Units.DEGREES);
+        wait(100);
+        tools.setPosition(AutoTools.Position.HOVER_5);
+        wait(100);
+        goForward(5, 0.5); //slow this down
+        wait(1000);
+        goLeft(35.5);
+        goBackward(1.25);
+        tools.setIntake(1);
+        tools.setPosition(AutoTools.Position.INTAKE_5);
+        wait(1000);
+        tools.setPosition(AutoTools.Position.EXIT_5);
+        wait(1000);
+        goRight(20);
+        turret.setPos(-34, AutoTurret.Units.DEGREES);
+        tools.setPosition(AutoTools.Position.HIGH_TARGET_LOWER);
+        goRight(14.5, 0.5);
+        goBackward(3.75, 0.5);
+        wait(500);
+        turret.setPos(-35, AutoTurret.Units.DEGREES);
+        tools.setIntake(-1);
+        wait(500);
+        turret.setPos(54, AutoTurret.Units.DEGREES);
+        wait(100);
+        tools.setPosition(AutoTools.Position.HOVER_4);
+        wait(100);
+        goForward(5, 0.5);
+        wait(1000);
+        goLeft(35.5);
+        goBackward(1.25);
+        tools.setIntake(1);
+        tools.setPosition(AutoTools.Position.INTAKE_4);
+        wait(1000);
+        tools.setPosition(AutoTools.Position.EXIT_4);
+        wait(1000);
+        goRight(20);
+
+        tools.setPosition(AutoTools.Position.HIGH_ARM);
+        wait(1000);
 
 
 
+        tools.cleanup();
     }
 }

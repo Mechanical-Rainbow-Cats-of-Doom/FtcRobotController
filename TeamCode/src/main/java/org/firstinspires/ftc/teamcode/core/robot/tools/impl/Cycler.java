@@ -15,7 +15,8 @@ import androidx.annotation.NonNull;
 @Config
 public class Cycler {
     public static double isObjectDistance = 0;
-    public static double dumpWaitTimeMs = 250, intakeWaitTimeMs = 75;
+    public static double dumpWaitTimeMs = 250, intakeWaitTimeMs = 150;
+    public static double power = 0.5;
     private final double switchPoint;
     private final ElapsedTime timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
     private final BetterDistanceSensor distanceSensor;
@@ -29,7 +30,7 @@ public class Cycler {
     private final Runnable unsafeStop;
 
     private Steps step;
-    private boolean ran = false, detected = false, movedin = false, firstrun = true, shouldEndVal = false;
+    private boolean ran = false, movedin = false, firstrun = true, shouldEndVal = false, waitingForTurret = false, setArmMotorBackUp = false;
     private int conesDumped = 0;
 
     public Cycler(@NonNull BetterDistanceSensor distanceSensor, DcMotor liftMotor, DcMotor armMotor,
@@ -64,6 +65,9 @@ public class Cycler {
         switchPoint = Math.abs(cycle.intaking.turretPos - cycle.dumping.turretPos) / 2;
         distanceSensor.start();
         distanceSensor.request(); //idk why this is there but kooky has it
+        liftMotor.setPower(power);
+        armMotor.setPower(power);
+        turret.setPower(power);
     }
 
     /**
@@ -109,8 +113,8 @@ public class Cycler {
 
     public enum Cycles {
         ALLIANCE_LEFT_HIGH(
-                new State(0, 0, true, 0),
-                new State(0, 0, true, 0),
+                new State(0, 600, true, -25),
+                new State(1100, 1100, true, -143),
                 false
         ),
         ALLIANCE_RIGHT_HIGH(
@@ -153,7 +157,7 @@ public class Cycler {
     }
 
     private boolean ready() {
-        return !(liftMotor.isBusy() || armMotor.isBusy() || cyclerArm.isBusy() || turret.isMoving());
+        return !(liftMotor.isBusy() || armMotor.isBusy() || turret.isMoving());
     }
 
     private void setToState(@NonNull State state) {
@@ -189,26 +193,21 @@ public class Cycler {
                 if (!ran) {
                     setIntake.accept(AutoTools.Action.INTAKE);
                     if (!cycle.stack) {
-                        armMotor.setTargetPosition(Math.max(cycle.intaking.armPos - 100, 0));
+                        armMotor.setTargetPosition(Math.max(cycle.intaking.armPos - 200, 0));
                     } else {
-                        liftMotor.setPower(0.6);
+                        liftMotor.setPower(liftMotor.getPower() * 0.6);
                         liftMotor.setTargetPosition(Math.max(cycle.intaking.liftPos - 100 * (conesDumped + 1), 0));
                     }
                     ran = true;
-                } else if (!detected) {
-                    if (distanceSensor.request() < isObjectDistance) {
-                        detected = true;
-                        timer.reset();
-                    }
+                    timer.reset();
                 } else if (timer.time() > intakeWaitTimeMs && (!movedin || ready())) {
                     if (cycle.stack && !movedin) {
                         liftMotor.setTargetPosition(cycle.intaking.liftPos + 200);
-                        liftMotor.setPower(1);
+                        liftMotor.setPower(liftMotor.getPower() / 0.6);
                         movedin = true;
                         break;
-                    }
+                    } else if (!cycle.stack && !ready()) break;
                     ran = false;
-                    detected = false;
                     movedin = false;
                     step = Steps.GO_TO_DUMP;
                 }
@@ -227,20 +226,30 @@ public class Cycler {
                 }
                 break;
             case DUMP:
-                if (!ran) {
+                if (waitingForTurret && timer.time() > 50) {
+                    step = Steps.GO_TO_INTAKING;
+                    waitingForTurret = false;
+                    break;
+                } else if (!ran) {
                     armMotor.setTargetPosition(cycle.dumping.armPos - 100);
                     setIntake.accept(AutoTools.Action.DUMP);
                     ran = true;
                     timer.reset();
-                } else if (timer.time() > dumpWaitTimeMs / 1.5) {
+                } else if (!setArmMotorBackUp && timer.time() > dumpWaitTimeMs / 1.5) {
                     armMotor.setTargetPosition(cycle.dumping.armPos);
+                    setArmMotorBackUp = true;
                 } else if (timer.time() > dumpWaitTimeMs) {
                     ++conesDumped;
                     ran = false;
                     if (shouldEndVal) {
                         wrapUpThread.start();
                         step = Steps.DONE;
-                    } else step = Steps.INTAKING;
+                        setArmMotorBackUp = false;
+                    } else {
+                        turret.setPos(cycle.intaking.turretPos, AutoTurret.Units.DEGREES);
+                        timer.reset();
+                        waitingForTurret = true;
+                    }
                 }
                 break;
         }

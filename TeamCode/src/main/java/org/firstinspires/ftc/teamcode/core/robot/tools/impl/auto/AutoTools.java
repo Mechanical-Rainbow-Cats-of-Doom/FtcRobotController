@@ -39,48 +39,51 @@ public class AutoTools {
 
     //armpos on dump is above
     public enum Position {
-        NEUTRAL(0, 80, Action.NOTHING),
-        OFF(0, 0, Action.NOTHING),
-        INTAKE(0, 25, Action.INTAKE),
-        INTAKE_NO_INTAKE(INTAKE.liftPos, INTAKE.armPos, Action.NOTHING),
-        GROUND_TARGET(INTAKE.liftPos, 280, Action.DUMP),
-        LOW_TARGET(0, 752, Action.DUMP),
-        MEDIUM_TARGET(1251, 671, Action.DUMP),
-        MAX(2050, 1000, Action.NOTHING), //lift max is not verified
-        HIGH_TARGET(1875, MAX.armPos, Action.DUMP),
-        GROUND_TARGET_NODUMP(GROUND_TARGET.liftPos, GROUND_TARGET.armPos, Action.NOTHING),
-        LOW_TARGET_NODUMP(LOW_TARGET.liftPos, LOW_TARGET.armPos, Action.NOTHING),
-        MEDIUM_TARGET_NODUMP(MEDIUM_TARGET.liftPos, MEDIUM_TARGET.armPos, Action.NOTHING),
-        HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING),
-        HIGH_ARM(0, MAX.armPos, Action.NOTHING),
+        NEUTRAL(0, 80, Action.NOTHING, false),
+        OFF(0, 0, Action.NOTHING, false),
+        INTAKE(0, 25, Action.INTAKE, false),
+        INTAKE_NO_INTAKE(INTAKE.liftPos, INTAKE.armPos, Action.NOTHING, false),
+        GROUND_TARGET(INTAKE.liftPos, 280, Action.DUMP, false),
+        LOW_TARGET(0, 752, Action.DUMP, false),
+        MEDIUM_TARGET(1251, 671, Action.DUMP, false),
+        MAX(9000, 1200, Action.NOTHING, false), //lift max is not verified
+        HIGH_TARGET(1875, MAX.armPos, Action.DUMP, false),
+        GROUND_TARGET_NODUMP(GROUND_TARGET.liftPos, GROUND_TARGET.armPos, Action.NOTHING, false),
+        LOW_TARGET_NODUMP(LOW_TARGET.liftPos, LOW_TARGET.armPos, Action.NOTHING, false),
+        MEDIUM_TARGET_NODUMP(MEDIUM_TARGET.liftPos, MEDIUM_TARGET.armPos, Action.NOTHING, false),
+        HIGH_TARGET_LOWER(1200,1000,Action.NOTHING, false),
+        HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING, false),
+        HIGH_ARM(0, MAX.armPos, Action.NOTHING, true),
         //cone 5
-        HOVER_5(900, 0, Action.NOTHING),
-        INTAKE_5(600, 0, Action.NOTHING),
-        EXIT_5(1250, 0, Action.NOTHING),
+        HOVER_5(600, 0, Action.NOTHING, true),
+        INTAKE_5(300, 0, Action.NOTHING, false),
+        EXIT_5(950, 0, Action.NOTHING, false),
         //cone 4
-        HOVER_4(750,0,Action.NOTHING),
-        INTAKE_4(550,0,Action.NOTHING),
-        EXIT_4(1050,0,Action.NOTHING),
+        HOVER_4(450,0,Action.NOTHING, true),
+        INTAKE_4(250,0,Action.NOTHING, false),
+        EXIT_4(750,0,Action.NOTHING, false),
         //cone 3
-        HOVER_3(570,0,Action.NOTHING),
-        INTAKE_3(370,0,Action.NOTHING),
-        EXIT_3(900,0,Action.NOTHING),
+        HOVER_3(570,0,Action.NOTHING, true),
+        INTAKE_3(370,0,Action.NOTHING, false),
+        EXIT_3(900,0,Action.NOTHING, false),
         //cone 2
-        HOVER_2(360,0,Action.NOTHING),
-        INTAKE_2(160,0,Action.NOTHING),
-        EXIT_2(700,0,Action.NOTHING),
+        HOVER_2(360,0,Action.NOTHING, true),
+        INTAKE_2(160,0,Action.NOTHING, false),
+        EXIT_2(700,0,Action.NOTHING, false),
         //cone 1
-        HOVER_1(200,0,Action.NOTHING),
-        INTAKE_1(0,0,Action.NOTHING),
-        EXIT_1(500,0,Action.NOTHING);
+        HOVER_1(200,0,Action.NOTHING, true),
+        INTAKE_1(0,0,Action.NOTHING, false),
+        EXIT_1(500,0,Action.NOTHING, false);
 
         public final int liftPos;
         public final int armPos;
         final Action action;
-        Position(int liftPos, int armPos, Action action) {
+        public final boolean hover;
+        Position(int liftPos, int armPos, Action action, boolean hover) {
             this.liftPos = liftPos;
             this.armPos = armPos;
             this.action = action;
+            this.hover = hover;
         }
     }
 
@@ -106,7 +109,7 @@ public class AutoTools {
         this.distanceSensor = new BetterDistanceSensor(hardwareMap, "distanceSensor", 50, DistanceUnit.CM);
         this.liftMotor = hardwareMap.get(DcMotor.class, "lift");
         this.armMotor = hardwareMap.get(DcMotor.class, "arm");
-        this.cyclerArm = new CyclerArm(hardwareMap, telemetry);
+        this.cyclerArm = new CyclerArm(hardwareMap, telemetry, opMode);
         this.intake = hardwareMap.get(CRServo.class, "intake");
         this.turret = turret;
         this.timer = timer;
@@ -126,13 +129,13 @@ public class AutoTools {
     }
 
     public boolean setCycler(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
-        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
-        return isCycling();
+        if (!isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, howManyCones, startWithDump);
+        return !isCycling();
     }
 
     public boolean setCycler(Cycler.Cycles cycle, BooleanSupplier shouldEnd, boolean startWithDump) {
-        if (isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
-        return isCycling();
+        if (!isCycling()) cycler = new Cycler(distanceSensor, liftMotor, armMotor, cyclerArm, turret, this::setIntake, cycle, this::stopCycling, shouldEnd, startWithDump);
+        return !isCycling();
     }
 
     public void startCycling(Cycler.Cycles cycle, int howManyCones, boolean startWithDump) {
@@ -154,8 +157,8 @@ public class AutoTools {
     
     @SuppressWarnings("UnusedReturnValue")
     public boolean endCyclingEarly(boolean safe) {
-        if (isCycling()) cycler.endEarly(safe);
-        return isCycling();
+        if (!isCycling()) cycler.endEarly(safe);
+        return !isCycling();
     }
     
     public boolean isCycling() {
@@ -184,6 +187,7 @@ public class AutoTools {
             }
         }
         if (!cycling) {
+            cyclerArm.setExtended(false);
             if (lastPosition != position) {
                 this.stage = 0;
                 this.lastPosition = position;
@@ -196,7 +200,7 @@ public class AutoTools {
                         doingstuff.value = true;
                         liftMotor.setTargetPosition(position.liftPos);
                         armMotor.setTargetPosition(position.armPos);
-                        liftMotor.setPower(1);
+                        liftMotor.setPower(position.hover ? 1 : 1); // 1st number will be slower when moving to hover
                         armMotor.setPower(1);
                         if (position.action == Action.INTAKE) intake.setPower(-1);
                     }
@@ -249,7 +253,7 @@ public class AutoTools {
             telemetry.addData("cones cycled", cycler.getConesDumped());
             cycler.update();
         }
-        cyclerArm.update();
+//        cyclerArm.update();
     }
 
     public boolean isDoingStuff() {

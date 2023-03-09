@@ -30,6 +30,7 @@ public class CycleTester extends LinearOpMode {
                 tools.startCycling(cycleType, howManyCones, false);
                 howManyCones = 0;
             }
+            tools.update();
             telemetry.update();
         }
         tools.cleanup();
