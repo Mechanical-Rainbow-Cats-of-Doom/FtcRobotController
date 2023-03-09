@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes.tests;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.core.robot.distance.SEN0304DistanceSensor;
+import org.firstinspires.ftc.teamcode.distance.SEN0304DistanceSensor;
 
 @TeleOp
 public class UltrasonicDistanceSensorTest extends LinearOpMode{

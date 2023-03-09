@@ -47,10 +47,12 @@ public class FunnyControllerMovement extends ControllerMovement {
     @Contract(" -> new")
     private Vector2d calcAvg() {
         double ytotal = 0, xtotal = 0;
-        for (Vector2d vector : vals) {
-            ytotal += vector.getY();
-            xtotal += vector.getX();
-        }
+        CircularlyLinkedList.Node<Vector2d> node = vals.getHead();
+        do {
+            ytotal += node.getVal().getY();
+            xtotal += node.getVal().getX();
+            node = node.getNextNode();
+        } while (node != vals.getHead());
         return new Vector2d(xtotal / vals.size(), ytotal / vals.size());
     }
 

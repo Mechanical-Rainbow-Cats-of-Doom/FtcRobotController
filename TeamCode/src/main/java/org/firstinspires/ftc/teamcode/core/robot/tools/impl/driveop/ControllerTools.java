@@ -171,7 +171,6 @@ public class ControllerTools extends AutoTools {
         toolCapHeight.readValue();
         runBoundedTool(liftMotor, wasOn[0], toolCapHeight.getState() ? Position.MAX.liftPos : Integer.MAX_VALUE, left, false, liftZeroPower);
         runBoundedTool(armMotor, wasOn[1], toolCapHeight.getState() ? Position.MAX.armPos : Integer.MAX_VALUE, -right, false, armZeroPower);
-        if (cyclerArm.isBusy()) cyclerArm.update();
     }
 
 
@@ -180,12 +179,8 @@ public class ControllerTools extends AutoTools {
 
         if (((power < 0) && (motorPos > minBound + 4)) || ((power > 0) && (motorPos < maxBound - 4))) {
             motor.setPower(power);
-            previouslyOn.value = true;
         } else {
-            if(previouslyOn.value) {
-                motor.setPower(zeroPower);
-                previouslyOn.value = false;
-            }
+            motor.setPower(zeroPower);
         }
     }
 
