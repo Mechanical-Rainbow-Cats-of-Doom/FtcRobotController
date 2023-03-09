@@ -200,7 +200,7 @@ public class AutoTools {
                         doingstuff.value = true;
                         liftMotor.setTargetPosition(position.liftPos);
                         armMotor.setTargetPosition(position.armPos);
-                        liftMotor.setPower(position.hover ? 1 : 1); // 1st number will be slower when moving to hover
+                        liftMotor.setPower(position.hover ? 0.5 : 1); // 1st number will be slower when moving to hover
                         armMotor.setPower(1);
                         if (position.action == Action.INTAKE) intake.setPower(-1);
                     }
