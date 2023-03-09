@@ -40,8 +40,6 @@ public class NormalDrive extends LinearOpMode {
         final GamepadEx moveGamepad = new GamepadEx(gamepad1);
         final GamepadEx toolGamepad = new GamepadEx(gamepad2);
         final ButtonReader xButton = new ButtonReader(moveGamepad, GamepadKeys.Button.X);
-        final Encoder leftEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.leftEncoder));
-        int LEReset = leftEncoder.getCurrentPosition();
         final Encoder rightEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.rightEncoder));
         int REReset = rightEncoder.getCurrentPosition();
         final Encoder frontEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, EncoderNames.frontEncoder));
@@ -53,7 +51,6 @@ public class NormalDrive extends LinearOpMode {
         while (opModeIsActive()) {
             drive.update();
             tools.update();
-            telemetry.addData("left encoder: ", leftEncoder.getCurrentPosition()-LEReset);
             telemetry.addData("right encoder: ", rightEncoder.getCurrentPosition()-REReset);
             telemetry.addData("front encoder: ", frontEncoder.getCurrentPosition()-FEReset);
             telemetry.addData("Turret Rotation", tools.getTurretPos(AutoTurret.Units.DEGREES));

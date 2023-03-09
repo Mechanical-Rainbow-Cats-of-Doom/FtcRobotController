@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.core.robot.distance;
+package org.firstinspires.ftc.teamcode.distance;
 
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynch;

@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.core.robot.distance;
+package org.firstinspires.ftc.teamcode.distance;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import java.util.Arrays;
