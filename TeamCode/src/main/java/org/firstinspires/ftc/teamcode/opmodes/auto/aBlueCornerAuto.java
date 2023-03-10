@@ -4,13 +4,10 @@ import static org.firstinspires.ftc.teamcode.roadrunner.util.MirroringUtil.cMirr
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.arcrobotics.ftclib.gamepad.ButtonReader;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -23,13 +20,12 @@ import org.firstinspires.ftc.teamcode.core.robot.vision.powerplay.ConePipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 @Autonomous
-public class AutoFin extends LinearOpMode {
+public class aBlueCornerAuto extends LinearOpMode {
     protected boolean mirror = false;
     private final ElapsedTime timer = new ElapsedTime();
 
@@ -42,28 +38,31 @@ public class AutoFin extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
 
-        final Pose2d middlePosition = cMirrorY(new Pose2d(-35, 10, startingHeading), mirror);
+        final Pose2d middlePosition = cMirrorY(new Pose2d(-35, 9.4, startingHeading), mirror);
 
         TrajectorySequence start = drive.trajectorySequenceBuilder(startPose)
                 .strafeTo(cMirrorY(new Vector2d(-35, 63), mirror))
                 .lineToLinearHeading(middlePosition)
                 .build();
 
-        final Pose2d dropPosition = cMirrorY(new Pose2d(-22, 10, startingHeading), mirror);
+        final Pose2d dropPosition = cMirrorY(new Pose2d(-23.3, 10, startingHeading), mirror);
 
         TrajectorySequence middleToHigh = drive.trajectorySequenceBuilder(middlePosition)
+                .setConstraints((v, pose2d, pose2d1, pose2d2) -> DriveConstants.MAX_VEL * 0.8, (v, pose2d, pose2d1, pose2d2) -> (DriveConstants.MAX_ACCEL*0.9))
                 .lineToLinearHeading(dropPosition)
+                .resetConstraints()
                 .build();
 
-        final Pose2d intakePosition = cMirrorY(new Pose2d(-60, 12, startingHeading), mirror);
+        final Pose2d intakePosition = cMirrorY(new Pose2d(-59.8, 12, startingHeading), mirror);
 
         TrajectorySequence intake = drive.trajectorySequenceBuilder(dropPosition)
                 .strafeTo(cMirrorY(new Vector2d(-22,13), mirror))
-                .strafeTo(cMirrorY(new Vector2d(-57, 13), mirror))
+                .strafeTo(cMirrorY(new Vector2d(-59.5, 13), mirror))
                 .lineToLinearHeading(intakePosition)
                 .build();
 
         TrajectorySequence intakeToMiddle = drive.trajectorySequenceBuilder(cMirrorY(new Pose2d(-57, 12, startingHeading), mirror))
+                .strafeTo(cMirrorY(new Vector2d(middlePosition.getX(), 12), mirror))
                 .lineToLinearHeading(middlePosition)
                 .build();
 
@@ -122,25 +121,28 @@ public class AutoFin extends LinearOpMode {
         
         drive.followTrajectorySequence(start);
 
+        tools.setIntake(1);
         tools.setPosition(AutoTools.Position.HIGH_TARGET_LOWER);
         wait(drive, 1000, middlePosition);
         drive.followTrajectorySequence(middleToHigh);
         // drop 1
+        wait(drive, 200, dropPosition);
         tools.setIntake(-1);
         wait(drive, 500, dropPosition);
         turret.setPos(54, AutoTurret.Units.DEGREES);
         wait(drive, 200, dropPosition);
         tools.setPosition(AutoTools.Position.HOVER_5);
+        tools.setIntake(1);
         wait(drive, 100, dropPosition);
 
         drive.followTrajectorySequence(intake);
 
-        tools.setIntake(1);
-        wait(drive, 100);
+
+        wait(100);
         tools.setPosition(AutoTools.Position.INTAKE_5);
-        wait(drive, 1000);
+        wait(1500);
         tools.setPosition(AutoTools.Position.EXIT_5);
-        wait(drive, 1000);
+        wait(1000);
 
         drive.followTrajectorySequence(intakeToMiddle);
 
@@ -189,10 +191,11 @@ public class AutoFin extends LinearOpMode {
                 throw new RuntimeException("shut java its initialized");
         }
 
-        while (!isStopRequested()) {
-            StayInPosition.stayInPose(drive, finalPosition);
-        }
-
+//        while (!isStopRequested()) {
+//            StayInPosition.stayInPose(drive, finalPosition);
+//        }
+        tools.setPosition(AutoTools.Position.HIGH_ARM);
+        wait(drive,500,finalPosition);
         // for fun :)
         PoseStorage.currentPose = drive.getPoseEstimate();
     }
@@ -206,5 +209,13 @@ public class AutoFin extends LinearOpMode {
 
     private void wait(SampleMecanumDrive drive, int milliseconds) {
         wait(drive, milliseconds, drive.getPoseEstimate());
+    }
+
+    private void wait(int milliseconds){
+        timer.reset();
+        while (timer.time(TimeUnit.MILLISECONDS) < milliseconds){
+            telemetry.addData("raw waiting", timer.time(TimeUnit.MILLISECONDS));
+            telemetry.update();
+        }
     }
 }

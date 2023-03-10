@@ -25,6 +25,7 @@ import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySe
 import java.util.Timer;
 
 @Autonomous
+@Disabled
 
 public class TestAuto extends AutoOpMode {
     @Override

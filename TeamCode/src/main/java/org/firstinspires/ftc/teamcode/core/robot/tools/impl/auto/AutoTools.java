@@ -56,7 +56,7 @@ public class AutoTools {
         HIGH_ARM(0, MAX.armPos, Action.NOTHING, true),
         //cone 5
         HOVER_5(600, 0, Action.NOTHING, true),
-        INTAKE_5(430, 0, Action.NOTHING, false),
+        INTAKE_5(410, 0, Action.NOTHING, false),
         EXIT_5(1250, 0, Action.NOTHING, false),
         //cone 4
         HOVER_4(500,0,Action.NOTHING, true),
