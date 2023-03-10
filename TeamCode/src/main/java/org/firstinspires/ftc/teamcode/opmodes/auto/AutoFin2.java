@@ -29,7 +29,7 @@ import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
 @Autonomous
-public class AutoFin extends LinearOpMode {
+public class AutoFin2 extends LinearOpMode {
     protected boolean mirror = false;
     private final ElapsedTime autoTimer = new ElapsedTime();
 
