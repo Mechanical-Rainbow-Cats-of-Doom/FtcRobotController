@@ -56,7 +56,7 @@ public class Main {
     }
 
     public static RoadRunnerBotEntity closeBase(MeepMeep meep, boolean mirror) {
-        final Pose2d startPose = cMirrorY(new Pose2d(-35, 63,
+        final Pose2d startPose = cMirrorY(new Pose2d(-32, 63,
                 Math.toRadians(90)), mirror);
 
         RoadRunnerBotEntity roadRunnerBot = new RoadRunnerBotEntity(meep, DriveConstants.CONSTRAINTS,
@@ -68,6 +68,7 @@ public class Main {
                 new ProfileAccelerationConstraint(DriveConstants.MAX_ACCEL),
                 DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL);
 
+        builder.strafeTo(cMirrorY(new Vector2d(-35, 63), mirror));
         builder.strafeTo(cMirrorY(new Vector2d(-35, 12), mirror));
         builder.strafeTo(cMirrorY(new Vector2d(-22, 12), mirror));
         builder.waitSeconds(0.5);

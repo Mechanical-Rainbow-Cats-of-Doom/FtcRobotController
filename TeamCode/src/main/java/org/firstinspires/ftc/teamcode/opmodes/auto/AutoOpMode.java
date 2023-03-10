@@ -6,12 +6,17 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
+import com.arcrobotics.ftclib.gamepad.ButtonReader;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTools;
 import org.firstinspires.ftc.teamcode.core.robot.tools.impl.auto.AutoTurret;
 import org.firstinspires.ftc.teamcode.core.robot.util.StayInPosition;
+import org.firstinspires.ftc.teamcode.core.robot.vision.powerplay.ConeDetector;
+import org.firstinspires.ftc.teamcode.core.robot.vision.powerplay.ConePipeline;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadrunner.trajectorysequence.TrajectorySequence;
@@ -23,20 +28,45 @@ public abstract class AutoOpMode extends LinearOpMode {
     SampleMecanumDrive drive;
     AutoTurret turret;
     AutoTools tools;
+    public static boolean isRed;
+    ConeDetector detector;
+
     final ElapsedTime timer = new ElapsedTime();
     public void initialize() {
+
         drive = new SampleMecanumDrive(hardwareMap);
         turret = new AutoTurret(hardwareMap, 0);
         tools = new AutoTools(hardwareMap, new Timer(), turret, this, telemetry);
-        Thread thread = new Thread(() -> {
+        Thread tool = new Thread(() -> {
             while (opModeIsActive()) {
                 tools.update();
             }
         });
-
-        waitForStart();
-        if (isStopRequested()) return;
+        detector = new ConeDetector(hardwareMap, "webcam", true, isRed);
+        final Thread thread = new Thread(() -> {
+            final GamepadEx moveGamepad = new GamepadEx(gamepad1);
+            final ButtonReader up = new ButtonReader(moveGamepad, GamepadKeys.Button.DPAD_UP);
+            final ButtonReader left = new ButtonReader(moveGamepad, GamepadKeys.Button.DPAD_LEFT);
+            final ButtonReader down = new ButtonReader(moveGamepad, GamepadKeys.Button.DPAD_DOWN);
+            final ButtonReader right = new ButtonReader(moveGamepad, GamepadKeys.Button.DPAD_RIGHT);
+            while (!isStarted()) {
+                up.readValue();
+                left.readValue();
+                down.readValue();
+                right.readValue();
+                if (up.wasJustReleased()) ConePipeline.topRectHeightPercentage -= 0.01;
+                if (down.wasJustReleased()) ConePipeline.topRectHeightPercentage += 0.01;
+                if (left.wasJustReleased()) ConePipeline.topRectWidthPercentage -= 0.01;
+                if (right.wasJustReleased()) ConePipeline.topRectWidthPercentage += 0.01;
+            }
+        });
         thread.start();
+//        int color = detector.run();
+        waitForStart();
+        thread.interrupt();
+        if (isStopRequested()) return;
+        tool.start();
+
     }
 
     public void setStartingPos(double x, double y, double angle) {
@@ -100,7 +130,7 @@ public abstract class AutoOpMode extends LinearOpMode {
                 }, new TrajectoryAccelerationConstraint() {
                     @Override
                     public double get(double v, @NonNull Pose2d pose2d, @NonNull Pose2d pose2d1, @NonNull Pose2d pose2d2) {
-                        return (speed_multiplier > 0.75 ? (DriveConstants.MAX_ACCEL * speed_multiplier) : 0.5);
+                        return (speed_multiplier > 0.7 ? (DriveConstants.MAX_ACCEL * /*speed_multiplier*/1) : 1);
                     }
                 })
                 .strafeLeft(inches)

@@ -51,20 +51,20 @@ public class AutoTools {
         GROUND_TARGET_NODUMP(GROUND_TARGET.liftPos, GROUND_TARGET.armPos, Action.NOTHING, false),
         LOW_TARGET_NODUMP(LOW_TARGET.liftPos, LOW_TARGET.armPos, Action.NOTHING, false),
         MEDIUM_TARGET_NODUMP(MEDIUM_TARGET.liftPos, MEDIUM_TARGET.armPos, Action.NOTHING, false),
-        HIGH_TARGET_LOWER(1200,1000,Action.NOTHING, false),
+        HIGH_TARGET_LOWER(1250,1000,Action.NOTHING, false),
         HIGH_TARGET_NODUMP(HIGH_TARGET.liftPos, HIGH_TARGET.armPos, Action.NOTHING, false),
         HIGH_ARM(0, MAX.armPos, Action.NOTHING, true),
         //cone 5
         HOVER_5(600, 0, Action.NOTHING, true),
-        INTAKE_5(300, 0, Action.NOTHING, false),
-        EXIT_5(950, 0, Action.NOTHING, false),
+        INTAKE_5(430, 0, Action.NOTHING, false),
+        EXIT_5(1250, 0, Action.NOTHING, false),
         //cone 4
-        HOVER_4(450,0,Action.NOTHING, true),
-        INTAKE_4(250,0,Action.NOTHING, false),
-        EXIT_4(750,0,Action.NOTHING, false),
+        HOVER_4(500,0,Action.NOTHING, true),
+        INTAKE_4(300,0,Action.NOTHING, false),
+        EXIT_4(1250,0,Action.NOTHING, false),
         //cone 3
         HOVER_3(570,0,Action.NOTHING, true),
-        INTAKE_3(370,0,Action.NOTHING, false),
+        INTAKE_3(250,0,Action.NOTHING, false),
         EXIT_3(900,0,Action.NOTHING, false),
         //cone 2
         HOVER_2(360,0,Action.NOTHING, true),
