@@ -11,6 +11,7 @@
 
 # Java class files
 *.class
+*.hprof
 
 # Generated files
 bin/
@@ -89,4 +90,3 @@ lint/tmp/
 # lint/reports/
 
 **/eocvsim_workspace.*
-*.hprof
